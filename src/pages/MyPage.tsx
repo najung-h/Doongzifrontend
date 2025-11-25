@@ -18,11 +18,12 @@ const mockProperties: Property[] = [
   {
     id: '1',
     userId: '1',
-    address: '서울특별시 강남구 역삼동 123-45',
+    address: '서울특별시 강남구 테헤란로 123',
     propertyType: 'apartment',
     contractType: 'jeonse',
     deposit: 300000000,
-    createdAt: new Date('2024-01-15')
+    createdAt: new Date('2024-01-15'),
+    nickname: '16평 남향 아파트'
   }
 ];
 
@@ -80,10 +81,12 @@ export default function MyPage() {
   const [properties] = useState<Property[]>(mockProperties);
   const [conversations] = useState<Conversation[]>(mockConversations);
   const [savedURLs] = useState<URLResource[]>(mockURLs);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
 
   const tabs = [
     { id: 'profile' as TabType, name: '내 프로필', icon: User },
-    { id: 'property' as TabType, name: '내 주택 정보', icon: Home },
+    { id: 'property' as TabType, name: '관심 주택 정보', icon: Home },
     { id: 'conversations' as TabType, name: '대화 기록', icon: MessageSquare },
     { id: 'links' as TabType, name: '저장한 링크', icon: Bookmark }
   ];
@@ -323,7 +326,7 @@ export default function MyPage() {
               gap: 'var(--spacing-md)'
             }}>
               <h3 style={{ fontSize: 'clamp(18px, 3vw, 22px)' }}>
-                내 주택 정보
+                관심 주택 정보
               </h3>
               <button style={{
                 padding: 'clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px)',
@@ -354,19 +357,26 @@ export default function MyPage() {
             {properties.map((property) => (
               <div
                 key={property.id}
+                onClick={() => {
+                  setSelectedProperty(property);
+                  setIsDocumentModalOpen(true);
+                }}
                 style={{
                   backgroundColor: 'var(--color-bg-white)',
                   borderRadius: 'var(--radius-lg)',
-                  padding: 'clamp(20px, 4vw, 28px)',
+                  padding: 'clamp(18px, 3.5vw, 24px)',
                   marginBottom: 'var(--spacing-md)',
-                  boxShadow: 'var(--shadow-md)',
+                  boxShadow: 'var(--shadow-sm)',
                   border: '2px solid transparent',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                   e.currentTarget.style.borderColor = 'var(--color-accent-green)';
                 }}
                 onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                   e.currentTarget.style.borderColor = 'transparent';
                 }}
               >
@@ -374,110 +384,73 @@ export default function MyPage() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  marginBottom: 'clamp(16px, 3vw, 20px)',
+                  marginBottom: 'clamp(10px, 2vw, 12px)',
                   gap: 'var(--spacing-md)'
                 }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{
-                      display: 'inline-flex',
+                    <h3 style={{
+                      fontSize: 'clamp(18px, 3vw, 20px)',
+                      marginBottom: 'clamp(8px, 1.5vw, 10px)',
+                      fontWeight: '700',
+                      color: 'var(--color-text-primary)',
+                      display: 'flex',
                       alignItems: 'center',
-                      gap: 'var(--spacing-xs)',
-                      padding: '6px 12px',
+                      gap: 'var(--spacing-xs)'
+                    }}>
+                      🏡 {property.nickname || '계약 예정 물건'}
+                    </h3>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '4px 10px',
                       backgroundColor: 'var(--color-accent-green-light)',
                       borderRadius: 'var(--radius-full)',
-                      fontSize: 'clamp(11px, 1.8vw, 13px)',
+                      fontSize: 'clamp(10px, 1.5vw, 11px)',
                       fontWeight: '700',
                       color: 'var(--color-accent-green)',
-                      marginBottom: 'clamp(12px, 2vw, 16px)'
+                      marginBottom: 'clamp(8px, 1.5vw, 10px)'
                     }}>
-                      <span>🏠</span>
                       {getContractTypeLabel(property.contractType)} · {getPropertyTypeLabel(property.propertyType)}
-                    </div>
-                    <p style={{ 
-                      fontWeight: '600', 
-                      marginBottom: 'clamp(8px, 1.5vw, 12px)',
-                      fontSize: 'clamp(15px, 2.5vw, 17px)',
-                      lineHeight: '1.5'
-                    }}>
-                      {property.address}
-                    </p>
+                    </span>
                   </div>
-                  <button style={{
-                    padding: '8px',
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    border: 'none',
-                    borderRadius: 'var(--radius-sm)',
-                    cursor: 'pointer',
-                    flexShrink: 0
-                  }}>
-                    <Edit2 size={16} color="var(--color-text-secondary)" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: 편집 기능
+                    }}
+                    style={{
+                      padding: '6px',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      borderRadius: 'var(--radius-sm)',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-accent-green)' + '20';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <Edit2 size={16} color="var(--color-accent-green)" />
                   </button>
                 </div>
 
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
-                  gap: 'clamp(10px, 2vw, 12px)'
+                <p style={{
+                  fontSize: 'clamp(13px, 2vw, 14px)',
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  lineHeight: '1.6'
                 }}>
-                  {property.deposit && (
-                    <div style={{
-                      padding: 'clamp(14px, 2.5vw, 16px)',
-                      backgroundColor: 'var(--color-bg-secondary)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '2px solid var(--color-border)'
-                    }}>
-                      <span style={{ 
-                        fontSize: 'clamp(12px, 1.8vw, 13px)', 
-                        color: 'var(--color-text-secondary)',
-                        display: 'block',
-                        marginBottom: 'var(--spacing-xs)'
-                      }}>
-                        💰 보증금
-                      </span>
-                      <p style={{ 
-                        fontWeight: '700', 
-                        marginTop: 'var(--spacing-xs)',
-                        fontSize: 'clamp(16px, 2.5vw, 20px)',
-                        color: 'var(--color-accent-green)'
-                      }}>
-                        {formatCurrency(property.deposit)}
-                      </p>
-                    </div>
-                  )}
-
-                  {property.monthlyRent && (
-                    <div style={{
-                      padding: 'clamp(14px, 2.5vw, 16px)',
-                      backgroundColor: 'var(--color-bg-secondary)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '2px solid var(--color-border)'
-                    }}>
-                      <span style={{ 
-                        fontSize: 'clamp(12px, 1.8vw, 13px)', 
-                        color: 'var(--color-text-secondary)',
-                        display: 'block',
-                        marginBottom: 'var(--spacing-xs)'
-                      }}>
-                        📅 월세
-                      </span>
-                      <p style={{ 
-                        fontWeight: '700', 
-                        marginTop: 'var(--spacing-xs)',
-                        fontSize: 'clamp(16px, 2.5vw, 20px)',
-                        color: 'var(--color-accent-green)'
-                      }}>
-                        {formatCurrency(property.monthlyRent)}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  📍 {property.address}
+                </p>
 
                 <p style={{
                   fontSize: 'clamp(11px, 1.8vw, 12px)',
-                  color: 'var(--color-text-light)',
-                  marginTop: 'clamp(16px, 3vw, 20px)'
+                  color: 'var(--color-text-light)'
                 }}>
-                  📌 등록일: {formatDate(property.createdAt)}
+                  📌 {formatDate(property.createdAt)}
                 </p>
               </div>
             ))}
@@ -802,6 +775,413 @@ export default function MyPage() {
           </div>
         )}
       </div>
+
+      {/* Document Management Modal */}
+      {isDocumentModalOpen && selectedProperty && (
+        <div
+          onClick={() => setIsDocumentModalOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'var(--color-bg-white)',
+              borderRadius: 'var(--radius-lg)',
+              width: '100%',
+              maxWidth: '1200px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: 'var(--shadow-lg)'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: 'clamp(20px, 3vw, 24px)',
+              borderBottom: '2px solid var(--color-border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: 'var(--color-bg-white)',
+              zIndex: 10
+            }}>
+              <div>
+                <h2 style={{
+                  fontSize: 'clamp(20px, 3vw, 24px)',
+                  fontWeight: '700',
+                  marginBottom: '4px'
+                }}>
+                  📄 {selectedProperty.nickname || '계약 예정 물건'}
+                </h2>
+                <p style={{
+                  fontSize: 'clamp(13px, 2vw, 14px)',
+                  color: 'var(--color-text-secondary)'
+                }}>
+                  {selectedProperty.address}
+                </p>
+              </div>
+              <button
+                onClick={() => setIsDocumentModalOpen(false)}
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: 'var(--radius-sm)',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <X size={24} color="var(--color-text-secondary)" />
+              </button>
+            </div>
+
+            {/* Modal Content - 3 Column Layout */}
+            <div style={{
+              padding: 'clamp(20px, 3vw, 24px)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: 'clamp(16px, 2vw, 20px)'
+            }}>
+              {/* 등기부등본 Section */}
+              <div style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'clamp(18px, 2.5vw, 20px)',
+                border: '2px solid var(--color-border)'
+              }}>
+                <h3 style={{
+                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontWeight: '700',
+                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-xs)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  📋 등기부등본
+                </h3>
+
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'clamp(10px, 1.5vw, 12px)'
+                }}>
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-accent-green)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                  }}
+                  >
+                    <Upload size={16} />
+                    문서 업로드
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-bg-white)',
+                    color: 'var(--color-text-primary)',
+                    border: '2px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.color = 'var(--color-text-primary)';
+                  }}
+                  >
+                    <FileText size={16} />
+                    문서 조회
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-info)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  >
+                    <Search size={16} />
+                    문서 분석
+                  </button>
+                </div>
+              </div>
+
+              {/* 건축물대장 Section */}
+              <div style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'clamp(18px, 2.5vw, 20px)',
+                border: '2px solid var(--color-border)'
+              }}>
+                <h3 style={{
+                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontWeight: '700',
+                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-xs)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  🏗️ 건축물대장
+                </h3>
+
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'clamp(10px, 1.5vw, 12px)'
+                }}>
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-accent-green)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                  }}
+                  >
+                    <Upload size={16} />
+                    문서 업로드
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-bg-white)',
+                    color: 'var(--color-text-primary)',
+                    border: '2px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.color = 'var(--color-text-primary)';
+                  }}
+                  >
+                    <FileText size={16} />
+                    문서 조회
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-info)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  >
+                    <Search size={16} />
+                    문서 분석
+                  </button>
+                </div>
+              </div>
+
+              {/* 계약서 Section */}
+              <div style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'clamp(18px, 2.5vw, 20px)',
+                border: '2px solid var(--color-border)'
+              }}>
+                <h3 style={{
+                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontWeight: '700',
+                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-xs)',
+                  color: 'var(--color-text-primary)'
+                }}>
+                  📝 계약서
+                </h3>
+
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'clamp(10px, 1.5vw, 12px)'
+                }}>
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-accent-green)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                  }}
+                  >
+                    <Upload size={16} />
+                    문서 업로드
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-bg-white)',
+                    color: 'var(--color-text-primary)',
+                    border: '2px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.color = 'var(--color-text-primary)';
+                  }}
+                  >
+                    <FileText size={16} />
+                    문서 조회
+                  </button>
+
+                  <button style={{
+                    padding: 'clamp(12px, 2vw, 14px)',
+                    backgroundColor: 'var(--color-info)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'clamp(13px, 2vw, 14px)',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 'var(--spacing-xs)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  >
+                    <Search size={16} />
+                    문서 분석
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
