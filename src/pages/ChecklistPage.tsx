@@ -28,6 +28,8 @@ import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
 import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
 import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
+import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
+import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
 
 type SubChecklistItem = {
   id: string;
@@ -340,6 +342,8 @@ export default function ChecklistPage() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
   const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -1055,6 +1059,10 @@ export default function ChecklistPage() {
                                     window.open(button.url, '_blank');
                                   } else if (button.label === '등기부등본 분석하러가기') {
                                     setIsRegistryModalOpen(true);
+                                  } else if (button.label === '계약서 분석하러가기') {
+                                    setIsContractModalOpen(true);
+                                  } else if (button.label === '건축물대장 분석하러가기') {
+                                    setIsBuildingModalOpen(true);
                                   } else if (button.type === 'primary') {
                                     // TODO: 웹훅 연결 예정
                                     console.log('문서 분석 요청:', button.label);
@@ -1287,6 +1295,10 @@ export default function ChecklistPage() {
                                   handleAnalyzeRisk();
                                 } else if (button.label === '등기부등본 분석하러가기') {
                                   setIsRegistryModalOpen(true);
+                                } else if (button.label === '계약서 분석하러가기') {
+                                  setIsContractModalOpen(true);
+                                } else if (button.label === '건축물대장 분석하러가기') {
+                                  setIsBuildingModalOpen(true);
                                 } else if (button.type === 'primary') {
                                   // TODO: 웹훅 연결 예정
                                   console.log('문서 분석 요청:', button.label);
@@ -1354,6 +1366,18 @@ export default function ChecklistPage() {
       <RegistryAnalysisModal
         isOpen={isRegistryModalOpen}
         onClose={() => setIsRegistryModalOpen(false)}
+      />
+
+      {/* Contract Analysis Modal */}
+      <ContractAnalysisModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+      />
+
+      {/* Building Analysis Modal */}
+      <BuildingAnalysisModal
+        isOpen={isBuildingModalOpen}
+        onClose={() => setIsBuildingModalOpen(false)}
       />
     </div>
   );

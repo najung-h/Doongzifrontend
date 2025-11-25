@@ -3,12 +3,12 @@ import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download
 import { scanAPI } from '../../api/scan';
 import type { ScanResponse } from '../../types';
 
-interface RegistryAnalysisModalProps {
+interface ContractAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnalysisModalProps) {
+export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnalysisModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -192,7 +192,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
               margin: 0,
             }}
           >
-            등기부등본 분석
+            계약서 분석
           </h2>
           <button
             onClick={handleClose}
@@ -413,7 +413,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
                       margin: 0,
                     }}
                   >
-                    등기부등본 분석 완료
+                    계약서 분석 완료
                   </p>
                 </div>
               </div>
