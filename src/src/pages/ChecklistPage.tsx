@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Mail, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Download, Mail, ChevronDown, ChevronUp, MessageCircle, X, Upload } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
+import { scanAPI } from '../api/scan';
+import Navigation from '../components/Navigation';
 
 type SubChecklistItem = {
   id: string;
@@ -104,7 +106,7 @@ const initialChecklist: ChecklistTab[] = [
           {
             id: 'before-3-2',
             title: '집과 소유자에 관련된 돈문제가 있는지 확인하기',
-            whatIsIt: '소유자에게 가압류·압류·강제경매·세금 체납 등이 걸려있는지 확인하는 과정이에요. 즉, 집주인의 재정 상태가 위험해서 집이 공매·경매로 넘어갈 가능성을 확인하는 단���입니다.',
+            whatIsIt: '소유자에게 가압류·압류·강제경매·세금 체납 등이 걸려있는지 확인하는 과정이에요. 즉, 집주인의 재정 상태가 위험해서 집이 공매·경매로 넘어갈 가능성을 확인하는 단계입니다.',
             whyDoIt: '이런 기록이 있으면 집주인이 경제적으로 위험한 상태일 확률이 높아요. 결과적으로 전세보증금을 제대로 돌려받지 못할 가능성이 높아지기 때문에 반드시 확인해야 합니다.',
             completed: false
           }
@@ -244,7 +246,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'after-2',
         title: '주택 상태 확인 및 이사하기',
-        whatIsIt: '입주 전·후에 집 상태를 사진으로 남기고, 이사 업체와 일정·책임을 미리 맞춰두며, 전기·가스처럼 빠져나가는 공과금도 정리해 두는 거예요.',
+        whatIsIt: '입주 전·후에 집 상태를 사진으로 남기고, 이사 업체와 일정·책임을 미리 맞춰두며, 전기·가스처럼 빠져나가는 공과금도 정리해 두�� 거예요.',
         whyDoIt: '사진을 찍어두지 않으면 나중에 원래 있던 하자까지 내 책임이 되는 일이 생길 수 있고, 이사 업체나 공과금 정리를 미뤄두면 예상치 못한 비용 분쟁이 생길 수 있어요.',
         completed: false
       },
@@ -303,6 +305,12 @@ export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'before' | 'during' | 'after'>('before');
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  
+  // 상세 분석 모달 상태
+  const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
+  const [analysisType, setAnalysisType] = useState<'registry' | 'contract' | 'building'>('registry');
+  const [analysisFile, setAnalysisFile] = useState<File | null>(null);
+  const [analysisEmail, setAnalysisEmail] = useState('');
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -709,47 +717,7 @@ export default function ChecklistPage() {
       backgroundColor: '#F5F3E6'
     }}>
       {/* Top Navigation */}
-      <nav style={{
-        backgroundColor: '#FFFFFF',
-        borderBottom: '1px solid #E5E5E5',
-        padding: '16px 40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <button
-          onClick={() => navigate('/')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'none',
-            border: 'none',
-            color: '#2C2C2C',
-            fontSize: '15px',
-            cursor: 'pointer',
-            padding: '8px 0'
-          }}
-        >
-          <ArrowLeft size={20} />
-          메인으로
-        </button>
-
-        <button
-          style={{
-            backgroundColor: '#8FBF4D',
-            border: 'none',
-            color: '#FFFFFF',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            padding: '10px 20px',
-            borderRadius: '8px'
-          }}
-        >
-          로그인
-        </button>
-      </nav>
+      <Navigation />
 
       {/* Header */}
       <div style={{
@@ -1033,23 +1001,6 @@ export default function ChecklistPage() {
                         <div style={{ color: '#2D7A8E' }}>
                           {isGroupExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </div>
-                        
-                        {/* Checkbox */}
-                        <input
-                          type="checkbox"
-                          checked={groupCompleted}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            toggleGroupCompletion(item.id);
-                          }}
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            cursor: 'pointer',
-                            accentColor: '#8FBF4D',
-                            flexShrink: 0
-                          }}
-                        />
                       </div>
                     </div>
 

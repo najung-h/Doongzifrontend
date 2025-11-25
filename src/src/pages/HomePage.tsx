@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { X, Upload, Mail, CheckCircle, MessageCircle } from 'lucide-react';
+import { X, Upload, Mail, CheckCircle } from 'lucide-react';
 import { scanAPI } from '../api/scan';
-import FloatingChatWidget from '../components/FloatingChatWidget';
+import Navigation from '../components/Navigation';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [uploadStep, setUploadStep] = useState<'upload' | 'email' | 'complete'>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [email, setEmail] = useState('');
@@ -25,8 +24,8 @@ export default function HomePage() {
     
     setIsUploading(true);
     try {
-      // 파일 업로드 API 호출
-      const result = await scanAPI.uploadDocument(selectedFile);
+      // 파일 업로드 API 호출 (둥지 스캔하기 - 빠른 분석)
+      const result = await scanAPI.analyzeDocuments([selectedFile]);
       
       if (result.success) {
         // 업로드 성공시 이메일 입력 단계로 이동
@@ -69,126 +68,7 @@ export default function HomePage() {
       backgroundColor: '#FAF8F3'
     }}>
       {/* Top Navigation */}
-      <nav style={{
-        backgroundColor: '#FFFFFF',
-        borderBottom: '1px solid #E5E5E5',
-        padding: '16px 40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        {/* Left Menu */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '32px'
-        }}>
-          <div style={{
-            width: '24px',
-            height: '24px',
-            backgroundColor: '#9ACD32',
-            borderRadius: '4px'
-          }} />
-          <button
-            onClick={() => navigate('/checklist')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0'
-            }}
-          >
-            체크리스트
-          </button>
-          <button
-            onClick={() => navigate('/chatbot')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0'
-            }}
-          >
-            AI 챗봇
-          </button>
-          <button
-            onClick={() => navigate('/search')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0'
-            }}
-          >
-            법률 검색
-          </button>
-        </div>
-
-        {/* Center Logo */}
-        <div style={{
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#FFE4C4',
-            borderRadius: '50%'
-          }} />
-          <span style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#2C2C2C'
-          }}>
-            둥지
-          </span>
-        </div>
-
-        {/* Right Buttons */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px'
-        }}>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#666666',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 16px'
-            }}
-          >
-            로그인
-          </button>
-          <button
-            onClick={() => navigate('/mypage')}
-            style={{
-              backgroundColor: '#8FBF4D',
-              border: 'none',
-              color: '#FFFFFF',
-              fontSize: '15px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              padding: '10px 20px',
-              borderRadius: '8px'
-            }}
-          >
-            회원가입
-          </button>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <div style={{
@@ -395,18 +275,9 @@ export default function HomePage() {
                 fontSize: '11px',
                 color: '#4A90E2',
                 fontWeight: '600',
-                marginBottom: '3px',
                 letterSpacing: '-0.1px'
               }}>
-                확인하는 목록: 계약 전 조건, 건축물대장 등
-              </p>
-              <p style={{
-                fontSize: '10px',
-                color: '#666666',
-                lineHeight: '1.4',
-                letterSpacing: '-0.1px'
-              }}>
-                개인정보는 분석 후 즉시 서버에서 자동 삭제됩니다!
+                문서를 빠르게 스캔해서 완료된 체크리스트 항목을 자동으로 체크해드려요
               </p>
             </div>
           </div>
@@ -503,7 +374,7 @@ export default function HomePage() {
               lineHeight: '1.5',
               letterSpacing: '-0.2px'
             }}>
-              막막한 계약 용어, 쉽게 알려줄게!
+              막막한 계약 용어를 쉽게 설명해드려요
             </p>
           </div>
 
@@ -547,61 +418,11 @@ export default function HomePage() {
               lineHeight: '1.5',
               letterSpacing: '-0.2px'
             }}>
-              궁금한 건 언제든 물어봐!
+              법률과 판례를 쉽게 검색해보세요
             </p>
           </div>
         </div>
       </div>
-
-      {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsChatOpen(!isChatOpen)}
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          width: '64px',
-          height: '64px',
-          borderRadius: '50%',
-          backgroundColor: '#8FBF4D',
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '28px',
-          transition: 'transform 0.2s ease',
-          zIndex: 9998
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <MessageCircle size={32} color="#FFFFFF" />
-        {/* Red notification dot */}
-        {!isChatOpen && (
-          <div style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            width: '12px',
-            height: '12px',
-            backgroundColor: '#FF5252',
-            borderRadius: '50%',
-            border: '2px solid #FFFFFF'
-          }} />
-        )}
-      </button>
-
-      {/* Floating Chat Widget */}
-      <FloatingChatWidget
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-      />
 
       {/* Modal */}
       {isModalOpen && (
@@ -677,7 +498,7 @@ export default function HomePage() {
                       fontSize: '13px',
                       color: '#666666'
                     }}>
-                      등기부등본, 건축물대장, 계약서 중 하나를 선택해주세요
+                      등기부등본, 건축물대장, 계약서를 업로드하면 어미새가 확인해드려요
                     </p>
                   </div>
                 </div>
@@ -835,24 +656,6 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                <div style={{
-                  backgroundColor: '#FFF9E6',
-                  border: '1px solid #FFE4B3',
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  marginBottom: '20px'
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#F57C00',
-                    lineHeight: '1.6',
-                    margin: 0
-                  }}>
-                    💡 <strong>개인정보 보호</strong><br />
-                    업로드된 파일과 민감정보는 분석 완료 후 즉시 서버에서 자동으로 삭제됩니다.
-                  </p>
-                </div>
-
                 <input
                   type="email"
                   value={email}
@@ -956,25 +759,6 @@ export default function HomePage() {
                     • 스팸 메일함도 확인해주세요<br />
                     • 발신자: noreply@doongzi.com<br />
                     • 10분 이내 미수신 시 고객센터로 문의해주세요
-                  </p>
-                </div>
-
-                <div style={{
-                  backgroundColor: '#FFF9E6',
-                  border: '1px solid #FFE4B3',
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  marginBottom: '24px'
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#F57C00',
-                    lineHeight: '1.6',
-                    margin: 0
-                  }}>
-                    🔒 <strong>개인정보 보호</strong><br />
-                    업로드하신 파일과 개인정보는 분석 완료 후<br />
-                    즉시 서버에서 자동으로 삭제되었습니다.
                   </p>
                 </div>
 

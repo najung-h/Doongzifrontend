@@ -1,27 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import { Header } from '../components/Header';
 import { Send } from 'lucide-react';
 import type { Message } from '../types';
 import { chatbotAPI } from '../api/chatbot';
+import Navigation from '../components/Navigation';
 
 // Mock answers for suggested questions
 const mockAnswers: { [key: string]: string } = {
-  '확정일자 왜 받아야 하나요?': `확정일자는 전월세 계약서에 계약날짜를 도장으로 찍어서, 임차인의 우선변제권을 보장받는 중요한 절차예요. 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요.
-
-확정일자를 받으면 전입신고와 함께 대항력을 갖추어 계약 체결 순서에 따라 보증금을 우선적으로 돌려받을 수 있는 권리가 생겨요.`,
-  '전세사기 위험징후는 뭘까요?': `전세사기 위험징후는 전월세 계약 시에 나타나는 다음과 같은 신호예요:
-
-• 시세보다 현저히 낮은 보증금
-• 임대인의 부당한 우선변제권 보유 요구
-• 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요
-• 중개인이 여러 명 개입되는 복잡한 계약 구조
-
-이런 징후가 보이면 반드시 전문가에게 상담을 받아야 합니다.`,
-  '반전세는 뭘까요?': `반전세는 월세와 전세의 중간 형태로, 일정 보증금과 함께 소액의 월세를 내는 임대차 계약 방식이에요.
-
-예를 들어, 전세 2억원짜리 집을 보증금 1억 5천만원에 월세 30만원을 내는 식으로 계약하는 거예요. 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요.
-
-초기 목돈 부담은 전세보다 적지만, 매달 월세를 내야 하는 단점이 있어요.`
+  '확정일자를 왜 받아야 하나요?': `확정일자는 전월세 계약서에 계약날짜를 도장으로 찍어서, 임차인의 우선변제권을 보장받는 중요한 절차예요. 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요.\n\n확정일자를 받으면 전입신고와 함께 대항력을 갖추어 계약 체결 순서에 따라 보증금을 우선적으로 돌려받을 수 있는 권리가 생겨요.`,
+  '전세사기의 위험 징후에는 무엇이 있을까요?': `전세사기 위험징후는 전월세 계약 시에 나타나는 다음과 같은 신호예요:\n\n• 시세보다 현저히 낮은 보증금\n• 임대인의 부당한 우선변제권 보유 요구\n• 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요\n• 중개인이 여러 명 개입되는 복잡한 계약 구조\n\n이런 징후가 보이면 반드시 전문가에게 상담을 받아야 합니다.`,
+  '반전세가 뭐예요?': `반전세는 월세와 전세의 중간 형태로, 일정 보증금과 함께 소액의 월세를 내는 임대차 계약 방식이에요.\n\n예를 들어, 전세 2억원짜리 집을 보증금 1억 5천만원에 월세 30만원을 내는 식으로 계약하는 거예요. 계약 체결 후 주민센터나 등기소에서 무료로 받을 수 있어요.\n\n초기 목돈 부담은 전세보다 적지만, 매달 월세를 내야 하는 단점이 있어요.`
 };
 
 export default function ChatbotPage() {
@@ -38,9 +25,9 @@ export default function ChatbotPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedQuestions = [
-    '확정일자 왜 받아야 하나요?',
-    '전세사기 위험징후는 뭘까요?',
-    '반전세는 뭘까요?'
+    '확정일자를 왜 받아야 하나요?',
+    '전세사기의 위험 징후에는 무엇이 있을까요?',
+    '반전세가 뭐예요?'
   ];
 
   const scrollToBottom = () => {
@@ -115,7 +102,7 @@ export default function ChatbotPage() {
       flexDirection: 'column',
       backgroundColor: '#FAF8F3'
     }}>
-      <Header title="메인으로" showBack showLogin />
+      <Navigation title="메인으로" showBack showLogin />
 
       {/* Chat Header */}
       <div style={{
@@ -142,7 +129,9 @@ export default function ChatbotPage() {
           fontSize: '14px', 
           color: '#666666'
         }}>
-          부동산 계약 질문이, 쉽게 알려드려요
+          막막한 계약 용어를 쉽게 설명해드려요.
+          <br />
+          법적 책임은 행위자에게 있으니 챗봇의 답변 내용은 참고용으로만 사용하고 중요한 법률 문제는 반드시 전문가와 상담하세요.
         </p>
       </div>
 

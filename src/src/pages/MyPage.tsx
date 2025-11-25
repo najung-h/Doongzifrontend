@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Header } from '../components/Header';
+import Navigation from '../components/Navigation';
 import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus } from 'lucide-react';
 import type { User as UserType, Property, Conversation, URLResource } from '../types';
 
@@ -8,8 +8,8 @@ type TabType = 'profile' | 'property' | 'conversations' | 'links';
 // Mock data (will be replaced with Supabase)
 const mockUser: UserType = {
   id: '1',
-  email: 'doongzi@example.com',
-  name: '김둥지',
+  email: 'asgi.doongzi@gmail.com',
+  name: '김아기',
   phone: '010-1234-5678',
   createdAt: new Date('2024-01-01')
 };
@@ -124,7 +124,7 @@ export default function MyPage() {
       minHeight: '100vh',
       backgroundColor: 'var(--color-bg-primary)'
     }}>
-      <Header title="마이페이지" showBack showLogin />
+      <Navigation title="마이페이지" showBack showLogin />
 
       {/* Tabs */}
       <div style={{
