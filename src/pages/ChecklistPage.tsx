@@ -27,6 +27,7 @@ import {
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
 import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
+import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
 
 type SubChecklistItem = {
   id: string;
@@ -338,6 +339,7 @@ export default function ChecklistPage() {
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
+  const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -1051,6 +1053,8 @@ export default function ChecklistPage() {
                                 onClick={() => {
                                   if (button.url) {
                                     window.open(button.url, '_blank');
+                                  } else if (button.label === '등기부등본 분석하러가기') {
+                                    setIsRegistryModalOpen(true);
                                   } else if (button.type === 'primary') {
                                     // TODO: 웹훅 연결 예정
                                     console.log('문서 분석 요청:', button.label);
@@ -1281,6 +1285,8 @@ export default function ChecklistPage() {
                                   handleCheckInsurance();
                                 } else if (button.label === '깡통전세 위험도 분석') {
                                   handleAnalyzeRisk();
+                                } else if (button.label === '등기부등본 분석하러가기') {
+                                  setIsRegistryModalOpen(true);
                                 } else if (button.type === 'primary') {
                                   // TODO: 웹훅 연결 예정
                                   console.log('문서 분석 요청:', button.label);
@@ -1342,6 +1348,12 @@ export default function ChecklistPage() {
       <RiskAnalysisModal
         isOpen={isRiskModalOpen}
         onClose={() => setIsRiskModalOpen(false)}
+      />
+
+      {/* Registry Analysis Modal */}
+      <RegistryAnalysisModal
+        isOpen={isRegistryModalOpen}
+        onClose={() => setIsRegistryModalOpen(false)}
       />
     </div>
   );
