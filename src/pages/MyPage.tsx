@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Navigation from '../components/common/Navigation';
-import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus } from 'lucide-react';
+import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus, X, Upload, FileText, Search } from 'lucide-react';
 import type { User as UserType, Property, Conversation, URLResource } from '../types';
 
 type TabType = 'profile' | 'property' | 'conversations' | 'links';
@@ -97,10 +97,6 @@ export default function MyPage() {
       month: 'long',
       day: 'numeric'
     });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `${(amount / 10000).toLocaleString()}만원`;
   };
 
   const getContractTypeLabel = (type: string) => {

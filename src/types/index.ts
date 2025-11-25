@@ -188,6 +188,7 @@ export interface Property {
   contractType: 'jeonse' | 'monthly' | 'purchase';
   deposit?: number;
   monthlyRent?: number;
+  nickname?: string;
   createdAt: Date;
 }
 
