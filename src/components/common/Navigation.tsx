@@ -115,33 +115,55 @@ export default function Navigation() {
         alignItems: 'center',
         gap: '16px'
       }}>
-        <button
-          onClick={() => setIsLoggedIn(!isLoggedIn)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#666666',
-            fontSize: '15px',
-            cursor: 'pointer',
-            padding: '8px 16px'
-          }}
-        >
-          {isLoggedIn ? '로그아웃' : '로그인'}
-        </button>
-        <button
-          style={{
-            backgroundColor: '#8FBF4D',
-            border: 'none',
-            color: '#FFFFFF',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            padding: '10px 20px',
-            borderRadius: '8px'
-          }}
-        >
-          회원가입
-        </button>
+        {!isLoggedIn ? (
+          // 로그인하지 않은 상태: 로그인 + 회원가입 버튼
+          <>
+            <button
+              onClick={() => setIsLoggedIn(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#666666',
+                fontSize: '15px',
+                cursor: 'pointer',
+                padding: '8px 16px'
+              }}
+            >
+              로그인
+            </button>
+            <button
+              style={{
+                backgroundColor: '#8FBF4D',
+                border: 'none',
+                color: '#FFFFFF',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                padding: '10px 20px',
+                borderRadius: '8px'
+              }}
+            >
+              회원가입
+            </button>
+          </>
+        ) : (
+          // 로그인한 상태: 로그아웃 버튼만
+          <button
+            onClick={() => setIsLoggedIn(false)}
+            style={{
+              backgroundColor: '#8FBF4D',
+              border: 'none',
+              color: '#FFFFFF',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              padding: '10px 20px',
+              borderRadius: '8px'
+            }}
+          >
+            로그아웃
+          </button>
+        )}
       </div>
     </nav>
   );

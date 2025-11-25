@@ -250,7 +250,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'after-2',
         title: '주택 상태 확인 및 이사하기',
-        whatIsIt: '입주 전·후에 집 상태를 사진으로 남기고, 이사 업체와 일정·책임을 미리 맞춰두며, 전기·가스처럼 빠져나가는 공과금도 정리해 두�� 거예요.',
+        whatIsIt: '입주 전·후에 집 상태를 사진으로 남기고, 이사 업체와 일정·책임을 미리 맞춰두며, 전기·가스처럼 빠져나가는 공과금도 정리해 두는 거예요.',
         whyDoIt: '사진을 찍어두지 않으면 나중에 원래 있던 하자까지 내 책임이 되는 일이 생길 수 있고, 이사 업체나 공과금 정리를 미뤄두면 예상치 못한 비용 분쟁이 생길 수 있어요.',
         completed: false
       },
@@ -482,28 +482,37 @@ export default function ChecklistPage() {
             padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            cursor: 'pointer'
+            gap: '12px'
           }}
-          onClick={() => toggleExpand(subItem.id)}
         >
           {/* Icon */}
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            backgroundColor: subItem.completed ? '#8FBF4D' : '#E8E8E8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            flexShrink: 0
-          }}>
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSubItem(parentId, subItem.id);
+            }}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: subItem.completed ? '#8FBF4D' : '#E8E8E8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '16px',
+              flexShrink: 0,
+              cursor: 'pointer'
+            }}>
             {getItemIcon(subItem.title)}
           </div>
 
           {/* Title */}
-          <div style={{ flex: 1 }}>
+          <div
+            onClick={() => toggleExpand(subItem.id)}
+            style={{
+              flex: 1,
+              cursor: 'pointer'
+            }}>
             <h5 style={{
               fontSize: '14px',
               fontWeight: '600',
@@ -516,7 +525,14 @@ export default function ChecklistPage() {
           </div>
 
           {/* Expand Icon */}
-          <div style={{ color: '#999999' }}>
+          <div
+            onClick={() => toggleExpand(subItem.id)}
+            style={{
+              color: '#999999',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
             {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
 
@@ -826,7 +842,7 @@ export default function ChecklistPage() {
                   onClick={() => setActiveTab(tab.id)}
                   style={{
                     padding: '12px',
-                    backgroundColor: activeTab === tab.id ? '#2D7A8E' : '#FFFFFF',
+                    backgroundColor: activeTab === tab.id ? '#8FBF4D' : '#FFFFFF',
                     color: activeTab === tab.id ? '#FFFFFF' : '#666666',
                     border: activeTab === tab.id ? 'none' : '1px solid #E8E8E8',
                     borderRadius: '8px',
@@ -946,13 +962,13 @@ export default function ChecklistPage() {
                 return (
                   <div key={item.id} style={{ marginBottom: '16px' }}>
                     {/* Group Header - 클릭 가능 */}
-                    <div 
+                    <div
                       style={{
-                        backgroundColor: groupCompleted ? '#F8F8F8' : '#F0F7FA',
+                        backgroundColor: groupCompleted ? '#F8F8F8' : '#F5F3E6',
                         padding: '16px 20px',
                         borderRadius: '12px',
                         marginBottom: isGroupExpanded ? '12px' : '0',
-                        borderLeft: '4px solid #2D7A8E',
+                        borderLeft: '4px solid #8FBF4D',
                         cursor: 'pointer'
                       }}
                       onClick={() => toggleExpand(item.id)}
@@ -967,7 +983,7 @@ export default function ChecklistPage() {
                           width: '36px',
                           height: '36px',
                           borderRadius: '50%',
-                          backgroundColor: groupCompleted ? '#8FBF4D' : '#2D7A8E',
+                          backgroundColor: groupCompleted ? '#8FBF4D' : '#7AA83F',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -976,22 +992,22 @@ export default function ChecklistPage() {
                         }}>
                           {getItemIcon(item.title)}
                         </div>
-                        
+
                         {/* Title */}
                         <div style={{ flex: 1 }}>
                           <h4 style={{
                             fontSize: '15px',
                             fontWeight: '700',
-                            color: groupCompleted ? '#999999' : '#2D7A8E',
+                            color: groupCompleted ? '#999999' : '#5A7A3C',
                             textDecoration: groupCompleted ? 'line-through' : 'none',
                             margin: 0
                           }}>
                             {item.title}
                           </h4>
                         </div>
-                        
+
                         {/* Expand Icon */}
-                        <div style={{ color: '#2D7A8E' }}>
+                        <div style={{ color: '#7AA83F' }}>
                           {isGroupExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </div>
                       </div>
@@ -1018,7 +1034,8 @@ export default function ChecklistPage() {
                                   if (button.url) {
                                     window.open(button.url, '_blank');
                                   } else if (button.type === 'primary') {
-                                    navigate('/scan');
+                                    // TODO: 웹훅 연결 예정
+                                    console.log('문서 분석 요청:', button.label);
                                   } else if (button.type === 'modal') {
                                     alert('준비 중입니다.');
                                   }
@@ -1028,9 +1045,9 @@ export default function ChecklistPage() {
                                   minWidth: '140px',
                                   padding: '12px 20px',
                                   borderRadius: '8px',
-                                  border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
-                                  backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
-                                  color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
+                                  border: button.type === 'primary' ? 'none' : '1px solid #8FBF4D',
+                                  backgroundColor: button.type === 'primary' ? '#8FBF4D' : '#FFFFFF',
+                                  color: button.type === 'primary' ? '#FFFFFF' : '#8FBF4D',
                                   fontSize: '14px',
                                   fontWeight: '600',
                                   cursor: 'pointer'
@@ -1247,7 +1264,8 @@ export default function ChecklistPage() {
                                 } else if (button.label === '깡통전세 위험도 분석') {
                                   handleAnalyzeRisk();
                                 } else if (button.type === 'primary') {
-                                  navigate('/scan');
+                                  // TODO: 웹훅 연결 예정
+                                  console.log('문서 분석 요청:', button.label);
                                 } else if (button.type === 'modal') {
                                   alert('준비 중입니다.');
                                 }

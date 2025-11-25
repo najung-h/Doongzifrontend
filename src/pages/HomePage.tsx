@@ -168,7 +168,17 @@ export default function HomePage() {
             border: '1px solid #F0F0F0',
             display: 'flex',
             flexDirection: 'column',
-            height: '100%'
+            height: '100%',
+            transition: 'all 0.3s ease',
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.03)';
+            e.currentTarget.style.borderColor = '#8FBF4D';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.borderColor = '#F0F0F0';
           }}
         >
           <div style={{
@@ -304,7 +314,17 @@ export default function HomePage() {
             alignItems: 'center',
             textAlign: 'center',
             height: '100%',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            transform: 'scale(1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.03)';
+            e.currentTarget.style.borderColor = '#8FBF4D';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.borderColor = '#F0F0F0';
           }}
         >
           <img
@@ -358,7 +378,17 @@ export default function HomePage() {
               alignItems: 'center',
               textAlign: 'center',
               flex: 1,
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.3s ease',
+              transform: 'scale(1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.03)';
+              e.currentTarget.style.borderColor = '#8FBF4D';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.borderColor = '#F0F0F0';
             }}
           >
             <img
@@ -405,7 +435,17 @@ export default function HomePage() {
               alignItems: 'center',
               textAlign: 'center',
               flex: 1,
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.3s ease',
+              transform: 'scale(1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.03)';
+              e.currentTarget.style.borderColor = '#8FBF4D';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.borderColor = '#F0F0F0';
             }}
           >
             <img
