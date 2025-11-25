@@ -125,9 +125,10 @@ export interface RiskCheckResponse extends BaseResponse {
 }
 
 export interface RiskAnalysisRequest {
-  address: string;
-  marketPrice: number;  // 매매가
-  deposit: number;      // 보증금
+  address: string;       // 도로명 주소
+  deposit: number;       // 보증금 (만원)
+  area: number;          // 전용면적 (㎡)
+  propertyType: '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
 }
 
 export interface RiskAnalysisResponse extends BaseResponse {

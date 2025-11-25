@@ -7,7 +7,9 @@
       "Bash(npm install:*)",
       "Bash($null)",
       "Bash(powershell -Command \"Get-ChildItem -Directory | Select-Object -ExpandProperty Name\")",
-      "Bash(powershell -Command \"Get-ChildItem src -Directory | Select-Object -ExpandProperty Name\")"
+      "Bash(powershell -Command \"Get-ChildItem src -Directory | Select-Object -ExpandProperty Name\")",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)"
     ],
     "deny": [],
     "ask": []

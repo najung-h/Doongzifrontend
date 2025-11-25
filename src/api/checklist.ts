@@ -111,8 +111,9 @@ export const checklistAPI = {
    */
   analyzeRisk: async (propertyInfo: {
     address: string;
-    marketPrice: number;
     deposit: number;
+    area: number;
+    propertyType: '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
   }): Promise<{
     success: boolean;
     riskLevel: 'low' | 'medium' | 'high';
