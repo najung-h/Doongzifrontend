@@ -96,22 +96,56 @@
 
 ---
 
-## n8n Switch 노드 설정
+## n8n Switch 노드 설정 방법
+
+### 1. Webhook 노드 → Switch 노드 연결
+
+### 2. Switch 노드 설정
+- **Mode:** `Rules`
+- **Data Property Name:** `actionType` (또는 `{{ $json.actionType }}`)
+
+### 3. 10개 분기 규칙 추가
+
+각 규칙마다:
+- **Condition:** `Equal`
+- **Value:** actionType 값 입력
 
 ```
-checklist webhook 수신
+Rule 0:  actionType = "exportPDF"                      → Output 0
+Rule 1:  actionType = "sendEmail"                      → Output 1
+Rule 2:  actionType = "analyzeRisk"                    → Output 2
+Rule 3:  actionType = "checkInsurance"                 → Output 3
+Rule 4:  actionType = "exportRegistryAnalysisPDF"      → Output 4
+Rule 5:  actionType = "sendRegistryAnalysisEmail"      → Output 5
+Rule 6:  actionType = "exportContractAnalysisPDF"      → Output 6
+Rule 7:  actionType = "sendContractAnalysisEmail"      → Output 7
+Rule 8:  actionType = "exportBuildingAnalysisPDF"      → Output 8
+Rule 9:  actionType = "sendBuildingAnalysisEmail"      → Output 9
+```
+
+### 4. 각 Output에 처리 로직 노드 연결
+- Output 0 → PDF 생성 로직
+- Output 1 → 이메일 전송 로직
+- ... (각 actionType에 맞는 처리)
+
+---
+
+## 플로우 다이어그램
+
+```
+Webhook (CHECKLIST)
   ↓
 Switch (actionType 분기)
-  ├─ exportPDF
-  ├─ sendEmail
-  ├─ analyzeRisk
-  ├─ checkInsurance
-  ├─ exportRegistryAnalysisPDF
-  ├─ sendRegistryAnalysisEmail
-  ├─ exportContractAnalysisPDF
-  ├─ sendContractAnalysisEmail
-  ├─ exportBuildingAnalysisPDF
-  └─ sendBuildingAnalysisEmail
+  ├─ Output 0 (exportPDF) → PDF 생성 → 응답
+  ├─ Output 1 (sendEmail) → 이메일 전송 → 응답
+  ├─ Output 2 (analyzeRisk) → 위험도 분석 → 응답
+  ├─ Output 3 (checkInsurance) → 보험 확인 → 응답
+  ├─ Output 4 (exportRegistryAnalysisPDF) → PDF 생성 → 응답
+  ├─ Output 5 (sendRegistryAnalysisEmail) → 이메일 전송 → 응답
+  ├─ Output 6 (exportContractAnalysisPDF) → PDF 생성 → 응답
+  ├─ Output 7 (sendContractAnalysisEmail) → 이메일 전송 → 응답
+  ├─ Output 8 (exportBuildingAnalysisPDF) → PDF 생성 → 응답
+  └─ Output 9 (sendBuildingAnalysisEmail) → 이메일 전송 → 응답
 ```
 
 ---
@@ -120,3 +154,34 @@ Switch (actionType 분기)
 - **API 함수:** `src/api/checklist.ts`
 - **타입 정의:** `src/types/index.ts`
 - **axios 설정:** `src/api/index.ts`
+
+---
+
+## 요청 예시
+
+```json
+{
+  "actionType": "analyzeRisk",
+  "propertyInfo": {
+    "address": "서울특별시 강남구 테헤란로 123",
+    "deposit": 40000,
+    "area": 84,
+    "propertyType": "아파트"
+  }
+}
+```
+
+## 응답 예시
+
+```json
+{
+  "success": true,
+  "riskLevel": "low",
+  "riskScore": 65,
+  "message": "안전한 수준입니다.",
+  "recommendations": [
+    "등기부등본 재확인 권장",
+    "확정일자 받기"
+  ]
+}
+```
