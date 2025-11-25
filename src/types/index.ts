@@ -40,6 +40,7 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse extends BaseResponse {
+  success: boolean;
   reply: string;
   conversation_id?: string;
 }
@@ -77,12 +78,10 @@ export interface ToxicClause {
 }
 
 export interface AnalysisResult {
-  riskLevel: number;
   riskGrade: RiskGrade;
   summary: string;
   issues: ScanIssue[];
-  recommendations?: string[];
-  autoCheckItems?: AutoCheckItem[];
+  autoCheckItems: AutoCheckItem[];
 }
 
 // API Response Types
@@ -159,14 +158,9 @@ export interface SendEmailResponse extends BaseResponse {
 export interface ChecklistItem {
   id: string;
   title: string;
-  whatIsIt: string;
-  whyDoIt: string;
+  description?: string;
   completed: boolean;
-  buttons?: Array<{
-    label: string;
-    url?: string;
-    type?: 'primary' | 'secondary' | 'modal';
-  }>;
+  helpKeyword?: string; // 챗봇 질문용 키워드
 }
 
 export interface ChecklistTab {
@@ -237,4 +231,5 @@ export interface LegalCase {
   lawName?: string;
   article?: string;
   summary?: string;
+  date?: string;
 }

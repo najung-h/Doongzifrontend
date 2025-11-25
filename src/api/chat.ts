@@ -1,6 +1,6 @@
 import { apiClient } from './index';
 import { env } from '../config/env';
-import type { ChatRequest, ChatResponse } from '../types';
+import type { ChatResponse } from '../types';
 
 /**
  * 챗봇 API
@@ -23,6 +23,7 @@ export const chatbotAPI = {
       console.error('Failed to send message:', error);
       // Mock response for development
       return {
+        success: false,
         reply: '죄송합니다. 현재 서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',
         conversation_id: conversationId,
       };

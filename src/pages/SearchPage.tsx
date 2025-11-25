@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Search, FileText, Scale } from 'lucide-react';
 import type { LegalCase } from '../types';
-import { legalAPI } from '../api/legal';
 import Navigation from '../components/common/Navigation';
 
 // Mock data - 확정일자 관련 판례 및 법령
@@ -70,7 +69,7 @@ export default function SearchPage() {
       minHeight: '100vh',
       backgroundColor: 'var(--color-bg-primary)'
     }}>
-      <Navigation title="메인으로" showBack showLogin />
+      <Navigation />
 
       {/* Page Header */}
       <div style={{

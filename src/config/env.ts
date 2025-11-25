@@ -1,10 +1,10 @@
 // 환경 변수 관리
 export const env = {
   // n8n Webhook URLs
-  chatbotWebhookUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_N8N_CHATBOT_WEBHOOK_URL) || '',
-  scanWebhookUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_N8N_SCAN_WEBHOOK_URL) || '',
-  checklistWebhookUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_N8N_CHECKLIST_WEBHOOK_URL) || '',
-  legalWebhookUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_N8N_LEGAL_WEBHOOK_URL) || '',
+  chatbotWebhookUrl: import.meta.env.VITE_N8N_CHATBOT_WEBHOOK_URL || '',
+  scanWebhookUrl: import.meta.env.VITE_N8N_SCAN_WEBHOOK_URL || '',
+  checklistWebhookUrl: import.meta.env.VITE_N8N_CHECKLIST_WEBHOOK_URL || '',
+  legalWebhookUrl: import.meta.env.VITE_N8N_LEGAL_WEBHOOK_URL || '',
 };
 
 // 환경 변수 유효성 검사

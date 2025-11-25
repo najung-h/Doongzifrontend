@@ -7,7 +7,6 @@ export default function ScanPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -36,14 +35,12 @@ export default function ScanPage() {
     if (uploadedFiles.length === 0) return;
     
     setIsAnalyzing(true);
-    setAnalysisResult(null);
     
     try {
       const result = await scanAPI.analyzeDocuments(uploadedFiles);
-      setAnalysisResult(result);
-      
+
       if (result.success) {
-        alert(`분석 완료!\n위험도: ${result.analysis.riskLevel}%\n등급: ${result.analysis.riskGrade}`);
+        alert(`분석 완료!\n등급: ${result.analysis.riskGrade}`);
       }
     } catch (error) {
       console.error('문서 분석 실패:', error);

@@ -1,0 +1,60 @@
+# Git & Version Control
+.git/
+.gitignore
+.gitattributes
+
+# Dependencies (will be installed in container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs (will be built in container)
+dist/
+build/
+
+# Development files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE files
+.editorconfig
+.prettierignore
+.prettierrc
+
+# Documentation (optional, include if needed)
+# README.md
+# CLAUDE.md
+
+# Environment (use build-time args or mount secrets instead)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+.npm/
+.cache/
+
+# OS files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Claude Code
+.claude/

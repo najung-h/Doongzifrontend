@@ -124,7 +124,7 @@ export default function MyPage() {
       minHeight: '100vh',
       backgroundColor: 'var(--color-bg-primary)'
     }}>
-      <Navigation title="마이페이지" showBack showLogin />
+      <Navigation />
 
       {/* Tabs */}
       <div style={{

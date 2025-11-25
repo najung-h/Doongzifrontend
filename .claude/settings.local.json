@@ -4,7 +4,8 @@
       "Bash(powershell -Command \"\nGet-ChildItem -Recurse -Directory | Select-Object -ExpandProperty FullName | Foreach-Object { $_eplace(''''C:\\workspaces\\Doongzifrontend\\src\\'''', ''''src/'''') }\n\")",
       "Bash(tree:*)",
       "Bash(npm run build:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash($null)"
     ],
     "deny": [],
     "ask": []

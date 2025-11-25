@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, X, Minimize2 } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 import type { Message } from '../../types';
-import { chatbotAPI } from '../../api/chatbot';
+import { chatbotAPI } from '../../api/chat';
 
 // Mock answers for suggested questions
 const mockAnswers: { [key: string]: string } = {
@@ -38,7 +38,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string>('');
+  const [conversationId, setConversationId] = useState<string | undefined>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedQuestions = [
@@ -89,13 +89,13 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
       .then(response => {
         const aiMessage: Message = {
           role: 'assistant',
-          content: response.message,
+          content: response.reply,
           timestamp: new Date()
         };
         setMessages(prev => [...prev, aiMessage]);
-        setConversationId(response.conversationId);
+        setConversationId(response.conversation_id);
       })
-      .catch(error => {
+      .catch(() => {
         const aiMessage: Message = {
           role: 'assistant',
           content: '답변 준비 중입니다... (API 연결 후 실제 답변이 표시됩니다)',

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Mail, ChevronDown, ChevronUp, MessageCircle, X, Upload } from 'lucide-react';
+import { Download, Mail, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
-import { scanAPI } from '../api/scan';
 import Navigation from '../components/common/Navigation';
 
 type SubChecklistItem = {
@@ -17,9 +16,11 @@ type SubChecklistItem = {
 type ChecklistItem = {
   id: string;
   title: string;
-  whatIsIt?: string;  // 일반 항목일 때
-  whyDoIt?: string;   // 일반 항목일 때
-  completed?: boolean; // 일반 항목일 때만
+  description?: string;
+  completed: boolean;
+  helpKeyword?: string;
+  whatIsIt?: string;  // 추가 필드
+  whyDoIt?: string;
   subItems?: SubChecklistItem[]; // 그룹 헤더일 때
   buttons?: Array<{
     label: string;
@@ -94,6 +95,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'before-3',
         title: '등기부등본 확인하기',
+        completed: false,
         isGroup: true,
         subItems: [
           {
@@ -145,6 +147,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'during-1',
         title: '등기부등본 확인하기',
+        completed: false,
         isGroup: true,
         subItems: [
           {
@@ -205,6 +208,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'during-6',
         title: '계약서 작성하기',
+        completed: false,
         isGroup: true,
         subItems: [
           {
@@ -260,6 +264,7 @@ const initialChecklist: ChecklistTab[] = [
       {
         id: 'after-4',
         title: '임대차 계약 신고하기',
+        completed: false,
         isGroup: true,
         subItems: [
           {
@@ -305,12 +310,6 @@ export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'before' | 'during' | 'after'>('before');
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  
-  // 상세 분석 모달 상태
-  const [analysisModalOpen, setAnalysisModalOpen] = useState(false);
-  const [analysisType, setAnalysisType] = useState<'registry' | 'contract' | 'building'>('registry');
-  const [analysisFile, setAnalysisFile] = useState<File | null>(null);
-  const [analysisEmail, setAnalysisEmail] = useState('');
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -356,26 +355,6 @@ export default function ChecklistPage() {
             subItems: item.subItems.map(sub =>
               sub.id === subItemId ? { ...sub, completed: !sub.completed } : sub
             )
-          };
-        }
-        return item;
-      })
-    })));
-  };
-  
-  // 그룹 항목 전체 체크/해제
-  const toggleGroupCompletion = (itemId: string) => {
-    setChecklist(prev => prev.map(tab => ({
-      ...tab,
-      items: tab.items.map(item => {
-        if (item.id === itemId && item.subItems) {
-          const allCompleted = item.subItems.every(sub => sub.completed);
-          return {
-            ...item,
-            subItems: item.subItems.map(sub => ({
-              ...sub,
-              completed: !allCompleted
-            }))
           };
         }
         return item;
