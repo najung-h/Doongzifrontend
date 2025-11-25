@@ -1,6 +1,29 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Mail, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import {
+  Download,
+  Mail,
+  ChevronDown,
+  ChevronUp,
+  MessageCircle,
+  DollarSign,
+  Shield,
+  Search,
+  AlertTriangle,
+  ClipboardList,
+  Landmark,
+  Building,
+  User,
+  FileText,
+  TrendingDown,
+  Building2,
+  FileCheck,
+  Home,
+  Send,
+  Pin,
+  ScrollText,
+  CheckCircle
+} from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
 
@@ -38,31 +61,33 @@ type ChecklistTab = {
 
 // 아이콘 매핑
 const getItemIcon = (title: string) => {
-  if (title.includes('매매가격')) return '💰';
-  if (title.includes('보증보험')) return '🛡️';
-  if (title.includes('선순위') || title.includes('권리')) return '🔍';
-  if (title.includes('소유자') || title.includes('돈문제')) return '⚠️';
-  if (title.includes('소유권')) return '📋';
-  if (title.includes('신탁')) return '🏦';
-  if (title.includes('다가구')) return '🏘️';
-  if (title.includes('무허가') || title.includes('불법')) return '⚠️';
-  if (title.includes('임대인')) return '👤';
-  if (title.includes('대리인') || title.includes('위임')) return '📝';
-  if (title.includes('미납') || title.includes('국세')) return '📊';
-  if (title.includes('공인중개사')) return '🏢';
-  if (title.includes('계약 내용')) return '📄';
-  if (title.includes('특약')) return '⚠️';
-  if (title.includes('잔금')) return '💰';
-  if (title.includes('주택 상태')) return '🏠';
-  if (title.includes('전입신고')) return '🏠';
-  if (title.includes('임대차 계약 신고')) return '📮';
-  if (title.includes('임대차 신고제 대상인지')) return '📋';
-  if (title.includes('임대차 신고제 대상인 경우')) return '📝';
-  if (title.includes('확정일자')) return '📌';
-  if (title.includes('전세보증금')) return '🛡️';
-  if (title.includes('등기부등본')) return '📜';
-  if (title.includes('계약서')) return '📝';
-  return '✓';
+  const iconProps = { size: 18, strokeWidth: 2 };
+
+  if (title.includes('매매가격')) return <DollarSign {...iconProps} />;
+  if (title.includes('보증보험')) return <Shield {...iconProps} />;
+  if (title.includes('선순위') || title.includes('권리')) return <Search {...iconProps} />;
+  if (title.includes('소유자') || title.includes('돈문제')) return <AlertTriangle {...iconProps} />;
+  if (title.includes('소유권')) return <ClipboardList {...iconProps} />;
+  if (title.includes('신탁')) return <Landmark {...iconProps} />;
+  if (title.includes('다가구')) return <Building {...iconProps} />;
+  if (title.includes('무허가') || title.includes('불법')) return <AlertTriangle {...iconProps} />;
+  if (title.includes('임대인')) return <User {...iconProps} />;
+  if (title.includes('대리인') || title.includes('위임')) return <FileText {...iconProps} />;
+  if (title.includes('미납') || title.includes('국세')) return <TrendingDown {...iconProps} />;
+  if (title.includes('공인중개사')) return <Building2 {...iconProps} />;
+  if (title.includes('계약 내용')) return <FileCheck {...iconProps} />;
+  if (title.includes('특약')) return <AlertTriangle {...iconProps} />;
+  if (title.includes('잔금')) return <DollarSign {...iconProps} />;
+  if (title.includes('주택 상태')) return <Home {...iconProps} />;
+  if (title.includes('전입신고')) return <Home {...iconProps} />;
+  if (title.includes('임대차 계약 신고')) return <Send {...iconProps} />;
+  if (title.includes('임대차 신고제 대상인지')) return <ClipboardList {...iconProps} />;
+  if (title.includes('임대차 신고제 대상인 경우')) return <FileText {...iconProps} />;
+  if (title.includes('확정일자')) return <Pin {...iconProps} />;
+  if (title.includes('전세보증금')) return <Shield {...iconProps} />;
+  if (title.includes('등기부등본')) return <ScrollText {...iconProps} />;
+  if (title.includes('계약서')) return <FileText {...iconProps} />;
+  return <CheckCircle {...iconProps} />;
 };
 
 const initialChecklist: ChecklistTab[] = [
@@ -500,9 +525,9 @@ export default function ChecklistPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
               flexShrink: 0,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: subItem.completed ? '#FFFFFF' : '#5A7A3C'
             }}>
             {getItemIcon(subItem.title)}
           </div>
@@ -988,8 +1013,8 @@ export default function ChecklistPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '18px',
-                          flexShrink: 0
+                          flexShrink: 0,
+                          color: '#FFFFFF'
                         }}>
                           {getItemIcon(item.title)}
                         </div>
@@ -1099,8 +1124,8 @@ export default function ChecklistPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '18px',
-                      flexShrink: 0
+                      flexShrink: 0,
+                      color: item.completed ? '#FFFFFF' : '#5A7A3C'
                     }}>
                       {getItemIcon(item.title)}
                     </div>
