@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
+import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
 
 type SubChecklistItem = {
   id: string;
@@ -336,6 +337,7 @@ export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'before' | 'during' | 'after'>('before');
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -467,23 +469,9 @@ export default function ChecklistPage() {
     }
   };
 
-  // 위험도 분석 핸들러
-  const handleAnalyzeRisk = async () => {
-    try {
-      const result = await checklistAPI.analyzeRisk({
-        address: '',
-        marketPrice: 0,
-        deposit: 0
-      });
-      
-      if (result.success) {
-        const recommendations = result.recommendations?.join('\n• ') || '';
-        alert(`위험도 분석 결과\n\n위험도: ${result.riskLevel} (점수: ${result.riskScore})\n\n${result.message}\n\n권장사항:\n• ${recommendations}`);
-      }
-    } catch (error) {
-      console.error('위험도 분석 실패:', error);
-      alert('위험도 분석 중 오류가 발생했습니다.');
-    }
+  // 위험도 분석 핸들러 - 모달 열기
+  const handleAnalyzeRisk = () => {
+    setIsRiskModalOpen(true);
   };
 
   // 서브 항목 렌더링 함수
@@ -1349,6 +1337,12 @@ export default function ChecklistPage() {
           </div>
         </div>
       </div>
+
+      {/* Risk Analysis Modal */}
+      <RiskAnalysisModal
+        isOpen={isRiskModalOpen}
+        onClose={() => setIsRiskModalOpen(false)}
+      />
     </div>
   );
 }
