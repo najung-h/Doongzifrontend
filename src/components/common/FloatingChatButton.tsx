@@ -37,14 +37,17 @@ export function FloatingChatButton({ hasNotification = false }: FloatingChatButt
       }}
       aria-label="어미새 챗봇 열기"
     >
-      {/* Bird Emoji */}
-      <span style={{ 
-        fontSize: '28px',
-        lineHeight: 1,
-        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
-      }}>
-        🐦
-      </span>
+      {/* Mom Bird Icon */}
+      <img
+        src="/mom.png"
+        alt="어미새 챗봇"
+        style={{
+          width: '40px',
+          height: '40px',
+          objectFit: 'contain',
+          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))'
+        }}
+      />
 
       {/* Notification Badge */}
       {hasNotification && (

@@ -111,12 +111,16 @@ export default function ChatbotPage() {
         borderBottom: '1px solid #E5E5E5',
         backgroundColor: '#FFFFFF'
       }}>
-        <div style={{ 
-          fontSize: '40px', 
-          marginBottom: '12px'
-        }}>
-          🐦
-        </div>
+        <img
+          src="/mom.png"
+          alt="어미새"
+          style={{
+            width: '80px',
+            height: '80px',
+            objectFit: 'contain',
+            margin: '0 auto 12px'
+          }}
+        />
         <h2 style={{ 
           fontSize: '24px',
           fontWeight: '700',
@@ -165,9 +169,17 @@ export default function ChatbotPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                fontSize: '18px'
+                padding: '4px'
               }}>
-                🐦
+                <img
+                  src="/mom.png"
+                  alt="어미새"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
               </div>
             )}
             <div
@@ -213,9 +225,17 @@ export default function ChatbotPage() {
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              fontSize: '18px'
+              padding: '4px'
             }}>
-              🐦
+              <img
+                src="/mom.png"
+                alt="어미새"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+              />
             </div>
             <div
               style={{

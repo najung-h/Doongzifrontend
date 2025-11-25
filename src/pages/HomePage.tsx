@@ -92,12 +92,15 @@ export default function HomePage() {
           gap: '20px',
           marginBottom: '30px'
         }}>
-          <div style={{
-            width: '100px',
-            height: '100px',
-            backgroundColor: '#FFE4C4',
-            borderRadius: '50%'
-          }} />
+          <img
+            src="/logo.png"
+            alt="둥지 메인 로고"
+            style={{
+              width: '180px',
+              height: '180px',
+              objectFit: 'contain'
+            }}
+          />
           <div style={{
             textAlign: 'left'
           }}>

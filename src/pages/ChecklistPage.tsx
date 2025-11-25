@@ -860,31 +860,40 @@ export default function ChecklistPage() {
                   transition: 'width 0.3s ease',
                   borderRadius: '16px'
                 }} />
-                {/* Bird Icon */}
-                <div style={{
-                  position: 'absolute',
-                  left: `calc(${currentTabProgress}% - 16px)`,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: '#4FC3F7',
-                  borderRadius: '50%',
-                  transition: 'left 0.3s ease',
-                  zIndex: 2
-                }} />
-                {/* Nest Icon */}
-                <div style={{
-                  position: 'absolute',
-                  right: '8px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '28px',
-                  height: '28px',
-                  backgroundColor: '#8B6F47',
-                  borderRadius: '50%',
-                  zIndex: 1
-                }} />
+                {/* Baby Bird Icon - flying to the nest */}
+                <img
+                  src="/baby.png"
+                  alt="아기새"
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${currentTabProgress}% - 20px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '40px',
+                    height: '40px',
+                    objectFit: 'contain',
+                    transition: 'left 0.3s ease',
+                    zIndex: 2,
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                  }}
+                />
+                {/* Nest Icon - empty nest or baby in nest when complete */}
+                <img
+                  src={currentTabProgress >= 100 ? "/rest.png" : "/nest.png"}
+                  alt={currentTabProgress >= 100 ? "아기새가 둥지에 도착" : "빈 둥지"}
+                  style={{
+                    position: 'absolute',
+                    right: '4px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '40px',
+                    height: '40px',
+                    objectFit: 'contain',
+                    transition: 'opacity 0.3s ease',
+                    zIndex: 1,
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))'
+                  }}
+                />
               </div>
               <div style={{
                 position: 'absolute',

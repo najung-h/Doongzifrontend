@@ -21,15 +21,16 @@ export default function Navigation() {
         alignItems: 'center',
         gap: '32px'
       }}>
-        <div 
+        <img
+          src="/logo.png"
+          alt="둥지 로고"
           onClick={() => navigate('/')}
           style={{
-            width: '24px',
-            height: '24px',
-            backgroundColor: '#9ACD32',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }} 
+            width: '40px',
+            height: '40px',
+            cursor: 'pointer',
+            objectFit: 'contain'
+          }}
         />
         <button
           onClick={() => navigate('/checklist')}
@@ -101,12 +102,15 @@ export default function Navigation() {
       }}
       onClick={() => navigate('/')}
       >
-        <div style={{
-          width: '32px',
-          height: '32px',
-          backgroundColor: '#FFE4C4',
-          borderRadius: '50%'
-        }} />
+        <img
+          src="/logo.png"
+          alt="둥지 로고"
+          style={{
+            width: '40px',
+            height: '40px',
+            objectFit: 'contain'
+          }}
+        />
         <span style={{
           fontSize: '20px',
           fontWeight: '700',
