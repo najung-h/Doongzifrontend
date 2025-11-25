@@ -119,7 +119,7 @@ export default function Navigation() {
           // 로그인하지 않은 상태: 로그인 + 회원가입 버튼
           <>
             <button
-              onClick={() => setIsLoggedIn(true)}
+              onClick={() => navigate('/login')}
               style={{
                 background: 'none',
                 border: 'none',

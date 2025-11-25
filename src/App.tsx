@@ -5,11 +5,13 @@ import ChecklistPage from './pages/ChecklistPage';
 import ScanPage from './pages/ScanPage';
 import MyPage from './pages/MyPage';
 import SearchPage from './pages/SearchPage';
+import LoginPage from './pages/LoginPage';
 
 function AppContent() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/chatbot" element={<ChatbotPage />} />
       <Route path="/checklist" element={<ChecklistPage />} />
       <Route path="/scan" element={<ScanPage />} />
