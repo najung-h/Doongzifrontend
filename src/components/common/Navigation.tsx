@@ -132,6 +132,7 @@ export default function Navigation() {
               로그인
             </button>
             <button
+              onClick={() => navigate('/signup')}
               style={{
                 backgroundColor: '#8FBF4D',
                 border: 'none',
