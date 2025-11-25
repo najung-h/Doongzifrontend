@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  webserver:
+    build: . # 현재 디렉토리의 Dockerfile을 사용하여 React 앱과 Nginx 서버를 빌드합니다.
+    container_name: doongzi-app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Nginx 설정 파일을 마운트합니다.
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # 사용자가 직접 발급받은 SSL 인증서 파일을 마운트합니다 (프로덕션용).
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
