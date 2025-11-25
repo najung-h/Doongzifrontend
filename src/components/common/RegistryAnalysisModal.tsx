@@ -1,22 +1,36 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail } from 'lucide-react';
-import { scanAPI } from '../../api/scan';
-import type { ScanResponse } from '../../types';
+import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
+import { checklistAPI } from '../../api/checklist';
 
 interface RegistryAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+type AnalysisResult = {
+  success: boolean;
+  message: string;
+  analysis: {
+    riskGrade: 'low' | 'medium' | 'high';
+    summary: string;
+    issues: Array<{
+      title: string;
+      description: string;
+      severity: 'warning' | 'danger';
+    }>;
+  };
+};
+
 export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnalysisModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [email, setEmail] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -96,7 +110,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await scanAPI.analyzeDocuments([file]);
+      const result = await checklistAPI.analyzeRegistry(file);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -125,7 +139,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsSendingEmail(true);
     try {
-      const result = await scanAPI.analyzeDetailedDocument(file, email, 'registry');
+      const result = await checklistAPI.sendRegistryAnalysisEmail(file, email);
       if (result.success) {
         alert(result.message);
         setShowEmailForm(false);
@@ -138,6 +152,29 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
       alert('상세 분석 요청 중 오류가 발생했습니다.');
     } finally {
       setIsSendingEmail(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!file) {
+      alert('파일을 다시 선택해주세요.');
+      return;
+    }
+
+    setIsDownloadingPDF(true);
+    try {
+      const result = await checklistAPI.exportRegistryAnalysisPDF(file);
+      if (result.success && result.pdfUrl) {
+        window.open(result.pdfUrl, '_blank');
+        alert(result.message || 'PDF가 생성되었습니다!');
+      } else {
+        alert('PDF 생성에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('PDF download error:', error);
+      alert('PDF 다운로드 중 오류가 발생했습니다.');
+    } finally {
+      setIsDownloadingPDF(false);
     }
   };
 
@@ -551,29 +588,54 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
             </div>
           )}
 
-          {/* Detailed Analysis Request */}
+          {/* Action Buttons - PDF Download and Email */}
           {analysisResult && !showEmailForm && (
-            <button
-              onClick={() => setShowEmailForm(true)}
-              style={{
-                width: '100%',
-                padding: '14px',
-                borderRadius: '8px',
-                border: '1px solid #8FBF4D',
-                backgroundColor: '#FFFFFF',
-                color: '#8FBF4D',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}
-            >
-              <Mail size={18} />
-              더 자세한 분석 요청하기
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isDownloadingPDF}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '8px',
+                  border: '1px solid #8FBF4D',
+                  backgroundColor: '#FFFFFF',
+                  color: '#8FBF4D',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  cursor: isDownloadingPDF ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  opacity: isDownloadingPDF ? 0.6 : 1,
+                }}
+              >
+                <Download size={18} />
+                {isDownloadingPDF ? 'PDF 생성 중...' : '분석결과 PDF로 다운받기'}
+              </button>
+              <button
+                onClick={() => setShowEmailForm(true)}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#8FBF4D',
+                  color: '#FFFFFF',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                <Mail size={18} />
+                분석결과 이메일로 전송하기
+              </button>
+            </div>
           )}
 
           {/* Email Form */}

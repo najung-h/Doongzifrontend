@@ -62,7 +62,7 @@ export const scanAPI = {
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const formData = new FormData();
-      
+
       // actionType 추가
       formData.append('actionType', 'analyzeDetailedDocument');
       formData.append('documentType', documentType);
