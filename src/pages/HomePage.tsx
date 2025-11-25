@@ -177,13 +177,16 @@ export default function HomePage() {
             gap: '12px',
             marginBottom: '20px'
           }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              backgroundColor: '#8B6F47',
-              borderRadius: '50%',
-              flexShrink: 0
-            }} />
+            <img
+              src="/nest.png"
+              alt="둥지"
+              style={{
+                width: '56px',
+                height: '56px',
+                objectFit: 'contain',
+                flexShrink: 0
+              }}
+            />
             <div>
               <h3 style={{
                 fontSize: '18px',
@@ -304,13 +307,16 @@ export default function HomePage() {
             justifyContent: 'center'
           }}
         >
-          <div style={{
-            width: '80px',
-            height: '80px',
-            backgroundColor: '#4FC3F7',
-            borderRadius: '50%',
-            marginBottom: '24px'
-          }} />
+          <img
+            src="/baby.png"
+            alt="아기새"
+            style={{
+              width: '96px',
+              height: '96px',
+              objectFit: 'contain',
+              marginBottom: '24px'
+            }}
+          />
           <h3 style={{
             fontSize: '18px',
             fontWeight: '700',
@@ -355,13 +361,16 @@ export default function HomePage() {
               justifyContent: 'center'
             }}
           >
-            <div style={{
-              width: '68px',
-              height: '68px',
-              backgroundColor: '#FFB74D',
-              borderRadius: '50%',
-              marginBottom: '18px'
-            }} />
+            <img
+              src="/mom.png"
+              alt="어미새"
+              style={{
+                width: '84px',
+                height: '84px',
+                objectFit: 'contain',
+                marginBottom: '18px'
+              }}
+            />
             <h3 style={{
               fontSize: '18px',
               fontWeight: '700',
@@ -399,13 +408,16 @@ export default function HomePage() {
               justifyContent: 'center'
             }}
           >
-            <div style={{
-              width: '68px',
-              height: '68px',
-              backgroundColor: '#4FC3F7',
-              borderRadius: '50%',
-              marginBottom: '18px'
-            }} />
+            <img
+              src="/rest.png"
+              alt="아기새 in 둥지"
+              style={{
+                width: '84px',
+                height: '84px',
+                objectFit: 'contain',
+                marginBottom: '18px'
+              }}
+            />
             <h3 style={{
               fontSize: '18px',
               fontWeight: '700',

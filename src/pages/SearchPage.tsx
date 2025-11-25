@@ -79,13 +79,18 @@ export default function SearchPage() {
         borderBottom: '2px solid var(--color-border)',
         boxShadow: 'var(--shadow-sm)'
       }}>
-        <div style={{ 
-          fontSize: 'clamp(56px, 12vw, 72px)', 
-          marginBottom: 'clamp(12px, 2vw, 16px)',
-          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
-        }}>
-          👨‍⚖️
-        </div>
+        <img
+          src="/rest.png"
+          alt="아기새 in 둥지"
+          style={{
+            width: 'clamp(80px, 15vw, 120px)',
+            height: 'clamp(80px, 15vw, 120px)',
+            objectFit: 'contain',
+            marginBottom: 'clamp(12px, 2vw, 16px)',
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+            margin: '0 auto clamp(12px, 2vw, 16px)'
+          }}
+        />
         <h2 style={{ 
           marginBottom: 'clamp(8px, 1.5vw, 12px)',
           fontSize: 'clamp(22px, 4vw, 28px)'

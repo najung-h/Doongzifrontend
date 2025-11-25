@@ -21,17 +21,6 @@ export default function Navigation() {
         alignItems: 'center',
         gap: '32px'
       }}>
-        <img
-          src="/logo.png"
-          alt="둥지 로고"
-          onClick={() => navigate('/')}
-          style={{
-            width: '40px',
-            height: '40px',
-            cursor: 'pointer',
-            objectFit: 'contain'
-          }}
-        />
         <button
           onClick={() => navigate('/checklist')}
           style={{
@@ -106,8 +95,8 @@ export default function Navigation() {
           src="/logo.png"
           alt="둥지 로고"
           style={{
-            width: '40px',
-            height: '40px',
+            width: '48px',
+            height: '48px',
             objectFit: 'contain'
           }}
         />
