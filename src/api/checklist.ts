@@ -48,33 +48,6 @@ export const checklistAPI = {
   },
 
   /**
-   * 등기부등본 발급
-   * actionType: "issueRegistry"
-   */
-  issueRegistry: async (address: string, phone: string, password: string): Promise<{
-    success: boolean;
-    registryUrl?: string;
-    message: string;
-  }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'issueRegistry',
-        address,
-        phone,
-        password,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to issue registry:', error);
-      return {
-        success: false,
-        message: '등기부등본 발급에 실패했습니다.',
-      };
-    }
-  },
-
-  /**
    * 보증보험 가입 가능 여부 확인
    * actionType: "checkInsurance"
    */
@@ -135,6 +108,132 @@ export const checklistAPI = {
         riskLevel: 'medium',
         riskScore: 0,
         message: '위험도 분석에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 등기부등본 분석 결과 PDF 다운로드
+   * actionType: "exportRegistryAnalysisPDF"
+   */
+  exportRegistryAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'exportRegistryAnalysisPDF',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to export registry analysis PDF:', error);
+      return {
+        success: false,
+        message: '등기부등본 분석 결과 PDF 생성에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 등기부등본 분석 결과 이메일 전송
+   * actionType: "sendRegistryAnalysisEmail"
+   */
+  sendRegistryAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'sendRegistryAnalysisEmail',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to send registry analysis email:', error);
+      return {
+        success: false,
+        message: '등기부등본 분석 결과 이메일 전송에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 계약서 분석 결과 PDF 다운로드
+   * actionType: "exportContractAnalysisPDF"
+   */
+  exportContractAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'exportContractAnalysisPDF',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to export contract analysis PDF:', error);
+      return {
+        success: false,
+        message: '계약서 분석 결과 PDF 생성에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 계약서 분석 결과 이메일 전송
+   * actionType: "sendContractAnalysisEmail"
+   */
+  sendContractAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'sendContractAnalysisEmail',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to send contract analysis email:', error);
+      return {
+        success: false,
+        message: '계약서 분석 결과 이메일 전송에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 건축물대장 분석 결과 PDF 다운로드
+   * actionType: "exportBuildingAnalysisPDF"
+   */
+  exportBuildingAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'exportBuildingAnalysisPDF',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to export building analysis PDF:', error);
+      return {
+        success: false,
+        message: '건축물대장 분석 결과 PDF 생성에 실패했습니다.',
+      };
+    }
+  },
+
+  /**
+   * 건축물대장 분석 결과 이메일 전송
+   * actionType: "sendBuildingAnalysisEmail"
+   */
+  sendBuildingAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await apiClient.post(env.checklistWebhookUrl, {
+        actionType: 'sendBuildingAnalysisEmail',
+        analysisResult,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to send building analysis email:', error);
+      return {
+        success: false,
+        message: '건축물대장 분석 결과 이메일 전송에 실패했습니다.',
       };
     }
   },

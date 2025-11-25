@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
 import { scanAPI } from '../../api/scan';
+import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
 
 interface ContractAnalysisModalProps {
@@ -100,12 +101,43 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
-  const handleDownloadPDF = () => {
-    alert('PDF 다운로드 기능은 준비 중입니다.');
+  const handleDownloadPDF = async () => {
+    if (!analysisResult) {
+      alert('분석 결과가 없습니다.');
+      return;
+    }
+
+    try {
+      const result = await checklistAPI.exportContractAnalysisPDF(analysisResult);
+      if (result.success && result.pdfUrl) {
+        window.open(result.pdfUrl, '_blank');
+        alert('PDF가 생성되었습니다!');
+      } else {
+        alert(result.message || 'PDF 생성에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('PDF 다운로드 실패:', error);
+      alert('PDF 다운로드 중 오류가 발생했습니다.');
+    }
   };
 
-  const handleSendEmail = () => {
-    alert('이메일 전송 기능은 준비 중입니다.');
+  const handleSendEmail = async () => {
+    if (!analysisResult) {
+      alert('분석 결과가 없습니다.');
+      return;
+    }
+
+    try {
+      const result = await checklistAPI.sendContractAnalysisEmail(analysisResult);
+      if (result.success) {
+        alert(result.message || '이메일이 전송되었습니다!');
+      } else {
+        alert(result.message || '이메일 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('이메일 전송 실패:', error);
+      alert('이메일 전송 중 오류가 발생했습니다.');
+    }
   };
 
   const getRiskColor = (grade: 'low' | 'medium' | 'high') => {

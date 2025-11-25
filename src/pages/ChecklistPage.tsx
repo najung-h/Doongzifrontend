@@ -443,20 +443,6 @@ export default function ChecklistPage() {
     }
   };
 
-  // 등기부등본 발급 핸들러
-  const handleIssueRegistry = async () => {
-    try {
-      const result = await checklistAPI.issueRegistry('', '', '');
-      if (result.success && result.registryUrl) {
-        window.open(result.registryUrl, '_blank');
-        alert(result.message || '등기부등본이 발급되었습니다!');
-      }
-    } catch (error) {
-      console.error('등기부등본 발급 실패:', error);
-      alert('등기부등본 발급 중 오류가 발생했습니다.');
-    }
-  };
-
   // 보증보험 확인 핸들러
   const handleCheckInsurance = async () => {
     try {
@@ -1287,8 +1273,6 @@ export default function ChecklistPage() {
                               onClick={() => {
                                 if (button.url) {
                                   window.open(button.url, '_blank');
-                                } else if (button.label === '등기부등본 발급받기') {
-                                  handleIssueRegistry();
                                 } else if (button.label === '보증보험 가입 가능 여부 확인') {
                                   handleCheckInsurance();
                                 } else if (button.label === '깡통전세 위험도 분석') {

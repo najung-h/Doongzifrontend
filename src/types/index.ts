@@ -1,11 +1,14 @@
 // ==========================================
 // 1. Common & Base Types
 // ==========================================
-export type ActionType = 
-  | 'sendMessage' | 'searchLegal'          // Chat Service
-  | 'scanDocuments' | 'deepAnalyzeContract' // Document Service
-  | 'analyzeRisk' | 'exportPDF' | 'sendEmail' // Checklist Service
-  | 'issueRegistry' | 'checkInsurance';    // Additional services
+export type ActionType =
+  | 'sendMessage' | 'searchLegal'                                      // Chat Service
+  | 'scanDocuments' | 'deepAnalyzeContract'                           // Document Service
+  | 'analyzeRisk' | 'exportPDF' | 'sendEmail'                          // Checklist Service (전체)
+  | 'checkInsurance'                                                   // Checklist Service (보험)
+  | 'exportRegistryAnalysisPDF' | 'sendRegistryAnalysisEmail'         // Checklist Service (등기부등본 분석)
+  | 'exportContractAnalysisPDF' | 'sendContractAnalysisEmail'         // Checklist Service (계약서 분석)
+  | 'exportBuildingAnalysisPDF' | 'sendBuildingAnalysisEmail';        // Checklist Service (건축물대장 분석)
 
 export interface BaseResponse {
   success: boolean;
