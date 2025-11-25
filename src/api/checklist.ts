@@ -1,12 +1,57 @@
 import { apiClient } from './index';
 import { env } from '../config/env';
-import type { ChecklistTab } from '../types';
+import type { ChecklistTab, ScanResponse } from '../types';
 
 /**
  * 체크리스트 관련 API
  * 모든 요청은 동일한 웹훅 URL로 전송되며, actionType으로 분기됨
  */
 export const checklistAPI = {
+  /**
+   * 계약서 분석
+   * actionType: "analyzeContract"
+   */
+  analyzeContract: async (files: File[]): Promise<ScanResponse> => {
+    try {
+      const formData = new FormData();
+
+      // actionType 추가
+      formData.append('actionType', 'analyzeContract');
+
+      // 파일들 추가
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to analyze contract:', error);
+      // Mock response for development
+      return {
+        success: false,
+        message: '계약서 분석 서버와 연결할 수 없습니다.',
+        analysis: {
+          riskGrade: 'low',
+          summary: '서버 연결 오류',
+          issues: [
+            {
+              title: '서버 연결 오류',
+              description: '계약서 분석 서버와 연결할 수 없습니다.',
+              severity: 'warning',
+            },
+          ],
+          autoCheckItems: [],
+        },
+      };
+    }
+  },
+
   /**
    * PDF 다운로드
    * actionType: "exportPDF"
