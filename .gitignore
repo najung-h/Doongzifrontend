@@ -8,7 +8,7 @@ dist/
 build/
 *.tsbuildinfo
 
-# IDE & Editor
+# IDE & Editor 
 .vscode/
 .idea/
 *.sublime-project
