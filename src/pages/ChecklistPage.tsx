@@ -55,6 +55,7 @@ const getItemIcon = (title: string) => {
   if (title.includes('잔금')) return '💰';
   if (title.includes('주택 상태')) return '🏠';
   if (title.includes('전입신고')) return '🏠';
+  if (title.includes('임대차 계약 신고')) return '📮';
   if (title.includes('임대차 신고제 대상인지')) return '📋';
   if (title.includes('임대차 신고제 대상인 경우')) return '📝';
   if (title.includes('확정일자')) return '📌';
