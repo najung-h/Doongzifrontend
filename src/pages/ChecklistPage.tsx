@@ -495,7 +495,7 @@ export default function ChecklistPage() {
         key={subItem.id}
         style={{
           marginBottom: '8px',
-          marginLeft: '20px',
+          marginLeft: '4px',
           border: '1px solid #E8E8E8',
           borderRadius: '12px',
           overflow: 'hidden',
@@ -735,7 +735,7 @@ export default function ChecklistPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#F5F3E6'
+      backgroundColor: '#FAF8F3'
     }}>
       {/* Top Navigation */}
       <Navigation />
@@ -986,15 +986,18 @@ export default function ChecklistPage() {
                 const groupCompleted = isGroupCompleted(item);
                 
                 return (
-                  <div key={item.id} style={{ marginBottom: '16px' }}>
+                  <div key={item.id} style={{
+                    marginBottom: '16px',
+                    borderLeft: '4px solid #8FBF4D',
+                    borderRadius: '12px',
+                    paddingLeft: '16px'
+                  }}>
                     {/* Group Header - 클릭 가능 */}
                     <div
                       style={{
-                        backgroundColor: groupCompleted ? '#F8F8F8' : '#F5F3E6',
-                        padding: '16px 20px',
+                        padding: '16px 20px 16px 4px',
                         borderRadius: '12px',
                         marginBottom: isGroupExpanded ? '12px' : '0',
-                        borderLeft: '4px solid #8FBF4D',
                         cursor: 'pointer'
                       }}
                       onClick={() => toggleExpand(item.id)}
@@ -1051,7 +1054,8 @@ export default function ChecklistPage() {
                             flexWrap: 'wrap',
                             gap: '10px',
                             marginTop: '12px',
-                            marginLeft: '20px'
+                            marginLeft: '4px',
+                            marginBottom: '12px'
                           }}>
                             {item.buttons.map((button, btnIndex) => (
                               <button
