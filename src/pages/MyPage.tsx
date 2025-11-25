@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/common/Navigation';
 import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus, X, Upload, FileText, Search } from 'lucide-react';
 import type { User as UserType, Property, Conversation, URLResource } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 type TabType = 'profile' | 'property' | 'conversations' | 'links';
 
@@ -87,6 +89,8 @@ const mockURLs: URLResource[] = [
 ];
 
 export default function MyPage() {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [user] = useState<UserType>(mockUser);
   const [properties, setProperties] = useState<Property[]>(mockProperties);
@@ -96,6 +100,13 @@ export default function MyPage() {
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isEditingProperty, setIsEditingProperty] = useState(false);
   const [editedProperty, setEditedProperty] = useState<Property | null>(null);
+
+  // 로그인 상태 체크 - 로그아웃 상태면 로그인 페이지로 리다이렉션
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   const tabs = [
     { id: 'profile' as TabType, name: '내 프로필', icon: User },
