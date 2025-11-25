@@ -22,7 +22,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#FAF8F3',
+      backgroundColor: '#FFF9E6',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -125,7 +125,7 @@ export default function LoginPage() {
                   outline: 'none',
                   transition: 'border-color 0.2s'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#8FBF4D'}
+                onFocus={(e) => e.target.style.borderColor = '#8AAB3E'}
                 onBlur={(e) => e.target.style.borderColor = '#E8E8E8'}
               />
             </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
                   outline: 'none',
                   transition: 'border-color 0.2s'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#8FBF4D'}
+                onFocus={(e) => e.target.style.borderColor = '#8AAB3E'}
                 onBlur={(e) => e.target.style.borderColor = '#E8E8E8'}
               />
             </div>
@@ -182,7 +182,7 @@ export default function LoginPage() {
             style={{
               width: '100%',
               padding: '14px',
-              backgroundColor: '#8FBF4D',
+              backgroundColor: '#8AAB3E',
               border: 'none',
               borderRadius: '8px',
               color: '#FFFFFF',
@@ -191,7 +191,7 @@ export default function LoginPage() {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7AA83F'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#708C3A'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8FBF4D'}
           >
             로그인
@@ -220,7 +220,7 @@ export default function LoginPage() {
             style={{
               background: 'none',
               border: 'none',
-              color: '#8FBF4D',
+              color: '#8AAB3E',
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',

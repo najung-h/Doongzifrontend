@@ -26,7 +26,7 @@ export default function Navigation() {
           style={{
             background: 'none',
             border: 'none',
-            color: location.pathname === '/checklist' ? '#8FBF4D' : '#2C2C2C',
+            color: location.pathname === '/checklist' ? '#8AAB3E' : '#2C2C2C',
             fontSize: '15px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -40,7 +40,7 @@ export default function Navigation() {
           style={{
             background: 'none',
             border: 'none',
-            color: location.pathname === '/chatbot' ? '#8FBF4D' : '#2C2C2C',
+            color: location.pathname === '/chatbot' ? '#8AAB3E' : '#2C2C2C',
             fontSize: '15px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -54,7 +54,7 @@ export default function Navigation() {
           style={{
             background: 'none',
             border: 'none',
-            color: location.pathname === '/search' ? '#8FBF4D' : '#2C2C2C',
+            color: location.pathname === '/search' ? '#8AAB3E' : '#2C2C2C',
             fontSize: '15px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -68,7 +68,7 @@ export default function Navigation() {
           style={{
             background: 'none',
             border: 'none',
-            color: location.pathname === '/mypage' ? '#8FBF4D' : '#2C2C2C',
+            color: location.pathname === '/mypage' ? '#8AAB3E' : '#2C2C2C',
             fontSize: '15px',
             cursor: 'pointer',
             padding: '8px 0',
@@ -134,7 +134,7 @@ export default function Navigation() {
             <button
               onClick={() => navigate('/signup')}
               style={{
-                backgroundColor: '#8FBF4D',
+                backgroundColor: '#8AAB3E',
                 border: 'none',
                 color: '#FFFFFF',
                 fontSize: '15px',
@@ -152,7 +152,7 @@ export default function Navigation() {
           <button
             onClick={logout}
             style={{
-              backgroundColor: '#8FBF4D',
+              backgroundColor: '#8AAB3E',
               border: 'none',
               color: '#FFFFFF',
               fontSize: '15px',

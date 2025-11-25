@@ -521,7 +521,7 @@ export default function ChecklistPage() {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: subItem.completed ? '#8FBF4D' : '#E8E8E8',
+              backgroundColor: subItem.completed ? '#8AAB3E' : '#E8E8E8',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -574,7 +574,7 @@ export default function ChecklistPage() {
               width: '18px',
               height: '18px',
               cursor: 'pointer',
-              accentColor: '#8FBF4D',
+              accentColor: '#606AAA',
               flexShrink: 0
             }}
           />
@@ -711,10 +711,9 @@ export default function ChecklistPage() {
                 width: '100%',
                 padding: '10px',
                 borderRadius: '8px',
-                border: '1px solid #8FBF4D',
-                backgroundColor: '#FFFFFF',
-                color: '#8FBF4D',
-                fontSize: '13px',
+                border: '1px solid #8AAB3E',
+                                backgroundColor: '#FFFFFF',
+                                color: '#8AAB3E',                fontSize: '13px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 display: 'flex',
@@ -735,7 +734,7 @@ export default function ChecklistPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#FAF8F3'
+      backgroundColor: '#FFF9E6'
     }}>
       {/* Top Navigation */}
       <Navigation />
@@ -744,7 +743,7 @@ export default function ChecklistPage() {
       <div style={{
         textAlign: 'center',
         padding: '40px 40px 30px',
-        backgroundColor: '#F5F3E6'
+        backgroundColor: '#FFF9E6'
       }}>
         <div style={{
           display: 'flex',
@@ -821,9 +820,9 @@ export default function ChecklistPage() {
                     gap: '6px',
                     padding: '8px 16px',
                     backgroundColor: '#FFFFFF',
-                    border: '1px solid #8FBF4D',
+                    border: '1px solid #8AAB3E',
                     borderRadius: '20px',
-                    color: '#8FBF4D',
+                    color: '#8AAB3E',
                     fontSize: '13px',
                     fontWeight: '600',
                     cursor: 'pointer'
@@ -839,7 +838,7 @@ export default function ChecklistPage() {
                     alignItems: 'center',
                     gap: '6px',
                     padding: '8px 16px',
-                    backgroundColor: '#8FBF4D',
+backgroundColor: '#8AAB3E',
                     border: 'none',
                     borderRadius: '20px',
                     color: '#FFFFFF',
@@ -868,7 +867,7 @@ export default function ChecklistPage() {
                   onClick={() => setActiveTab(tab.id)}
                   style={{
                     padding: '12px',
-                    backgroundColor: activeTab === tab.id ? '#8FBF4D' : '#FFFFFF',
+                    backgroundColor: activeTab === tab.id ? '#8AAB3E' : '#FFFFFF',
                     color: activeTab === tab.id ? '#FFFFFF' : '#666666',
                     border: activeTab === tab.id ? 'none' : '1px solid #E8E8E8',
                     borderRadius: '8px',
@@ -901,7 +900,7 @@ export default function ChecklistPage() {
                   top: 0,
                   height: '100%',
                   width: `${currentTabProgress}%`,
-                  backgroundColor: '#8FBF4D',
+                  backgroundColor: '#606AAA',
                   transition: 'width 0.3s ease',
                   borderRadius: '16px'
                 }} />
@@ -988,7 +987,7 @@ export default function ChecklistPage() {
                 return (
                   <div key={item.id} style={{
                     marginBottom: '16px',
-                    borderLeft: '4px solid #8FBF4D',
+                    borderLeft: '4px solid #8AAB3E',
                     borderRadius: '12px',
                     paddingLeft: '16px'
                   }}>
@@ -1012,7 +1011,7 @@ export default function ChecklistPage() {
                           width: '36px',
                           height: '36px',
                           borderRadius: '50%',
-                          backgroundColor: groupCompleted ? '#8FBF4D' : '#7AA83F',
+                          backgroundColor: groupCompleted ? '#8AAB3E' : '#708C3A',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -1027,7 +1026,7 @@ export default function ChecklistPage() {
                           <h4 style={{
                             fontSize: '15px',
                             fontWeight: '700',
-                            color: groupCompleted ? '#999999' : '#5A7A3C',
+                            color: groupCompleted ? '#999999' : '#708C3A',
                             textDecoration: groupCompleted ? 'line-through' : 'none',
                             margin: 0
                           }}>
@@ -1036,7 +1035,7 @@ export default function ChecklistPage() {
                         </div>
 
                         {/* Expand Icon */}
-                        <div style={{ color: '#7AA83F' }}>
+                        <div style={{ color: '#708C3A' }}>
                           {isGroupExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </div>
                       </div>
@@ -1075,9 +1074,9 @@ export default function ChecklistPage() {
                                   minWidth: '140px',
                                   padding: '12px 20px',
                                   borderRadius: '8px',
-                                  border: button.type === 'primary' ? 'none' : '1px solid #8FBF4D',
-                                  backgroundColor: button.type === 'primary' ? '#8FBF4D' : '#FFFFFF',
-                                  color: button.type === 'primary' ? '#FFFFFF' : '#8FBF4D',
+                                  border: button.type === 'primary' ? 'none' : '1px solid #8AAB3E',
+                                  backgroundColor: button.type === 'primary' ? '#8AAB3E' : '#FFFFFF',
+                                  color: button.type === 'primary' ? '#FFFFFF' : '#8AAB3E',
                                   fontSize: '14px',
                                   fontWeight: '600',
                                   cursor: 'pointer'
@@ -1124,12 +1123,12 @@ export default function ChecklistPage() {
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      backgroundColor: item.completed ? '#8FBF4D' : '#E8E8E8',
+                      backgroundColor: item.completed ? '#8AAB3E' : '#E8E8E8',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      color: item.completed ? '#FFFFFF' : '#5A7A3C'
+                      color: item.completed ? '#FFFFFF' : '#708C3A'
                     }}>
                       {getItemIcon(item.title)}
                     </div>
@@ -1164,7 +1163,7 @@ export default function ChecklistPage() {
                         width: '20px',
                         height: '20px',
                         cursor: 'pointer',
-                        accentColor: '#8FBF4D',
+                        accentColor: '#606AAA',
                         flexShrink: 0
                       }}
                     />
@@ -1178,7 +1177,7 @@ export default function ChecklistPage() {
                     }}>
                       {/* What is it */}
                       <div style={{
-                        backgroundColor: '#E3F2FD',
+                        backgroundColor: '#E6E9FF',
                         borderRadius: '8px',
                         padding: '16px',
                         marginTop: '16px',
@@ -1193,7 +1192,7 @@ export default function ChecklistPage() {
                             width: '24px',
                             height: '24px',
                             borderRadius: '50%',
-                            backgroundColor: '#2196F3',
+                            backgroundColor: '#606AAA',
                             color: '#FFFFFF',
                             display: 'flex',
                             alignItems: 'center',
@@ -1208,14 +1207,14 @@ export default function ChecklistPage() {
                             <h5 style={{
                               fontSize: '13px',
                               fontWeight: '700',
-                              color: '#1976D2',
+                              color: '#606AAA',
                               margin: '0 0 8px 0'
                             }}>
                               이게 뭐예요?
                             </h5>
                             <p style={{
                               fontSize: '13px',
-                              color: '#424242',
+                              color: '#333333',
                               lineHeight: '1.6',
                               margin: 0
                             }}>
@@ -1263,7 +1262,7 @@ export default function ChecklistPage() {
                             </h5>
                             <p style={{
                               fontSize: '13px',
-                              color: '#424242',
+                              color: '#333333',
                               lineHeight: '1.6',
                               margin: 0
                             }}>
@@ -1305,9 +1304,9 @@ export default function ChecklistPage() {
                                 minWidth: '140px',
                                 padding: '12px 20px',
                                 borderRadius: '8px',
-                                border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
-                                backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
-                                color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
+                                border: button.type === 'primary' ? 'none' : '1px solid #606AAA',
+                                backgroundColor: button.type === 'primary' ? '#606AAA' : '#FFFFFF',
+                                color: button.type === 'primary' ? '#FFFFFF' : '#606AAA',
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 cursor: 'pointer'
@@ -1326,10 +1325,9 @@ export default function ChecklistPage() {
                           width: '100%',
                           padding: '12px',
                           borderRadius: '8px',
-                          border: '1px solid #8FBF4D',
-                          backgroundColor: '#FFFFFF',
-                          color: '#8FBF4D',
-                          fontSize: '14px',
+                          border: '1px solid #8AAB3E',
+                                          backgroundColor: '#FFFFFF',
+                                          color: '#8AAB3E',                          fontSize: '14px',
                           fontWeight: '600',
                           cursor: 'pointer',
                           display: 'flex',

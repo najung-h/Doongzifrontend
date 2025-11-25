@@ -148,7 +148,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
       {/* Header */}
       <div style={{
         padding: '16px 20px',
-        backgroundColor: '#8FBF4D',
+        backgroundColor: '#8AAB3E',
         borderTopLeftRadius: '16px',
         borderTopRightRadius: '16px',
         display: 'flex',
@@ -220,7 +220,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
-        backgroundColor: '#FAF8F3'
+        backgroundColor: '#FFF9E6'
       }}>
         {messages.map((message, index) => (
           <div
@@ -253,7 +253,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
                 padding: '10px 14px',
                 borderRadius: '12px',
                 backgroundColor: message.role === 'user' 
-                  ? '#D4E5B8' 
+                  ? '#E6E9FF' 
                   : '#FFF9E6',
                 color: '#2C2C2C',
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -328,9 +328,9 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
             style={{
               padding: '8px 14px',
               borderRadius: '16px',
-              border: '1.5px solid #8FBF4D',
+              border: '1.5px solid #8AAB3E',
               backgroundColor: '#FFFFFF',
-              color: '#8FBF4D',
+              color: '#8AAB3E',
               fontSize: '11px',
               fontWeight: '600',
               whiteSpace: 'nowrap',
@@ -338,8 +338,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
               cursor: 'pointer',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#8FBF4D';
+e.currentTarget.style.backgroundColor = '#8AAB3E';
               e.currentTarget.style.color = '#FFFFFF';
             }}
             onMouseLeave={(e) => {
@@ -379,7 +378,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
             transition: 'all 0.2s'
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#8FBF4D';
+            e.currentTarget.style.borderColor = '#8AAB3E';
             e.currentTarget.style.backgroundColor = '#FFFFFF';
           }}
           onBlur={(e) => {
@@ -395,7 +394,7 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
             height: '36px',
             borderRadius: '50%',
             border: 'none',
-            backgroundColor: inputText.trim() ? '#8FBF4D' : '#E8E8E8',
+            backgroundColor: inputText.trim() ? '#8AAB3E' : '#E8E8E8',
             color: '#FFFFFF',
             cursor: inputText.trim() ? 'pointer' : 'not-allowed',
             display: 'flex',
@@ -406,12 +405,12 @@ export default function FloatingChatWidget({ isOpen, onClose }: FloatingChatWidg
           }}
           onMouseEnter={(e) => {
             if (inputText.trim()) {
-              e.currentTarget.style.backgroundColor = '#7AA83F';
+              e.currentTarget.style.backgroundColor = '#708C3A';
             }
           }}
           onMouseLeave={(e) => {
             if (inputText.trim()) {
-              e.currentTarget.style.backgroundColor = '#8FBF4D';
+              e.currentTarget.style.backgroundColor = '#8AAB3E';
             }
           }}
         >

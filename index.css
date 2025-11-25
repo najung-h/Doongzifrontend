@@ -400,20 +400,18 @@
 }
 
 :root {
-  --color-bg-primary: #faf8f3;
-  --color-bg-secondary: #f5f3e6;
-  --color-bg-white: #fff;
-  --color-accent-green: #8fbf4d;
-  --color-accent-green-hover: #7aa83f;
-  --color-accent-green-light: #d4e5b8;
-  --color-message-ai: #fff9e6;
-  --color-message-user: #d4e5b8;
-  --color-text-primary: #2c2c2c;
-  --color-text-secondary: #666;
-  --color-text-light: #999;
-  --color-border: #d9d9d9;
-  --color-warning: #ff6b6b;
-  --color-info: #7da8b8;
+  --color-bg-primary: #FFF9E6;
+  --color-bg-secondary: #F5F3E6;
+  --color-bg-white: #FFFFFF;
+  --color-primary-green: #8AAB3E;
+  --color-primary-blue: #606AAA;
+  --color-secondary-blue: #E6E9FF;
+  --color-card-white: #FFFFFF;
+  --color-text-black: #333333;
+  --color-text-gray: #666666;
+  --color-risk-safe: #4CAF50;
+  --color-risk-warning: #FFC107;
+  --color-risk-danger: #F44336;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -622,20 +620,18 @@ html {
 @import "tailwindcss";
 /* virtual-fs:file:///src/styles/globals.css */
 :root {
-  --color-bg-primary: #FAF8F3;
+  --color-bg-primary: #FFF9E6;
   --color-bg-secondary: #F5F3E6;
   --color-bg-white: #FFFFFF;
-  --color-accent-green: #8FBF4D;
-  --color-accent-green-hover: #7AA83F;
-  --color-accent-green-light: #D4E5B8;
-  --color-message-ai: #FFF9E6;
-  --color-message-user: #D4E5B8;
-  --color-text-primary: #2C2C2C;
-  --color-text-secondary: #666666;
-  --color-text-light: #999999;
-  --color-border: #D9D9D9;
-  --color-warning: #FF6B6B;
-  --color-info: #7DA8B8;
+  --color-primary-green: #8AAB3E;
+  --color-primary-blue: #606AAA;
+  --color-secondary-blue: #E6E9FF;
+  --color-card-white: #FFFFFF;
+  --color-text-black: #333333;
+  --color-text-gray: #666666;
+  --color-risk-safe: #4CAF50;
+  --color-risk-warning: #FFC107;
+  --color-risk-danger: #F44336;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;

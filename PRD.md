@@ -61,7 +61,7 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL= # 둥지 짓기 플랜 (위험도 분석, PDF, �
 
 - 채팅 인터페이스 (카카오톡 스타일)
 - 사용자 메시지 (오른쪽):
-  - 배경색: Primary Green (#8FBF4D)
+  - 배경색: Primary Green (#8AAB3E)
   - 텍스트: White (#FFFFFF) 또는 가독성을 고려한 Text Black (#333333)
 - AI 메시지 (왼쪽):
   - 배경색: Card White (#FFFFFF) (그림자 효과 적용)
@@ -75,7 +75,7 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL= # 둥지 짓기 플랜 (위험도 분석, PDF, �
     - 답변(System Prompt): "전세와 월세가 섞인 형태를 말해요. 보통 전세 보증금을 조금 낮추는 대신, 그 차액만큼 매달 월세를 내는 방식이죠. '보증부 월세'라고도 불리며, 전세 대출 이자가 부담스러울 때 많이 선택하는 방법이에요."
 - 입력창 영역:
   - 입력창 배경: Card White (#FFFFFF)
-  - 전송 버튼: Primary Green (#8FBF4D) (비행기 아이콘)
+  - 전송 버튼: Primary Green (#8AAB3E) (비행기 아이콘)
 
 ------
 
@@ -609,7 +609,9 @@ export interface RiskAnalysisResult {
 ## 7. 디자인 가이드
 
 ### Color Palette
-- Primary Green (메인): #8FBF4D (버튼, 활성 아이콘, 활성 체크박스, 로고)
+- Primary Green (메인): #8AAB3E (버튼, 활성 아이콘, 로고)
+- Primary Blue (중요 액션 버튼): #606AAA
+- Secondary Blue (서브): #E6E9FF (진행바)
 - Background Cream (배경): #FFF9E6 (앱 전체 배경)
 - Card White (카드 배경): #FFFFFF (컨텐츠 영역)
 - Text Black (본문): #333333

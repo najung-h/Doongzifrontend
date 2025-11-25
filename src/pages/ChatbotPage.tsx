@@ -100,7 +100,7 @@ export default function ChatbotPage() {
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: '#FAF8F3'
+      backgroundColor: '#FFF9E6'
     }}>
       <Navigation />
 
@@ -147,7 +147,7 @@ export default function ChatbotPage() {
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
-        backgroundColor: '#FAF8F3'
+        backgroundColor: '#FFF9E6'
       }}>
         {messages.map((message, index) => (
           <div
@@ -188,7 +188,7 @@ export default function ChatbotPage() {
                 padding: '14px 18px',
                 borderRadius: '16px',
                 backgroundColor: message.role === 'user' 
-                  ? '#D4E5B8' 
+                  ? '#E6E9FF' 
                   : '#FFF9E6',
                 color: '#2C2C2C',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
@@ -270,9 +270,9 @@ export default function ChatbotPage() {
             style={{
               padding: '10px 18px',
               borderRadius: '20px',
-              border: '2px solid #8FBF4D',
+              border: '2px solid #8AAB3E',
               backgroundColor: '#FFFFFF',
-              color: '#8FBF4D',
+              color: '#8AAB3E',
               fontSize: '13px',
               fontWeight: '600',
               whiteSpace: 'nowrap',
@@ -281,7 +281,7 @@ export default function ChatbotPage() {
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#8FBF4D';
+              e.currentTarget.style.backgroundColor = '#8AAB3E';
               e.currentTarget.style.color = '#FFFFFF';
             }}
             onMouseLeave={(e) => {
@@ -319,7 +319,7 @@ export default function ChatbotPage() {
             color: '#2C2C2C'
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#8FBF4D';
+            e.currentTarget.style.borderColor = '#8AAB3E';
             e.currentTarget.style.backgroundColor = '#FFFFFF';
           }}
           onBlur={(e) => {
@@ -334,7 +334,7 @@ export default function ChatbotPage() {
             width: '48px',
             height: '48px',
             borderRadius: '50%',
-            backgroundColor: inputText.trim() && !isLoading ? '#8FBF4D' : '#D9D9D9',
+            backgroundColor: inputText.trim() && !isLoading ? '#8AAB3E' : '#D9D9D9',
             border: 'none',
             display: 'flex',
             alignItems: 'center',
@@ -344,12 +344,12 @@ export default function ChatbotPage() {
           }}
           onMouseEnter={(e) => {
             if (inputText.trim() && !isLoading) {
-              e.currentTarget.style.backgroundColor = '#7DA842';
+              e.currentTarget.style.backgroundColor = '#708C3A';
             }
           }}
           onMouseLeave={(e) => {
             if (inputText.trim() && !isLoading) {
-              e.currentTarget.style.backgroundColor = '#8FBF4D';
+              e.currentTarget.style.backgroundColor = '#8AAB3E';
             }
           }}
         >

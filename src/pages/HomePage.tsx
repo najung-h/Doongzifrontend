@@ -65,7 +65,7 @@ export default function HomePage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#FAF8F3'
+      backgroundColor: '#FFF9E6'
     }}>
       {/* Top Navigation */}
       <Navigation />
@@ -107,7 +107,7 @@ export default function HomePage() {
             <h1 style={{
               fontSize: '48px',
               fontWeight: '700',
-              color: '#8FBF4D',
+              color: '#8AAB3E',
               marginBottom: '4px',
               lineHeight: '1',
               letterSpacing: '-1px'
@@ -174,7 +174,7 @@ export default function HomePage() {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'scale(1.03)';
-            e.currentTarget.style.borderColor = '#8FBF4D';
+            e.currentTarget.style.borderColor = '#8AAB3E';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)';
@@ -270,8 +270,8 @@ export default function HomePage() {
           </div>
 
           <div style={{
-            backgroundColor: '#EEF5FF',
-            border: '1px solid #D0E3FF',
+            backgroundColor: '#E6E9FF',
+            border: '1px solid #E6E9FF',
             borderRadius: '8px',
             padding: '10px 14px',
             display: 'flex',
@@ -279,7 +279,7 @@ export default function HomePage() {
             gap: '8px'
           }}>
             <span style={{
-              color: '#4A90E2',
+              color: '#606AAA',
               fontSize: '14px',
               lineHeight: '1',
               marginTop: '1px'
@@ -289,7 +289,7 @@ export default function HomePage() {
             <div>
               <p style={{
                 fontSize: '11px',
-                color: '#4A90E2',
+                color: '#606AAA',
                 fontWeight: '600',
                 letterSpacing: '-0.1px'
               }}>
@@ -320,7 +320,7 @@ export default function HomePage() {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'scale(1.03)';
-            e.currentTarget.style.borderColor = '#8FBF4D';
+            e.currentTarget.style.borderColor = '#8AAB3E';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)';
@@ -384,7 +384,7 @@ export default function HomePage() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.03)';
-              e.currentTarget.style.borderColor = '#8FBF4D';
+              e.currentTarget.style.borderColor = '#8AAB3E';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
@@ -441,7 +441,7 @@ export default function HomePage() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.03)';
-              e.currentTarget.style.borderColor = '#8FBF4D';
+              e.currentTarget.style.borderColor = '#8AAB3E';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
@@ -537,7 +537,7 @@ export default function HomePage() {
                   <div style={{
                     width: '48px',
                     height: '48px',
-                    backgroundColor: '#8B6F47',
+                    backgroundColor: '#8AAB3E',
                     borderRadius: '50%'
                   }} />
                   <div>
@@ -571,7 +571,7 @@ export default function HomePage() {
                 onClick={() => document.getElementById('fileInput')?.click()}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#F5F5F5';
-                  e.currentTarget.style.borderColor = '#8FBF4D';
+                  e.currentTarget.style.borderColor = '#8AAB3E';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = '#FAFAFA';
@@ -588,7 +588,7 @@ export default function HomePage() {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <Upload size={32} color="#8FBF4D" />
+                    <Upload size={32} color="#8AAB3E" />
                   </div>
                   <p style={{
                     fontSize: '14px',
@@ -616,8 +616,8 @@ export default function HomePage() {
 
                 {selectedFile && (
                   <div style={{
-                    backgroundColor: '#F0F7FA',
-                    border: '1px solid #D0E3FF',
+backgroundColor: '#E6E9FF',
+                    border: '1px solid #E6E9FF',
                     borderRadius: '8px',
                     padding: '12px 16px',
                     marginBottom: '20px',
@@ -630,7 +630,7 @@ export default function HomePage() {
                       alignItems: 'center',
                       gap: '8px'
                     }}>
-                      <CheckCircle size={20} color="#8FBF4D" />
+                      <CheckCircle size={20} color="#8AAB3E" />
                       <span style={{
                         fontSize: '13px',
                         color: '#2C2C2C',
@@ -659,7 +659,7 @@ export default function HomePage() {
                   disabled={!selectedFile || isUploading}
                   style={{
                     width: '100%',
-                    backgroundColor: selectedFile && !isUploading ? '#8FBF4D' : '#E8E8E8',
+                    backgroundColor: selectedFile && !isUploading ? '#8AAB3E' : '#E8E8E8',
                     color: selectedFile && !isUploading ? '#FFFFFF' : '#999999',
                     fontSize: '15px',
                     fontWeight: '600',
@@ -685,14 +685,14 @@ export default function HomePage() {
                   <div style={{
                     width: '64px',
                     height: '64px',
-                    backgroundColor: '#E3F2FD',
+                    backgroundColor: '#E6E9FF',
                     borderRadius: '50%',
                     margin: '0 auto 16px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <Mail size={32} color="#2196F3" />
+                    <Mail size={32} color="#606AAA" />
                   </div>
                   <h2 style={{
                     fontSize: '22px',
@@ -728,7 +728,7 @@ export default function HomePage() {
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#8FBF4D';
+                    e.currentTarget.style.borderColor = '#8AAB3E';
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = '#D9D9D9';
@@ -739,7 +739,7 @@ export default function HomePage() {
                   onClick={handleEmailSubmit}
                   style={{
                     width: '100%',
-                    backgroundColor: '#8FBF4D',
+                    backgroundColor: '#8AAB3E',
                     color: '#FFFFFF',
                     fontSize: '15px',
                     fontWeight: '600',
@@ -750,7 +750,7 @@ export default function HomePage() {
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#7DA842';
+                    e.currentTarget.style.backgroundColor = '#708C3A';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#8FBF4D';
@@ -767,7 +767,7 @@ export default function HomePage() {
                 <div style={{
                   width: '80px',
                   height: '80px',
-                  backgroundColor: '#E8F5E9',
+                  backgroundColor: '#E6E9FF',
                   borderRadius: '50%',
                   margin: '0 auto 20px',
                   display: 'flex',
@@ -792,13 +792,13 @@ export default function HomePage() {
                   lineHeight: '1.7',
                   marginBottom: '24px'
                 }}>
-                  분석 결과는 <strong style={{ color: '#8FBF4D' }}>{email}</strong>로<br />
+                  분석 결과는 <strong style={{ color: '#8AAB3E' }}>{email}</strong>로<br />
                   5-10분 이내에 전송될 예정입니다.
                 </p>
 
                 <div style={{
                   backgroundColor: '#F0F7FA',
-                  border: '1px solid #D0E3FF',
+                  border: '1px solid #E6E9FF',
                   borderRadius: '8px',
                   padding: '16px',
                   marginBottom: '24px',
@@ -821,7 +821,7 @@ export default function HomePage() {
                   onClick={handleModalClose}
                   style={{
                     width: '100%',
-                    backgroundColor: '#8FBF4D',
+                    backgroundColor: '#8AAB3E',
                     color: '#FFFFFF',
                     fontSize: '15px',
                     fontWeight: '600',
@@ -832,7 +832,7 @@ export default function HomePage() {
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#7DA842';
+                    e.currentTarget.style.backgroundColor = '#708C3A';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#8FBF4D';
