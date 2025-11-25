@@ -13,14 +13,14 @@ RUN npm ci
 # 전체 소스 코드 복사
 COPY . .
 
-# 애플리케이션 빌드 (vite.config.ts의 outDir 설정에 따라 'dist' 폴더에 결과물 생성)
+# 애플리케이션 빌드 (vite.config.ts의 outDir 설정에 따라 'build' 폴더에 결과물 생성)
 RUN npm run build
 
 # 2단계: Nginx 웹서버 설정 (Final Stage)
 FROM nginx:stable-alpine
 
-# 빌드 단계(builder)에서 생성된 결과물('dist' 폴더)을 Nginx의 기본 웹 루트 디렉터리로 복사
-COPY --from=builder /app/dist /usr/share/nginx/html
+# 빌드 단계(builder)에서 생성된 결과물('build' 폴더)을 Nginx의 기본 웹 루트 디렉터리로 복사
+COPY --from=builder /app/build /usr/share/nginx/html
 
 # 80번 포트 노출
 EXPOSE 80 443
