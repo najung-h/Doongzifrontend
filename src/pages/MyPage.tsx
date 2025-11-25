@@ -24,6 +24,17 @@ const mockProperties: Property[] = [
     deposit: 300000000,
     createdAt: new Date('2024-01-15'),
     nickname: '16평 남향 아파트'
+  },
+  {
+    id: '2',
+    userId: '1',
+    address: '서울특별시 강서구 공항대로 456',
+    propertyType: 'officetel',
+    contractType: 'monthly',
+    deposit: 10000000,
+    monthlyRent: 700000,
+    createdAt: new Date('2024-02-08'),
+    nickname: '13평 강서구 오피스텔'
   }
 ];
 
@@ -78,11 +89,13 @@ const mockURLs: URLResource[] = [
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [user] = useState<UserType>(mockUser);
-  const [properties] = useState<Property[]>(mockProperties);
+  const [properties, setProperties] = useState<Property[]>(mockProperties);
   const [conversations] = useState<Conversation[]>(mockConversations);
   const [savedURLs] = useState<URLResource[]>(mockURLs);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [isEditingProperty, setIsEditingProperty] = useState(false);
+  const [editedProperty, setEditedProperty] = useState<Property | null>(null);
 
   const tabs = [
     { id: 'profile' as TabType, name: '내 프로필', icon: User },
@@ -116,6 +129,28 @@ export default function MyPage() {
       house: '단독주택'
     };
     return labels[type] || type;
+  };
+
+  const handleStartEditProperty = () => {
+    if (selectedProperty) {
+      setEditedProperty({ ...selectedProperty });
+      setIsEditingProperty(true);
+    }
+  };
+
+  const handleSaveProperty = () => {
+    if (editedProperty) {
+      setProperties(properties.map(p =>
+        p.id === editedProperty.id ? editedProperty : p
+      ));
+      setSelectedProperty(editedProperty);
+      setIsEditingProperty(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedProperty(null);
+    setIsEditingProperty(false);
   };
 
   return (
@@ -808,36 +843,194 @@ export default function MyPage() {
               borderBottom: '2px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               position: 'sticky',
               top: 0,
               backgroundColor: 'var(--color-bg-white)',
               zIndex: 10
             }}>
-              <div>
-                <h2 style={{
-                  fontSize: 'clamp(20px, 3vw, 24px)',
-                  fontWeight: '700',
-                  marginBottom: '4px'
-                }}>
-                  📄 {selectedProperty.nickname || '계약 예정 물건'}
-                </h2>
-                <p style={{
-                  fontSize: 'clamp(13px, 2vw, 14px)',
-                  color: 'var(--color-text-secondary)'
-                }}>
-                  {selectedProperty.address}
-                </p>
+              <div style={{ flex: 1, marginRight: '16px' }}>
+                {isEditingProperty && editedProperty ? (
+                  // 편집 모드
+                  <div>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: 'clamp(12px, 2vw, 13px)',
+                        color: 'var(--color-text-secondary)',
+                        marginBottom: '4px',
+                        fontWeight: '600'
+                      }}>
+                        별칭
+                      </label>
+                      <input
+                        type="text"
+                        value={editedProperty.nickname || ''}
+                        onChange={(e) => setEditedProperty({ ...editedProperty, nickname: e.target.value })}
+                        placeholder="예: 16평 남향 아파트"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          fontSize: 'clamp(14px, 2.5vw, 16px)',
+                          border: '2px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          outline: 'none',
+                          transition: 'border-color 0.2s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-border)';
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        fontSize: 'clamp(12px, 2vw, 13px)',
+                        color: 'var(--color-text-secondary)',
+                        marginBottom: '4px',
+                        fontWeight: '600'
+                      }}>
+                        주소
+                      </label>
+                      <input
+                        type="text"
+                        value={editedProperty.address}
+                        onChange={(e) => setEditedProperty({ ...editedProperty, address: e.target.value })}
+                        placeholder="주소를 입력하세요"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          fontSize: 'clamp(13px, 2vw, 14px)',
+                          border: '2px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          outline: 'none',
+                          transition: 'border-color 0.2s ease'
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--color-border)';
+                        }}
+                      />
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginTop: '12px'
+                    }}>
+                      <button
+                        onClick={handleSaveProperty}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: 'var(--color-accent-green)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: 'clamp(12px, 2vw, 13px)',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                        }}
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: 'var(--color-bg-secondary)',
+                          color: 'var(--color-text-primary)',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: 'clamp(12px, 2vw, 13px)',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-border)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)';
+                        }}
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // 보기 모드
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '4px'
+                    }}>
+                      <h2 style={{
+                        fontSize: 'clamp(20px, 3vw, 24px)',
+                        fontWeight: '700',
+                        margin: 0
+                      }}>
+                        📄 {selectedProperty.nickname || '계약 예정 물건'}
+                      </h2>
+                      <button
+                        onClick={handleStartEditProperty}
+                        style={{
+                          padding: '6px',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          borderRadius: 'var(--radius-sm)',
+                          transition: 'background-color 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--color-accent-green)' + '20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <Edit2 size={16} color="var(--color-accent-green)" />
+                      </button>
+                    </div>
+                    <p style={{
+                      fontSize: 'clamp(13px, 2vw, 14px)',
+                      color: 'var(--color-text-secondary)',
+                      margin: 0
+                    }}>
+                      {selectedProperty.address}
+                    </p>
+                  </div>
+                )}
               </div>
               <button
-                onClick={() => setIsDocumentModalOpen(false)}
+                onClick={() => {
+                  setIsDocumentModalOpen(false);
+                  setIsEditingProperty(false);
+                  setEditedProperty(null);
+                }}
                 style={{
                   padding: '8px',
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                   borderRadius: 'var(--radius-sm)',
-                  transition: 'background-color 0.2s ease'
+                  transition: 'background-color 0.2s ease',
+                  flexShrink: 0
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)';
