@@ -2,14 +2,12 @@
 
 ## 환경 변수 설정
 
-1. `.env` 파일에 백엔드 팀에서 제공받은 n8n 웹훅 URL 입력
-
+백엔드 로직은 3개의 n8n 워크플로우로 통합 관리됩니다.
 ```bash
-# n8n Webhook URLs
-VITE_N8N_CHATBOT_WEBHOOK_URL=
-VITE_N8N_SCAN_WEBHOOK_URL=
-VITE_N8N_CHECKLIST_WEBHOOK_URL=
-VITE_N8N_LEGAL_WEBHOOK_URL=
+# .env
+VITE_N8N_CHATBOT_WEBHOOK_URL=       # 어미새 챗봇 + 법률 사전
+VITE_N8N_SCAN_WEBHOOK_URL=          # 둥지 스캔 (문서 분석/OCR)
+VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PDF, 이메일 등)
 ```
 
 ## API 구조
@@ -17,296 +15,337 @@ VITE_N8N_LEGAL_WEBHOOK_URL=
 모든 API는 **actionType 기반 라우팅**을 사용합니다.
 각 기능별로 하나의 웹훅 URL을 사용하며, `actionType` 필드로 세부 기능을 구분합니다.
 
-### 1. 챗봇 API (`VITE_N8N_CHATBOT_WEBHOOK_URL`)
+### 1. Chat Service (어미새 챗봇 + 법률 사전)
+- Endpoint: `VITE_N8N_CHATBOT_WEBHOOK_URL` 
+- 담당 기능: 어미새 챗봇 대화, 법률/판례 검색 (PRD 4.2, 4.5)
+- n8n Switch Logic (`actionType`)
+  - `sendMessage`: 일반 대화 및 고정 질문 처리 (어미새 챗봇)
+  - `searchLegal`: 법률 사전 키워드 검색
 
-```typescript
-import { chatbotAPI } from './api/chatbot';
+#### 1.1 메시지 전송 (`sendMessage`)
 
-// 메시지 전송
-const response = await chatbotAPI.sendMessage(
-  '확정일자가 뭔가요?',
-  'conversation-id-123'
-);
-
+```json
 // Request Body:
 {
-  actionType: 'sendMessage',
-  query: '확정일자가 뭔가요?',
-  conversation_id: 'conversation-id-123'
-}
-
-// Response:
-{
-  reply: '확정일자는...',
-  conversation_id: 'conversation-id-123'
+  "actionType": "sendMessage",
+  "query": "확정일자가 뭔가요?",
+  "conversation_id": "conv_12345" // 선택사항 (첫 대화 시 생략)
 }
 ```
 
-### 2. 스캔/분석 API (`VITE_N8N_SCAN_WEBHOOK_URL`)
-
-```typescript
-import { scanAPI } from './api/scan';
-
-// 문서 분석
-const files = [file1, file2, file3];
-const result = await scanAPI.analyzeDocuments(files);
-
-// Request (FormData):
+```json
+// Response Body:
 {
-  actionType: 'analyzeDocuments',
-  files: [File, File, File]
-}
-
-// Response:
-{
-  success: true,
-  analysis: {
-    riskLevel: 25,
-    riskGrade: 'low',
-    issues: [...],
-    recommendations: [...]
-  }
+  "success": true,
+  "reply": "확정일자란 법원 또는 동사무소 등에서 주택임대차계약을 체결한 날짜를 확인하여 주기 위해...",
+  "conversation_id": "conv_12345"
 }
 ```
 
-### 3. 체크리스트 API (`VITE_N8N_CHECKLIST_WEBHOOK_URL`)
+#### 1.2 법률 정보 검색 (`searchLegal`)
 
-#### 3.1 PDF 다운로드
-
-```typescript
-import { checklistAPI } from './api/checklist';
-
-// PDF 생성
-const result = await checklistAPI.exportPDF(checklistData);
-
+```json
+// !TODO 구현하려면 법령정보센터 API 규격에 맞게 수정
 // Request Body:
 {
-  actionType: 'exportPDF',
-  checklistData: [...]
-}
-
-// Response:
-{
-  success: true,
-  pdfUrl: 'https://...'
+  "actionType": "searchLegal",
+  "query": "전세사기",
+  "category": "case" // 'all' | 'law' (법령) | 'case' (판례)
 }
 ```
 
-#### 3.2 이메일 전송
-
-```typescript
-// 이메일 전송
-const result = await checklistAPI.sendEmail(
-  'user@example.com',
-  checklistData
-);
-
-// Request Body:
+```json
+// Response Body:
 {
-  actionType: 'sendEmail',
-  email: 'user@example.com',
-  checklistData: [...]
-}
-
-// Response:
-{
-  success: true,
-  message: '이메일이 전송되었습니다.'
-}
-```
-
-#### 3.3 등기부등본 발급
-
-```typescript
-// 등기부등본 발급
-const result = await checklistAPI.issueRegistry(
-  '서울시 강남구 역삼동 123-45',
-  '010-1234-5678',
-  'password123'
-);
-
-// Request Body:
-{
-  actionType: 'issueRegistry',
-  address: '서울시 강남구 역삼동 123-45',
-  phone: '010-1234-5678',
-  password: 'password123'
-}
-
-// Response:
-{
-  success: true,
-  registryUrl: 'https://...',
-  message: '발급이 완료되었습니다.'
-}
-```
-
-#### 3.4 보증보험 가입 가능 여부 확인
-
-```typescript
-// 보증보험 확인
-const result = await checklistAPI.checkInsurance({
-  address: '서울시 강남구 역삼동 123-45',
-  deposit: 300000000,
-  monthlyRent: 0
-});
-
-// Request Body:
-{
-  actionType: 'checkInsurance',
-  propertyInfo: {
-    address: '서울시 강남구 역삼동 123-45',
-    deposit: 300000000,
-    monthlyRent: 0
-  }
-}
-
-// Response:
-{
-  success: true,
-  eligible: true,
-  message: '보증보험 가입이 가능합니다.',
-  details: 'HUG, SGI 모두 가입 가능'
-}
-```
-
-#### 3.5 깡통전세 위험도 분석
-
-```typescript
-// 위험도 분석
-const result = await checklistAPI.analyzeRisk({
-  address: '서울시 강남구 역삼동 123-45',
-  marketPrice: 350000000,
-  deposit: 300000000
-});
-
-// Request Body:
-{
-  actionType: 'analyzeRisk',
-  propertyInfo: {
-    address: '서울시 강남구 역삼동 123-45',
-    marketPrice: 350000000,
-    deposit: 300000000
-  }
-}
-
-// Response:
-{
-  success: true,
-  riskLevel: 'medium',
-  riskScore: 65,
-  message: '보증금 비율이 85%로 다소 높습니다.',
-  recommendations: [
-    '보증보험 가입을 권장합니다.',
-    '선순위 권리관계를 확인하세요.'
+  "success": true,
+  "results": [
+    {
+      "title": "전세사기 관련 주요 판례 2023다1234",
+      "summary": "임대인이 보증금 반환 의사 없이...",
+      "link": "https://..."
+    }
   ]
 }
 ```
 
-### 4. 법률/판례 검색 API (`VITE_N8N_LEGAL_WEBHOOK_URL`)
+### 2. Document Service (문서 분석)
+- Endpoint: `VITE_N8N_SCAN_WEBHOOK_URL` 
+- 담당 기능: 둥지 스캔, 계약서 정밀 진단 (PRD 4.3, 4.4-MVP1)
+- n8n Switch Logic (`actionType`)
+  - 주의: 파일 업로드이므로 `Content-Type: multipart/form-data`를 사용합니다. `actionType`은 FormData의 필드로 전송합니다.
+  - `scanDocuments`: (둥지 스캔) 등기부등본/건축물대장/계약서 통합 분석 및 체크리스트 자동 완료. 처리 방식은 비동기 (Asynchronous) - 요청 즉시 200 OK 응답, 분석은 백그라운드에서 진행됨.
+  - `deepAnalyzeContract`: (체크리스트 내부) 계약서 독소조항 정밀 진단
+  - `deepAnalyzeRegistry`: (체크리스트 내부) 등기부등본 근저당 정밀 진단
 
-#### 4.1 법률/판례 검색
+#### 2.1 둥지 스캔 (`scanDocuments`)
+프론트엔드는 파일만 전송하고 연결을 종료합니다. 로딩 화면 대신 "분석이 시작되었습니다. 결과는 이메일로 전송됩니다."라는 안내가 필요합니다.
 
-```typescript
-import { legalAPI } from './api/legal';
-
-// 법률/판례 검색
-const result = await legalAPI.searchLegal('전세사기', 'all');
-
-// Request Body:
+```json
+// Request (FormData):
 {
-  actionType: 'searchLegal',
-  query: '전세사기',
-  filter: 'all'  // 'all' | 'case' | 'law'
-}
-
-// Response:
-{
-  success: true,
-  results: [
-    {
-      id: '1',
-      type: 'case',
-      title: '전세사기 관련 판례',
-      court: '대법원',
-      caseNumber: '2023다123456',
-      summary: '...',
-      url: 'https://...'
-    },
-    {
-      id: '2',
-      type: 'law',
-      title: '주택임대차보호법',
-      lawName: '주택임대차보호법',
-      article: '제3조의2',
-      summary: '...',
-      url: 'https://...'
-    }
-  ],
-  totalCount: 42
+  "actionType": "scanDocuments",
+  // "files": [File Object, File Object...]
+  "files": [File Object]
 }
 ```
 
-#### 4.2 법률/판례 상세 조회
-
-```typescript
-// 상세 조회
-const result = await legalAPI.getLegalDetail('case-123');
-
-// Request Body:
+```json
+// Response (즉시 반환)
 {
-  actionType: 'getLegalDetail',
-  id: 'case-123'
+  "message": "Workflow started" 
 }
+```
 
+#### 2.2 계약서 정밀 진단 (`deepAnalyzeContract`)
+
+```json
+// Request (FormData):
+{
+  "actionType": "deepAnalyzeContract",
+  "files": [Contract File Object]
+}
+```
+
+```json
 // Response:
 {
-  success: true,
-  data: {
-    id: 'case-123',
-    type: 'case',
-    title: '전세사기 관련 판례',
-    content: '...(전체 내용)...',
-    court: '대법원',
-    caseNumber: '2023다123456',
-    date: '2023-05-15',
-    url: 'https://...'
+  "success": true,
+  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
+}
+```
+
+#### 2.3 등기부등본 정밀 분석 (`deepAnalyzeRegistry`)
+```json
+// Request (FormData):
+{
+  "actionType": "deepAnalyzeRegistry",
+  "files": [Registry File Object]
+}
+```
+
+```json
+// Response:
+{
+  "success": true,
+  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
+}
+```
+
+
+### 3. Checklist Service (둥지 짓기 플랜)
+
+- Endpoint: `VITE_N8N_CHECKLIST_WEBHOOK_URL` 
+- 담당 기능: 깡통전세 분석, 보험 확인, PDF 내보내기 (PRD 4.4)
+- n8n Switch Logic (`actionType`)
+  - `analyzeRisk`: 깡통전세 위험도 분석
+  - `exportPDF`: 체크리스트 PDF 생성 및 다운로드 링크
+  - `sendEmail`: 체크리스트 PDF 이메일 발송
+
+
+#### 3.1 깡통전세 위험도 분석 (`analyzeRisk`)
+
+```json
+// Request Body:
+{
+  "actionType": "analyzeRisk",
+  "address": "서울특별시 관악구 쑥고개로 123",
+  "exclusiveArea": 20.74,
+  "type": "오피스텔",      // '아파트' | '단독/다가구' | '연립/다세대' | '오피스텔' 
+  "deposit": 12000        // 보증금 (단위: 만 원)
+}
+```
+
+```json
+// Response:
+{
+  "success": true,
+  "result": {
+    "riskLevel": "safe",  // 'safe' | 'warning' | 'danger'
+    "ratio": 66.3,
+    "message": "매매가 대비 전세가율이 70% 이하로 비교적 안전한 편입니다.",
+    "graphData": {
+      "safeLine": 70,
+      "current": 66.3
+    },
+    "extraToWarning_만원": 670,
+    "extraToDanger_만원": 0,
+    "mortgageMessage": "현재 보증금 기준으로 약 670만 원 이상 추가되는 근저당·선순위 채권이 잡히면 전세가율이 70%를 넘어 '주의' 단계로 올라갈 수 있어요. 등기부등본에서 근저당 설정 금액이 이 금액을 넘지 않는지 꼭 확인해보세요."
   }
 }
 ```
 
-#### 4.3 인기 검색어 조회
+#### 3.2 PDF 내보내기 (`exportPDF`)
 
-```typescript
-// 인기 검색어 조회
-const result = await legalAPI.getPopularKeywords();
-
+```json
 // Request Body:
 {
-  actionType: 'getPopularKeywords'
+  "actionType": "exportPDF",
+  "userId": "61a8fc1d-67b0-45db-b913-602654b45c3c"
 }
+```
 
+```json
 // Response:
 {
-  success: true,
-  keywords: ['전세사기', '임대차보호법', '확정일자', '계약해지', '보증금반환']
+  "success": true,
+  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
 }
 ```
 
-## n8n Switch 노드 설정 예시
+#### 3.3 이메일 전송 (`sendEmail`)
 
-### 체크리스트 웹훅의 n8n 플로우
+```json
+// Request Body:
+{
+  "actionType": "sendEmail",
+  "userId": "61a8fc1d-67b0-45db-b913-602654b45c3c"
+}
+```
 
+```json
+// Response:
+{
+  "success": true,
+  "message": "user@example.com으로 리포트가 발송되었습니다."
+}
 ```
-Webhook Trigger
-  ↓
-Switch ({{ $json.actionType }})
-  ├─ Case: exportPDF → PDF 생성 로직
-  ├─ Case: sendEmail → 이메일 전송 로직
-  ├─ Case: issueRegistry → 등기부등본 API 호출
-  ├─ Case: checkInsurance → 보증보험 확인 로직
-  └─ Case: analyzeRisk → 위험도 분석 로직
+
+## Axios 인스턴스 설정 (`src/api/http.ts`)
+중복 코드를 줄이기 위해 Axios 인스턴스를 생성합니다.
+
+```typescript
+// src/api/http.ts
+import axios from 'axios';
+
+export const apiClient = axios.create({
+  timeout: 60000, // 60초 타임아웃 (AI 분석 시간이 걸릴 수 있음)
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// 응답 인터셉터 (에러 처리 공통화)
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error);
+    // 필요 시 에러 토스트 메시지 띄우기 로직 추가
+    return Promise.reject(error);
+  }
+);
 ```
+
+## 서비스별 API 모듈 구현
+각 서비스 파일은 actionType을 페이로드에 포함하여 n8n의 Switch 노드가 작동하도록 합니다.
+
+### 1. Chat Service (`src/api/chat.ts`)
+```typescript
+import { apiClient } from './http';
+import { ChatResponse } from '../types/api';
+
+const WEBHOOK_URL = import.meta.env.VITE_N8N_CHAT_WEBHOOK_URL;
+
+export const chatAPI = {
+  // 일반 대화 보내기
+  sendMessage: async (query: string, conversationId?: string) => {
+    const { data } = await apiClient.post<ChatResponse>(WEBHOOK_URL, {
+      actionType: 'sendMessage',
+      query,
+      conversation_id: conversationId,
+    });
+    return data;
+  },
+
+  // 법률/판례 검색
+  searchLegal: async (keyword: string, category: 'all' | 'law' | 'case' = 'all') => {
+    const { data } = await apiClient.post<ChatResponse>(WEBHOOK_URL, {
+      actionType: 'searchLegal',
+      keyword,
+      category,
+    });
+    return data;
+  },
+};
+```
+
+### 2. Document Service (`src/api/document.ts`)
+파일 업로드를 위해 FormData를 사용해야 합니다.
+
+```typescript
+import { apiClient } from './http';
+import { DocAnalysisResponse } from '../types/api';
+
+const WEBHOOK_URL = import.meta.env.VITE_N8N_DOC_WEBHOOK_URL;
+
+export const docAPI = {
+  // 둥지 스캔 (등기부등본, 계약서 등 다중 파일 분석)
+  scanDocuments: async (files: File[]) => {
+    const formData = new FormData();
+    formData.append('actionType', 'scanDocuments');
+    
+    // 파일 배열 처리
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    const { data } = await apiClient.post<DocAnalysisResponse>(WEBHOOK_URL, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }, // 필수
+    });
+    return data;
+  },
+
+  // 계약서 정밀 진단 (체크리스트 내부 기능)
+  deepAnalyzeContract: async (file: File) => {
+    const formData = new FormData();
+    formData.append('actionType', 'deepAnalyzeContract');
+    formData.append('files', file);
+
+    const { data } = await apiClient.post<DocAnalysisResponse>(WEBHOOK_URL, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  },
+};
+```
+
+### 3. Checklist Service (`src/api/checklist.ts`)
+```typescript
+import { apiClient } from './http';
+import { ChecklistToolResponse } from '../types/api';
+
+const WEBHOOK_URL = import.meta.env.VITE_N8N_CHECKLIST_WEBHOOK_URL;
+
+export const checklistAPI = {
+  // 깡통전세 위험도 분석
+  analyzeRisk: async (address: string, deposit: number, marketPrice: number) => {
+    const { data } = await apiClient.post<ChecklistToolResponse>(WEBHOOK_URL, {
+      actionType: 'analyzeRisk',
+      data: { address, deposit, exclusiveArea, type },
+    });
+    return data;
+  },
+
+  // PDF 내보내기
+  exportPDF: async (checklistData: any) => {
+    const { data } = await apiClient.post<ChecklistToolResponse>(WEBHOOK_URL, {
+      actionType: 'exportPDF',
+      checklistData,
+    });
+    return data;
+  },
+
+  // 이메일 전송
+  sendEmail: async (email: string, checklistData: any) => {
+    const { data } = await apiClient.post<ChecklistToolResponse>(WEBHOOK_URL, {
+      actionType: 'sendEmail',
+      email,
+      checklistData,
+    });
+    return data;
+  },
+};
+```
+
 
 ## 에러 핸들링
 
@@ -319,13 +358,4 @@ try {
   console.error('API 호출 실패:', error);
   // 자동으로 fallback 응답 반환됨
 }
-```
-
-## 개발 모드 테스트
-
-환경 변수가 설정되지 않은 경우, 각 API는 Mock 데이터를 반환하여 프론트엔드 개발을 계속할 수 있습니다.
-
-```bash
-# 환경 변수 없이 개발 서버 실행
-npm run dev
 ```
