@@ -1,10 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
 
   return (
     <nav style={{
@@ -150,7 +150,7 @@ export default function Navigation() {
         ) : (
           // 로그인한 상태: 로그아웃 버튼만
           <button
-            onClick={() => setIsLoggedIn(false)}
+            onClick={logout}
             style={{
               backgroundColor: '#8FBF4D',
               border: 'none',

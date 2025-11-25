@@ -7,6 +7,7 @@ import MyPage from './pages/MyPage';
 import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import { AuthProvider } from './context/AuthContext';
 
 function AppContent() {
   return (
@@ -26,7 +27,9 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

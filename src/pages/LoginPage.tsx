@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -11,7 +13,9 @@ export default function LoginPage() {
     e.preventDefault();
     // TODO: 실제 로그인 로직 구현
     console.log('로그인 시도:', { email, password });
-    // 임시로 홈으로 이동
+    // 로그인 상태 업데이트
+    login();
+    // 홈으로 이동
     navigate('/');
   };
 
