@@ -37,11 +37,15 @@ export default function ScanPage() {
     setIsAnalyzing(true);
 
     try {
-      // docType은 파일명이나 사용자 선택으로 결정 가능 (현재는 임대차계약서로 기본값)
-      const result = await scanAPI.analyzeDocuments(uploadedFiles, '임대차계약서');
+      // [수정] scanAPI.analyzeDocuments로 함수명 변경 (scan.ts 정의와 일치)
+      // docType은 n8n 워크플로우에서 처리되거나 기본값으로 동작하도록 생략
+      const result = await scanAPI.scanDocuments(uploadedFiles);
 
       if (result.success) {
-        alert(`분석 완료!\n등급: ${result.analysis.riskGrade}`);
+        // 분석 결과 표출 (등급에 따라 이모지 추가 등 UI 개선 가능)
+        alert(`[분석 완료]\n위험 등급: ${result.analysis.riskGrade}\n\n${result.analysis.summary}`);
+      } else {
+        alert(`분석 실패: ${result.message}`);
       }
     } catch (error) {
       console.error('문서 분석 실패:', error);

@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
-import { X, Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Upload, FileText, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
-import AnalysisLoadingView from './AnalysisLoadingView';
 
 interface InsuranceCheckModalProps {
   isOpen: boolean;
@@ -9,178 +8,165 @@ interface InsuranceCheckModalProps {
 }
 
 export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckModalProps) {
-  const [files, setFiles] = useState<File[]>([]);
   const [deposit, setDeposit] = useState('');
-  const [landlordName, setLandlordName] = useState('');
-  const [address, setAddress] = useState('');
-  const [exclusiveArea, setExclusiveArea] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<{
-    success: boolean;
-    eligible: boolean;
-    message: string;
-    details?: string;
-  } | null>(null);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [registryFile, setRegistryFile] = useState<File | null>(null);
+  const [buildingFile, setBuildingFile] = useState<File | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  const registryInputRef = useRef<HTMLInputElement>(null);
+  const buildingInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
-    }
-  };
-
-  const handleCheck = async () => {
-    if (files.length === 0 || !deposit || !address || !exclusiveArea) {
-      alert('파일(등기부등본, 건축물대장), 보증금, 주소, 전용면적을 모두 입력해주세요.');
+  const handleAnalyze = async () => {
+    if (!deposit || !registryFile || !buildingFile) {
+      alert('보증금과 두 가지 서류를 모두 등록해주세요.');
       return;
     }
 
-    setIsLoading(true);
+    setIsAnalyzing(true);
     try {
-      const response = await checklistAPI.checkInsurance({
-        address,
-        deposit: Number(deposit),
-      });
-      setResult(response);
+      const result = await checklistAPI.checkInsurance(
+        registryFile,
+        buildingFile,
+        Number(deposit)
+      );
+
+      if (result.success) {
+        alert(`[분석 결과]\n${result.message}\n\n${result.details || ''}`);
+        onClose(); // 성공 시 모달 닫기
+      } else {
+        alert(`확인 실패: ${result.message}`);
+      }
     } catch (error) {
       console.error(error);
-      alert('오류가 발생했습니다.');
+      alert('분석 중 오류가 발생했습니다.');
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
-  const handleClose = () => {
-    setFiles([]);
-    setDeposit('');
-    setLandlordName('');
-    setAddress('');
-    setExclusiveArea('');
-    setResult(null);
-    onClose();
-  };
+  const FileUploadBox = ({ 
+    title, 
+    file, 
+    onSelect, 
+    inputRef 
+  }: { 
+    title: string, 
+    file: File | null, 
+    onSelect: (f: File) => void, 
+    inputRef: React.RefObject<HTMLInputElement> 
+  }) => (
+    <div 
+      onClick={() => inputRef.current?.click()}
+      style={{
+        border: `1px dashed ${file ? '#8FBF4D' : '#D9D9D9'}`,
+        borderRadius: '8px',
+        padding: '20px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        backgroundColor: file ? '#F0F7FA' : '#FAFAFA',
+        marginBottom: '12px'
+      }}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".pdf,.jpg,.png"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          if (e.target.files?.[0]) onSelect(e.target.files[0]);
+        }}
+      />
+      {file ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#2C2C2C' }}>
+          <CheckCircle size={20} color="#8FBF4D" />
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>{file.name}</span>
+        </div>
+      ) : (
+        <div style={{ color: '#666' }}>
+          <Upload size={24} style={{ marginBottom: '8px', color: '#999' }} />
+          <div style={{ fontSize: '14px', fontWeight: '600' }}>{title} 업로드</div>
+          <div style={{ fontSize: '12px', color: '#999' }}>PDF, JPG, PNG</div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <>
-      <AnalysisLoadingView isLoading={isLoading} analysisType="insurance" />
-
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+    }}>
       <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-        alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        backgroundColor: 'white', borderRadius: '16px', width: '100%', maxWidth: '500px',
+        padding: '24px', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
       }}>
-        <div style={{
-          backgroundColor: 'white', padding: '24px', borderRadius: '16px',
-          width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold' }}>보증보험 가입 확인</h2>
-            <button onClick={handleClose} style={{ border: 'none', background: 'none', cursor: 'pointer' }}>
-              <X />
-            </button>
+        <button 
+          onClick={onClose}
+          style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          <X size={24} color="#666" />
+        </button>
+
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ width: '48px', height: '48px', backgroundColor: '#E3F2FD', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <Shield size={24} color="#2196F3" />
           </div>
-
-          {!result ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  border: '2px dashed #ddd', padding: '30px', textAlign: 'center',
-                  borderRadius: '8px', cursor: 'pointer', backgroundColor: '#fafafa'
-                }}
-              >
-                <Upload style={{ margin: '0 auto 10px', display: 'block', color: '#8FBF4D' }} />
-                <p style={{ fontWeight: 600, marginBottom: '4px' }}>등기부등본 및 건축물대장 업로드</p>
-                <p style={{ fontSize: '12px', color: '#999' }}>
-                  {files.length > 0 ? `${files.length}개 파일 선택됨` : '클릭하여 파일 선택 (PDF, 이미지)'}
-                </p>
-                <input
-                  ref={fileInputRef} type="file" multiple
-                  accept=".pdf,.jpg,.png,.jpeg"
-                  style={{ display: 'none' }} onChange={handleFileChange}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>보증금 (만원)</label>
-                <input
-                  type="number" placeholder="예: 10000" value={deposit}
-                  onChange={e => setDeposit(e.target.value)}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>임대인 성명 (선택)</label>
-                <input
-                  type="text" placeholder="임대인 성명" value={landlordName}
-                  onChange={e => setLandlordName(e.target.value)}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>주소</label>
-                <input
-                  type="text" placeholder="예: 서울특별시 강남구 테헤란로 123" value={address}
-                  onChange={e => setAddress(e.target.value)}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>전용면적 (m²)</label>
-                <input
-                  type="number" placeholder="예: 84.5" value={exclusiveArea}
-                  onChange={e => setExclusiveArea(e.target.value)}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
-                />
-              </div>
-
-              <button
-                onClick={handleCheck} disabled={isLoading}
-                style={{
-                  padding: '14px', backgroundColor: isLoading ? '#ccc' : '#8FBF4D',
-                  color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold',
-                  cursor: isLoading ? 'not-allowed' : 'pointer', marginTop: '8px'
-                }}
-              >
-                {isLoading ? 'AI 분석 중...' : '가입 가능 여부 확인'}
-              </button>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              {result.eligible ?
-                <CheckCircle size={48} color="#4CAF50" style={{ margin: '0 auto 16px' }} /> :
-                <AlertCircle size={48} color="#F44336" style={{ margin: '0 auto 16px' }} />
-              }
-              <h3 style={{ fontSize: '20px', marginBottom: '12px', color: result.eligible ? '#4CAF50' : '#F44336' }}>
-                {result.message}
-              </h3>
-              {result.details && (
-                <div style={{
-                  backgroundColor: '#f5f5f5', padding: '16px', borderRadius: '8px',
-                  textAlign: 'left', fontSize: '14px', lineHeight: '1.6', color: '#444', whiteSpace: 'pre-wrap'
-                }}>
-                  {result.details}
-                </div>
-              )}
-              <button
-                onClick={handleClose}
-                style={{
-                  marginTop: '24px', padding: '12px 24px', backgroundColor: '#f0f0f0',
-                  border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', color: '#333'
-                }}
-              >
-                닫기
-              </button>
-            </div>
-          )}
+          <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#2C2C2C', marginBottom: '8px' }}>보증보험 가입 가능 여부 확인</h2>
+          <p style={{ fontSize: '14px', color: '#666' }}>전세보증금을 안전하게 지킬 수 있는지 확인해드려요.</p>
         </div>
+
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2C2C2C' }}>전세 보증금 (만원)</label>
+          <input
+            type="number"
+            value={deposit}
+            onChange={(e) => setDeposit(e.target.value)}
+            placeholder="예: 20000"
+            style={{
+              width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E8E8E8',
+              fontSize: '14px', outline: 'none'
+            }}
+          />
+        </div>
+
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2C2C2C' }}>필수 서류 업로드</label>
+          <FileUploadBox 
+            title="등기부등본" 
+            file={registryFile} 
+            onSelect={setRegistryFile} 
+            inputRef={registryInputRef} 
+          />
+          <FileUploadBox 
+            title="건축물대장" 
+            file={buildingFile} 
+            onSelect={setBuildingFile} 
+            inputRef={buildingInputRef} 
+          />
+        </div>
+
+        <div style={{ backgroundColor: '#FFF3E0', padding: '12px', borderRadius: '8px', marginBottom: '24px', display: 'flex', gap: '8px' }}>
+          <AlertTriangle size={18} color="#F57C00" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <p style={{ fontSize: '12px', color: '#E65100', margin: 0, lineHeight: '1.5' }}>
+            두 서류의 정보를 종합하여 분석하므로, 정확한 결과를 위해 <strong>모두 업로드</strong>해주셔야 합니다.
+          </p>
+        </div>
+
+        <button
+          onClick={handleAnalyze}
+          disabled={isAnalyzing}
+          style={{
+            width: '100%', padding: '14px', borderRadius: '8px', border: 'none',
+            backgroundColor: isAnalyzing ? '#E0E0E0' : '#8FBF4D',
+            color: 'white', fontSize: '16px', fontWeight: '600', cursor: isAnalyzing ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isAnalyzing ? '분석 중...' : '확인하기'}
+        </button>
       </div>
-    </>
+    </div>
   );
 }

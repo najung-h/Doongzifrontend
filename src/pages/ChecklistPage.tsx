@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Download,
@@ -339,11 +339,15 @@ export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'before' | 'during' | 'after'>('before');
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
   const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
+
+  // [추가] 파일 업로드 및 보증금 임시 저장을 위한 ref와 state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [checkInsuranceDeposit, setCheckInsuranceDeposit] = useState<number | null>(null);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -440,10 +444,12 @@ export default function ChecklistPage() {
     }
   };
 
+  // [수정] 보증보험 확인 핸들러: 이제 모달만 엽니다.
   const handleCheckInsurance = () => {
     setIsInsuranceModalOpen(true);
   };
 
+  // [수정] 깡통전세 위험도 분석 핸들러: 모달만 엽니다.
   const handleAnalyzeRisk = () => {
     setIsRiskModalOpen(true);
   };
@@ -989,14 +995,16 @@ export default function ChecklistPage() {
                                 onClick={() => {
                                   if (button.url) {
                                     window.open(button.url, '_blank');
+                                  } else if (button.label.includes('보증보험')) {
+                                    handleCheckInsurance();
+                                  } else if (button.label.includes('위험도 분석')) {
+                                    handleAnalyzeRisk();
                                   } else if (button.label === '등기부등본 분석하러가기') {
                                     setIsRegistryModalOpen(true);
                                   } else if (button.label === '계약서 분석하러가기') {
                                     setIsContractModalOpen(true);
                                   } else if (button.label === '건축물대장 분석하러가기') {
                                     setIsBuildingModalOpen(true);
-                                  } else if (button.type === 'primary') {
-                                    console.log('문서 분석 요청:', button.label);
                                   } else if (button.type === 'modal') {
                                     alert('준비 중입니다.');
                                   }

@@ -26,7 +26,7 @@ export default function HomePage() {
     try {
       // 파일 업로드 API 호출 (둥지 스캔하기 - 빠른 분석)
       // docType은 파일명이나 사용자 선택으로 결정 가능 (현재는 임대차계약서로 기본값)
-      const result = await scanAPI.analyzeDocuments([selectedFile], '임대차계약서');
+      const result = await scanAPI.scanDocuments([selectedFile], '임대차계약서');
       
       if (result.success) {
         // 업로드 성공시 이메일 입력 단계로 이동

@@ -85,16 +85,22 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
     }
 
     setIsAnalyzing(true);
-    try {
-      const result = await checklistAPI.analyzeContract([file]);
-      setAnalysisResult(result);
-    } catch (error) {
-      console.error('Analysis error:', error);
-      alert('분석 중 오류가 발생했습니다.');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+      try {
+        // [수정] docType: '등기부등본' 추가
+        const result = await checklistAPI.analyzeDocuments([file], '등기부등본');
+        
+        if (result.success) {
+            setAnalysisResult(result);
+        } else {
+            alert(result.message || '분석에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('Analysis error:', error);
+        alert('분석 중 오류가 발생했습니다.');
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
 
   const handleDownloadPDF = async () => {
     if (!analysisResult) {

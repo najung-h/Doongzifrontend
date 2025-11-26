@@ -103,7 +103,7 @@ export const checklistAPI = {
    * 보증보험 가입 가능 여부 확인
    * actionType: "checkInsurance"
    */
-  checkInsurance: async (files: File[], deposit: number): Promise<{
+  checkInsurance: async (registryFile: File, buildingFile: File, deposit: number): Promise<{
     success: boolean;
     eligible: boolean;
     message: string;
@@ -114,11 +114,9 @@ export const checklistAPI = {
       
       formData.append('actionType', 'checkInsurance');
       
-      // 파일들 추가 (등기부등본, 건축물대장)
-      files.forEach((file) => {
-        formData.append('files', file);
-      });
-      
+      // n8n '분기처리' 노드 기준: file0=등기부등본, file1=건축물대장
+      formData.append('file0', registryFile);
+      formData.append('file1', buildingFile);
       // 보증금 및 고정된 사용자 ID 추가
       formData.append('target_deposit', deposit.toString());
       formData.append('userId', '61a8fc1d-67b0-45db-b913-602654b45c3c');
@@ -135,7 +133,7 @@ export const checklistAPI = {
       return {
         success: false,
         eligible: false,
-        message: '보증보험 확인에 실패했습니다.',
+        message: '보증보험 확인 서버와 연결할 수 없습니다.',
       };
     }
   },
