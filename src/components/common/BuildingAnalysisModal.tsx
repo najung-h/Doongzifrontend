@@ -86,8 +86,7 @@ export default function BuildingAnalysisModal({ isOpen, onClose }: BuildingAnaly
 
     setIsAnalyzing(true);
     try {
-      // 수정: scanAPI 대신 checklistAPI.analyzeContract 사용 (인자 개수 오류 해결 및 통합)
-      const result = await checklistAPI.analyzeContract([file], '건축물대장');
+      const result = await checklistAPI.analyzeContract([file]);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -127,11 +126,8 @@ export default function BuildingAnalysisModal({ isOpen, onClose }: BuildingAnaly
       return;
     }
 
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-
     try {
-      // 수정: 올바른 API 메서드명(sendAnalysisEmail) 사용
-      const result = await checklistAPI.sendAnalysisEmail(fileKey, "user@example.com");
+      const result = await checklistAPI.sendBuildingAnalysisEmail(analysisResult);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {

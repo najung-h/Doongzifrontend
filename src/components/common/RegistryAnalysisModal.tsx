@@ -86,9 +86,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsAnalyzing(true);
     try {
-      // 수정됨: scanAPI.analyzeDocuments -> checklistAPI.analyzeContract
-      // (인자 개수 오류 해결 및 checklistAPI로 통합)
-      const result = await checklistAPI.analyzeContract([file], '등기부등본');
+      const result = await checklistAPI.analyzeContract([file]);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -129,18 +127,9 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
       return;
     }
 
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-    const userEmail = "user@example.com";
-
     try {
-      // 수정됨: sendAnalysisEmail 사용 (문자열 fileKey, email 전달)
-      const result = await checklistAPI.sendAnalysisEmail(fileKey, userEmail);
-      
-      if (result.success) {
-        alert(result.message || '이메일이 전송되었습니다!');
-      } else {
-        alert(result.message || '이메일 전송에 실패했습니다.');
-      }
+      // TODO: 등기부등본 분석 이메일 전송 API 구현 필요
+      alert('이메일 전송 기능이 준비 중입니다.');
     } catch (error) {
       console.error('이메일 전송 실패:', error);
       alert('이메일 전송 중 오류가 발생했습니다.');

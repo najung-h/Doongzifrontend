@@ -47,18 +47,8 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
         propertyType,
       });
 
-<<<<<<< HEAD
-      if (response.success) {
-        setResult({
-          riskLevel: response.riskLevel as 'low' | 'medium' | 'high',
-          riskScore: response.riskScore,
-          message: response.message,
-          recommendations: response.recommendations,
-        });
-=======
       if (response.success && response.result) {
         setResult(response.result);
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
       } else {
         alert('분석에 실패했습니다. 다시 시도해주세요.');
       }
@@ -81,58 +71,27 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
 
   const getRiskColor = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-<<<<<<< HEAD
-      case 'low':
-        return '#4CAF50';
-      case 'medium':
-        return '#FFC107';
-      case 'high':
-        return '#F44336';
-      default:
-        return '#999999';
-=======
       case 'safe': return '#4CAF50';
       case 'warning': return '#FFC107';
       case 'danger': return '#F44336';
       default: return '#999999';
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
     }
   };
 
   const getRiskLabel = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-<<<<<<< HEAD
-      case 'low':
-        return '안전';
-      case 'medium':
-        return '주의';
-      case 'high':
-        return '위험';
-      default:
-        return '알 수 없음';
-=======
       case 'safe': return '안전';
       case 'warning': return '주의';
       case 'danger': return '위험';
       default: return '알 수 없음';
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
     }
   };
 
   const getRiskIcon = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-<<<<<<< HEAD
-      case 'low':
-        return <Shield size={24} />;
-      case 'medium':
-        return <TrendingUp size={24} />;
-      case 'high':
-        return <AlertTriangle size={24} />;
-=======
       case 'safe': return <Shield size={24} />;
       case 'warning': return <TrendingUp size={24} />;
       case 'danger': return <AlertTriangle size={24} />;
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
     }
   };
 
@@ -148,15 +107,10 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
 
   // 바늘 각도 계산 (0-100% -> -90도 ~ 90도)
   const getNeedleAngle = () => {
-<<<<<<< HEAD
-    const score = result?.riskScore || 0;
-    return -90 + (score * 1.8); // 0% = -90도, 100% = 90도
-=======
     const ratio = result?.ratio || 0;
     // ratio가 100을 넘을 수 있으므로 최대값을 100으로 제한
     const normalizedRatio = Math.min(ratio, 100);
     return -90 + (normalizedRatio * 1.8);
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
   };
 
   const propertyTypes: PropertyType[] = ['아파트', '오피스텔', '연립,다세대주택', '단독,다가구'];
@@ -421,30 +375,6 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 {/* Score and Status */}
                 <div style={{ marginBottom: '12px' }}>
-<<<<<<< HEAD
-                  <div
-                    style={{
-                      fontSize: '48px',
-                      fontWeight: '700',
-                      color: getRiskColor(result.riskLevel),
-                      lineHeight: '1',
-                    }}
-                  >
-                    {result.riskScore}%
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: '600',
-                      color: getRiskColor(result.riskLevel),
-                      marginTop: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                    }}
-                  >
-=======
                   <div style={{ fontSize: '48px', fontWeight: '700', color: getRiskColor(result.riskLevel), lineHeight: '1' }}>
                     {result.ratio.toFixed(1)}%
                   </div>
@@ -452,7 +382,6 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                     전세가율
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: '600', color: getRiskColor(result.riskLevel), display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
                     {getRiskIcon(result.riskLevel)}
                     {getRiskLabel(result.riskLevel)}
                   </div>
@@ -564,42 +493,6 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                 </p>
               </div>
 
-<<<<<<< HEAD
-              {/* Recommendations */}
-              {result.recommendations && result.recommendations.length > 0 && (
-                <div>
-                  <h4
-                    style={{
-                      fontSize: '15px',
-                      fontWeight: '600',
-                      color: '#2C2C2C',
-                      marginBottom: '12px',
-                    }}
-                  >
-                    권장사항
-                  </h4>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: '20px',
-                      listStyle: 'disc',
-                    }}
-                  >
-                    {result.recommendations.map((rec, index) => (
-                      <li
-                        key={index}
-                        style={{
-                          fontSize: '14px',
-                          color: '#424242',
-                          lineHeight: '1.6',
-                          marginBottom: '8px',
-                        }}
-                      >
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-=======
               {/* 추가 정보 섹션 */}
               {(result.extraToWarning_만원 > 0 || result.extraToDanger_만원 > 0) && (
                 <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#FFF9E6', border: '1px solid #FFE082', marginBottom: '16px' }}>
@@ -629,7 +522,6 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: 0 }}>
                     {result.mortgageMessage}
                   </p>
->>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
                 </div>
               )}
             </div>
