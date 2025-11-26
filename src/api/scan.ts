@@ -41,6 +41,7 @@ export const scanAPI = {
       return {
         success: false,
         message: '문서 분석 서버와 연결할 수 없습니다.',
+        fileKey: '',
         analysis: {
           riskGrade: 'low',
           summary: '서버 연결 오류',
@@ -86,8 +87,8 @@ export const scanAPI = {
       console.error('Failed to analyze detailed document:', error);
       // Mock response for development
       return {
-        success: true,
-        message: '분석 요청이 접수되었습니다. 곧 이메일로 결과를 보내드립니다. (API 연결 후 실제 결과 전송)',
+        success: false,
+        message: '상세 문서 분석에 실패했습니다. (API 연결 후 실제 결과 전송)',
       };
     }
   },

@@ -7,55 +7,7 @@ import type { ScanResponse, DocumentDataType, InsuranceCheckResponse } from '../
  * 모든 요청은 동일한 웹훅 URL로 전송되며, actionType으로 분기됨
  */
 export const checklistAPI = {
-  /**
-   * 계약서 분석
-   * actionType: "analyzeContract"
-   */
-  analyzeContract: async (files: File[]): Promise<ScanResponse> => {
-    try {
-      const formData = new FormData();
 
-      // actionType 추가
-      formData.append('actionType', 'analyzeContract');
-
-      // 파일들 추가
-      files.forEach((file) => {
-        formData.append('files', file);
-      });
-
-      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to analyze contract:', error);
-      // Mock response for development
-      return {
-        success: false,
-        message: '계약서 분석 서버와 연결할 수 없습니다.',
-        analysis: {
-          riskGrade: 'low',
-          summary: '서버 연결 오류',
-          issues: [
-            {
-              title: '서버 연결 오류',
-              description: '계약서 분석 서버와 연결할 수 없습니다.',
-              severity: 'warning',
-            },
-          ],
-          autoCheckItems: [],
-        },
-      };
-    }
-  },
-
-  /**
-   * PDF 다운로드 (전체 체크리스트)
-   * actionType: "exportPDF"
-   */
   exportPDF: async (checklistData: any): Promise<{ success: boolean; pdfUrl?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
@@ -66,7 +18,7 @@ export const checklistAPI = {
       return response.data;
     } catch (error) {
       console.error('Failed to export PDF:', error);
-      return { success: false };
+      return { success: false, pdfUrl: '' };
     }
   },
 
@@ -110,6 +62,8 @@ export const checklistAPI = {
       return {
         success: false,
         status: 'FAIL',
+        message: '보증보험 가입 가능 여부 확인에 실패했습니다. 서버에 연결할 수 없습니다.',
+        details: [],
         failedItems: [{
           id: 'error',
           question: '오류 발생',
@@ -149,6 +103,7 @@ export const checklistAPI = {
         riskLevel: 'warning',
         riskScore: 0,
         message: '위험도 분석에 실패했습니다.',
+        recommendations: [],
       };
     }
   },
@@ -177,6 +132,7 @@ export const checklistAPI = {
       return {
         success: false,
         message: `${dataType} 분석 결과 PDF 생성에 실패했습니다.`,
+        pdfUrl: '',
       };
     }
   },
