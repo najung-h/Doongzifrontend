@@ -1130,7 +1130,7 @@ export default function ChecklistPage() {
                             fontWeight: '700',
                             flexShrink: 0
                           }}>
-                            Q
+                                              <HelpCircle size={14} strokeWidth={3} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h5 style={{
@@ -1177,7 +1177,7 @@ export default function ChecklistPage() {
                             fontWeight: '700',
                             flexShrink: 0
                           }}>
-                            A
+                            <Lightbulb size={14} strokeWidth={3} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h5 style={{
