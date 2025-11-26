@@ -80,8 +80,8 @@ export default function SearchPage() {
         boxShadow: 'var(--shadow-sm)'
       }}>
         <img
-          src="/rest.png"
-          alt="아기새 in 둥지"
+          src="/law.png"
+          alt="똑똑한 법률 사전"
           style={{
             width: 'clamp(80px, 15vw, 120px)',
             height: 'clamp(80px, 15vw, 120px)',

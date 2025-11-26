@@ -189,8 +189,8 @@ export default function HomePage() {
             marginBottom: '20px'
           }}>
             <img
-              src="/nest.png"
-              alt="둥지"
+              src="/scan.png"
+              alt="둥지스캔하기"
               style={{
                 width: '56px',
                 height: '56px',
@@ -450,8 +450,8 @@ export default function HomePage() {
             }}
           >
             <img
-              src="/rest.png"
-              alt="아기새 in 둥지"
+              src="/law.png"
+              alt="똑똑한 법률 사전"
               style={{
                 width: '84px',
                 height: '84px',
@@ -536,8 +536,8 @@ export default function HomePage() {
                 }}>
                   {/* [수정] 기존 div(갈색 원)를 img(둥지 이미지)로 교체 */}
                   <img
-                    src="/nest.png"
-                    alt="둥지"
+                    src="/scan.png"
+                    alt="둥지스캔하기"
                     style={{
                       width: '48px',
                       height: '48px',
