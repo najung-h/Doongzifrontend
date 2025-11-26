@@ -2,7 +2,14 @@ version: '3.8'
 
 services:
   webserver:
-    build: . # 현재 디렉토리의 Dockerfile을 사용하여 React 앱과 Nginx 서버를 빌드합니다.
+    build:
+      context: .
+      args:
+        # 🔥 Vite 빌드 시점에 환경변수 주입
+        VITE_N8N_CHATBOT_WEBHOOK_URL: /api/chatbot
+        VITE_N8N_SCAN_WEBHOOK_URL: /api/scan
+        VITE_N8N_CHECKLIST_WEBHOOK_URL: /api/checklist
+        VITE_N8N_LEGAL_WEBHOOK_URL: ""
     container_name: doongzi-app
     ports:
       - "80:80"
