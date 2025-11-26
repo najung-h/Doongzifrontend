@@ -136,7 +136,7 @@ export default function AnalysisLoadingView({ isLoading }: AnalysisLoadingViewPr
           gap: '8px',
           marginBottom: '30px',
         }}>
-          {loadingSteps.map((step, index) => (
+          {loadingSteps.map((_step, index) => (
             <div
               key={index}
               style={{
