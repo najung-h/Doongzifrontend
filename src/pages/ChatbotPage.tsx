@@ -21,7 +21,6 @@ export default function ChatbotPage() {
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState<string | undefined>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedQuestions = [
@@ -67,20 +66,28 @@ export default function ChatbotPage() {
       content: inputText,
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, userMessage]);
+
+    // Build conversation history including new message
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputText('');
 
-    // Call API or use mock
+    // Transform messages to n8n format (role + content only)
+    const messagesForAPI = updatedMessages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Call API with full conversation history
     setIsLoading(true);
-    chatbotAPI.sendMessage(inputText, conversationId)
+    chatbotAPI.sendMessage(messagesForAPI)
       .then(response => {
         const aiMessage: Message = {
           role: 'assistant',
-          content: response.reply,
+          content: response.answer,
           timestamp: new Date()
         };
         setMessages(prev => [...prev, aiMessage]);
-        setConversationId(response.conversation_id);
       })
       .catch(() => {
         const aiMessage: Message = {

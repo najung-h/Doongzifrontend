@@ -48,15 +48,16 @@ export interface LegalSearchResult {
 
 // API Request/Response Types
 export interface ChatRequest {
-  actionType: 'sendMessage';
-  query: string;
-  conversation_id?: string;
+  messages: Array<{
+    role: string;
+    content: string;
+  }>;
 }
 
 export interface ChatResponse extends BaseResponse {
   success: boolean;
-  reply: string;
-  conversation_id?: string;
+  answer: string;
+  full_log?: any;
 }
 
 export interface LegalSearchResponse extends BaseResponse {
