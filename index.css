@@ -622,34 +622,39 @@ html {
 @import "tailwindcss";
 /* virtual-fs:file:///src/styles/globals.css */
 :root {
-  --color-bg-primary: #FAF8F3;
-  --color-bg-secondary: #F5F3E6;
+--color-bg-primary: #FAFAF9; /* 웜톤 화이트 (변경) */
+  --color-bg-secondary: #F5F5F4;
   --color-bg-white: #FFFFFF;
-  --color-accent-green: #8FBF4D;
-  --color-accent-green-hover: #7AA83F;
-  --color-accent-green-light: #D4E5B8;
-  --color-message-ai: #FFF9E6;
-  --color-message-user: #D4E5B8;
-  --color-text-primary: #2C2C2C;
-  --color-text-secondary: #666666;
-  --color-text-light: #999999;
-  --color-border: #D9D9D9;
-  --color-warning: #FF6B6B;
-  --color-info: #7DA8B8;
+  --color-accent-green: #7CB342; /* 너무 쨍하지 않은 올리브 그린 (변경) */
+  --color-accent-green-hover: #689F38;
+  --color-accent-green-light: #DCEDC8;
+  --color-message-ai: #F7FEE7;
+  --color-message-user: #DCEDC8;
+  --color-text-primary: #1F2937; /* 완전 블랙 대신 짙은 회색 (변경) */
+  --color-text-secondary: #4B5563;
+  --color-text-light: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-warning: #EF4444;
+  --color-info: #0EA5E9;
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* Shadows - 더 부드럽게 변경 */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-soft: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 * {
   margin: 0;
@@ -657,23 +662,13 @@ html {
   box-sizing: border-box;
 }
 body {
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Roboto",
-    "Oxygen",
-    "Ubuntu",
-    "Cantarell",
-    "Fira Sans",
-    "Droid Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   overflow-x: hidden;
+  letter-spacing: -0.02em; /* 자간 축소로 세련미 더하기 */
 }
 h1 {
   font-size: 28px;
