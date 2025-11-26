@@ -4,6 +4,9 @@ import Navigation from '../components/common/Navigation';
 import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus, X, Upload, FileText, Search } from 'lucide-react';
 import type { User as UserType, Property, Conversation, URLResource } from '../types';
 import { useAuth } from '../context/AuthContext';
+import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
+import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
+import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
 
 type TabType = 'profile' | 'property' | 'conversations' | 'links';
 
@@ -71,7 +74,7 @@ const mockURLs: URLResource[] = [
   {
     id: '1',
     userId: '1',
-    url: 'https://www.court.go.kr',
+    url: 'https://portal.scourt.go.kr/pgp/index.on?m=PGP1011M01&l=N&c=900',
     title: '대법원 판례검색',
     description: '전세보증금 반환 관련 판례 모음',
     category: '법률',
@@ -100,6 +103,17 @@ export default function MyPage() {
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isEditingProperty, setIsEditingProperty] = useState(false);
   const [editedProperty, setEditedProperty] = useState<Property | null>(null);
+
+  // 분석 모달 상태
+  const [isRegistryAnalysisOpen, setIsRegistryAnalysisOpen] = useState(false);
+  const [isBuildingAnalysisOpen, setIsBuildingAnalysisOpen] = useState(false);
+  const [isContractAnalysisOpen, setIsContractAnalysisOpen] = useState(false);
+
+  // 조회 모달 상태
+  const [viewModalType, setViewModalType] = useState<'registry' | 'building' | 'contract' | null>(null);
+
+  // 대화 상세 모달 상태
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
 
   // 로그인 상태 체크 - 로그아웃 상태면 로그인 페이지로 리다이렉션
   useEffect(() => {
@@ -560,6 +574,7 @@ export default function MyPage() {
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
+                onClick={() => setSelectedConversation(conversation)}
                 style={{
                   backgroundColor: 'var(--color-bg-white)',
                   borderRadius: 'var(--radius-lg)',
@@ -588,8 +603,8 @@ export default function MyPage() {
                   marginBottom: 'clamp(10px, 2vw, 12px)',
                   gap: 'var(--spacing-md)'
                 }}>
-                  <h3 style={{ 
-                    fontSize: 'clamp(15px, 2.5vw, 17px)', 
+                  <h3 style={{
+                    fontSize: 'clamp(15px, 2.5vw, 17px)',
                     flex: 1,
                     fontWeight: '600',
                     display: 'flex',
@@ -599,7 +614,12 @@ export default function MyPage() {
                     <span style={{ fontSize: 'clamp(16px, 2.5vw, 18px)' }}>💬</span>
                     {conversation.title}
                   </h3>
-                  <button style={{
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: 삭제 기능
+                    }}
+                    style={{
                     padding: '6px',
                     backgroundColor: 'transparent',
                     border: 'none',
@@ -1099,105 +1119,98 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(12px, 2vw, 14px)'
+                  gap: '8px'
                 }}>
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-accent-green)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => navigate('/checklist')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-accent-green)',
+                    border: '1px solid var(--color-accent-green)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
                   }}
                   >
-                    <Upload size={18} />
-                    <span>문서 업로드</span>
+                    <Upload size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>업로드</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-bg-white)',
+                  <button
+                    onClick={() => setViewModalType('registry')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
                     color: 'var(--color-text-primary)',
-                    border: '2px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
-                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={18} />
-                    <span>문서 조회</span>
+                    <FileText size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>조회</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-info)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => setIsRegistryAnalysisOpen(true)}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-info)',
+                    border: '1px solid var(--color-info)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#6A9FB0';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-info)';
                   }}
                   >
-                    <Search size={18} />
-                    <span>문서 분석</span>
+                    <Search size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>분석</span>
                   </button>
                 </div>
               </div>
@@ -1224,105 +1237,98 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(12px, 2vw, 14px)'
+                  gap: '8px'
                 }}>
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-accent-green)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => navigate('/checklist')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-accent-green)',
+                    border: '1px solid var(--color-accent-green)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
                   }}
                   >
-                    <Upload size={18} />
-                    <span>문서 업로드</span>
+                    <Upload size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>업로드</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-bg-white)',
+                  <button
+                    onClick={() => setViewModalType('building')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
                     color: 'var(--color-text-primary)',
-                    border: '2px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
-                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={18} />
-                    <span>문서 조회</span>
+                    <FileText size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>조회</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-info)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => setIsBuildingAnalysisOpen(true)}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-info)',
+                    border: '1px solid var(--color-info)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#6A9FB0';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-info)';
                   }}
                   >
-                    <Search size={18} />
-                    <span>문서 분석</span>
+                    <Search size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>분석</span>
                   </button>
                 </div>
               </div>
@@ -1349,108 +1355,483 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(12px, 2vw, 14px)'
+                  gap: '8px'
                 }}>
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-accent-green)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => navigate('/checklist')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-accent-green)',
+                    border: '1px solid var(--color-accent-green)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-accent-green)';
                   }}
                   >
-                    <Upload size={18} />
-                    <span>문서 업로드</span>
+                    <Upload size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>업로드</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-bg-white)',
+                  <button
+                    onClick={() => setViewModalType('contract')}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
                     color: 'var(--color-text-primary)',
-                    border: '2px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
-                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={18} />
-                    <span>문서 조회</span>
+                    <FileText size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>조회</span>
                   </button>
 
-                  <button style={{
-                    padding: 'clamp(14px, 2.5vw, 16px)',
-                    backgroundColor: 'var(--color-info)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '700',
+                  <button
+                    onClick={() => setIsContractAnalysisOpen(true)}
+                    style={{
+                    padding: '10px 14px',
+                    backgroundColor: 'transparent',
+                    color: 'var(--color-info)',
+                    border: '1px solid var(--color-info)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.2s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 'var(--spacing-sm)',
-                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
+                    justifyContent: 'flex-start',
+                    gap: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#6A9FB0';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.color = 'white';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-info)';
                   }}
                   >
-                    <Search size={18} />
-                    <span>문서 분석</span>
+                    <Search size={16} />
+                    <span style={{ flex: 1, textAlign: 'left' }}>분석</span>
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 분석 모달들 */}
+      <RegistryAnalysisModal
+        isOpen={isRegistryAnalysisOpen}
+        onClose={() => setIsRegistryAnalysisOpen(false)}
+      />
+      <BuildingAnalysisModal
+        isOpen={isBuildingAnalysisOpen}
+        onClose={() => setIsBuildingAnalysisOpen(false)}
+      />
+      <ContractAnalysisModal
+        isOpen={isContractAnalysisOpen}
+        onClose={() => setIsContractAnalysisOpen(false)}
+      />
+
+      {/* 조회 모달 */}
+      {viewModalType && (
+        <div
+          onClick={() => setViewModalType(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0 }}>
+                {viewModalType === 'registry' && '등기부등본 조회'}
+                {viewModalType === 'building' && '건축물대장 조회'}
+                {viewModalType === 'contract' && '계약서 조회'}
+              </h2>
+              <button
+                onClick={() => setViewModalType(null)}
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: '8px'
+                }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
+                {selectedProperty?.address}
+              </p>
+
+              <div style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                padding: '20px',
+                borderRadius: '12px',
+                marginBottom: '16px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>문서 정보</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>발급일</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>2024.11.27</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>상태</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--color-accent-green)' }}>정상</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>파일 크기</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>1.2 MB</span>
+                  </div>
+                </div>
+              </div>
+
+              {viewModalType === 'registry' && (
+                <div style={{
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  marginBottom: '16px'
+                }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>소유권 정보</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>소유자</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>홍길동</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>근저당</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>2억 5천만원</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>선순위</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>없음</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {viewModalType === 'building' && (
+                <div style={{
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  marginBottom: '16px'
+                }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>건물 정보</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>건축년도</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>2018년</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>전용면적</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>84.5㎡</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>용도</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>아파트</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {viewModalType === 'contract' && (
+                <div style={{
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  marginBottom: '16px'
+                }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>계약 정보</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>계약일</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>2024.01.15</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>보증금</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>3억원</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>계약기간</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600' }}>2년</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setViewModalType(null)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                backgroundColor: 'var(--color-accent-green)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 대화 상세 모달 */}
+      {selectedConversation && (
+        <div
+          onClick={() => setSelectedConversation(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '32px',
+              maxWidth: '700px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: '22px', fontWeight: '700', margin: '0 0 8px 0' }}>
+                  {selectedConversation.title}
+                </h2>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-light)', margin: 0 }}>
+                  {formatDate(selectedConversation.createdAt)}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedConversation(null)}
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: '8px',
+                  flexShrink: 0
+                }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* 대화 내용 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* 사용자 메시지 */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <div style={{
+                  backgroundColor: 'var(--color-accent-green)',
+                  color: 'white',
+                  padding: '12px 16px',
+                  borderRadius: '12px 12px 4px 12px',
+                  maxWidth: '80%'
+                }}>
+                  <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                    {selectedConversation.id === '1' && '확정일자가 뭔가요? 전입신고와 무슨 차이가 있나요?'}
+                    {selectedConversation.id === '2' && '전세사기를 예방하려면 어떻게 해야 하나요?'}
+                    {selectedConversation.id === '3' && '전세보증보험은 어디서 가입할 수 있나요?'}
+                  </p>
+                </div>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                  {formatDate(selectedConversation.createdAt)}
+                </span>
+              </div>
+
+              {/* AI 응답 */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div style={{
+                  backgroundColor: 'var(--color-message-ai)',
+                  padding: '12px 16px',
+                  borderRadius: '12px 12px 12px 4px',
+                  maxWidth: '80%',
+                  border: '1px solid #FFE082'
+                }}>
+                  <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0, whiteSpace: 'pre-wrap' }}>
+                    {selectedConversation.lastMessage}
+                  </p>
+                </div>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                  둥지 AI · {formatDate(selectedConversation.updatedAt)}
+                </span>
+              </div>
+
+              {/* 추가 사용자 질문 (예시) */}
+              {selectedConversation.id === '1' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <div style={{
+                      backgroundColor: 'var(--color-accent-green)',
+                      color: 'white',
+                      padding: '12px 16px',
+                      borderRadius: '12px 12px 4px 12px',
+                      maxWidth: '80%'
+                    }}>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                        확정일자는 언제 받아야 하나요?
+                      </p>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                      {formatDate(selectedConversation.updatedAt)}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <div style={{
+                      backgroundColor: 'var(--color-message-ai)',
+                      padding: '12px 16px',
+                      borderRadius: '12px 12px 12px 4px',
+                      maxWidth: '80%',
+                      border: '1px solid #FFE082'
+                    }}>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                        확정일자는 전입신고와 함께 계약 당일 또는 전입신고 당일에 받는 것이 좋습니다. 확정일자를 받은 날짜부터 대항력이 발생하므로, 가능한 한 빨리 받는 것이 안전합니다. 주민센터나 인터넷 등기소에서 무료로 받을 수 있습니다.
+                      </p>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                      둥지 AI · {formatDate(selectedConversation.updatedAt)}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {selectedConversation.id === '2' && (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <div style={{
+                      backgroundColor: 'var(--color-accent-green)',
+                      color: 'white',
+                      padding: '12px 16px',
+                      borderRadius: '12px 12px 4px 12px',
+                      maxWidth: '80%'
+                    }}>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                        근저당은 얼마까지 안전한가요?
+                      </p>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                      {formatDate(selectedConversation.updatedAt)}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <div style={{
+                      backgroundColor: 'var(--color-message-ai)',
+                      padding: '12px 16px',
+                      borderRadius: '12px 12px 12px 4px',
+                      maxWidth: '80%',
+                      border: '1px solid #FFE082'
+                    }}>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                        일반적으로 전세가율(전세금/매매가)이 70% 이하인 경우 안전하다고 봅니다. 근저당액과 선순위 보증금을 합쳐서 매매가의 80%를 넘지 않는지 확인하세요. 또한 KB시세, 호갱노노 등에서 실거래가를 확인하는 것이 중요합니다.
+                      </p>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-light)', marginTop: '4px' }}>
+                      둥지 AI · {formatDate(selectedConversation.updatedAt)}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid var(--color-border)' }}>
+              <button
+                onClick={() => setSelectedConversation(null)}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  backgroundColor: 'var(--color-accent-green)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                닫기
+              </button>
             </div>
           </div>
         </div>
