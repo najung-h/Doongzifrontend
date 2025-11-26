@@ -22,7 +22,9 @@ import {
   Send,
   Pin,
   ScrollText,
-  CheckCircle
+  CheckCircle,
+  Lightbulb,
+  HelpCircle
 } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
@@ -570,8 +572,7 @@ export default function ChecklistPage() {
                   fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  Q
-                </div>
+                  <HelpCircle size={14} strokeWidth={3} />                </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
                     fontSize: '12px',
@@ -617,8 +618,7 @@ export default function ChecklistPage() {
                   fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  A
-                </div>
+                  <Lightbulb size={14} strokeWidth={3} />                </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
                     fontSize: '12px',
