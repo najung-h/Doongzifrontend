@@ -526,7 +526,6 @@ export default function HomePage() {
               <X size={24} />
             </button>
 
-            {/* Upload Step */}
             {uploadStep === 'upload' && (
               <div>
                 <div style={{
@@ -535,12 +534,16 @@ export default function HomePage() {
                   gap: '12px',
                   marginBottom: '24px'
                 }}>
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    backgroundColor: '#8B6F47',
-                    borderRadius: '50%'
-                  }} />
+                  {/* [수정] 기존 div(갈색 원)를 img(둥지 이미지)로 교체 */}
+                  <img
+                    src="/nest.png"
+                    alt="둥지"
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      objectFit: 'contain'
+                    }}
+                  />
                   <div>
                     <h2 style={{
                       fontSize: '22px',
