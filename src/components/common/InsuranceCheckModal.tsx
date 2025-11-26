@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, Upload, Shield, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
 
 interface InsuranceCheckModalProps {
@@ -12,8 +12,6 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   const [deposit, setDeposit] = useState('');
   const [landlordName, setLandlordName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // API 응답 타입에 맞춘 상태 정의
   const [result, setResult] = useState<{
     success: boolean;
     eligible: boolean;
@@ -47,7 +45,6 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
         formData.append('files', file);
       });
 
-      // checkInsurance는 이제 FormData를 받고, { eligible, message, details }를 반환합니다.
       const response = await checklistAPI.checkInsurance(formData);
       setResult(response);
     } catch (error) {
