@@ -1099,86 +1099,105 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(10px, 1.5vw, 12px)'
+                  gap: 'clamp(12px, 2vw, 14px)'
                 }}>
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-accent-green)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
                   }}
                   >
-                    <Upload size={16} />
-                    문서 업로드
+                    <Upload size={18} />
+                    <span>문서 업로드</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-bg-white)',
                     color: 'var(--color-text-primary)',
                     border: '2px solid var(--color-border)',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={16} />
-                    문서 조회
+                    <FileText size={18} />
+                    <span>문서 조회</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-info)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.backgroundColor = '#6A9FB0';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
                   }}
                   >
-                    <Search size={16} />
-                    문서 분석
+                    <Search size={18} />
+                    <span>문서 분석</span>
                   </button>
                 </div>
               </div>
@@ -1205,86 +1224,105 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(10px, 1.5vw, 12px)'
+                  gap: 'clamp(12px, 2vw, 14px)'
                 }}>
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-accent-green)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
                   }}
                   >
-                    <Upload size={16} />
-                    문서 업로드
+                    <Upload size={18} />
+                    <span>문서 업로드</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-bg-white)',
                     color: 'var(--color-text-primary)',
                     border: '2px solid var(--color-border)',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={16} />
-                    문서 조회
+                    <FileText size={18} />
+                    <span>문서 조회</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-info)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.backgroundColor = '#6A9FB0';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
                   }}
                   >
-                    <Search size={16} />
-                    문서 분석
+                    <Search size={18} />
+                    <span>문서 분석</span>
                   </button>
                 </div>
               </div>
@@ -1311,86 +1349,105 @@ export default function MyPage() {
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 'clamp(10px, 1.5vw, 12px)'
+                  gap: 'clamp(12px, 2vw, 14px)'
                 }}>
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-accent-green)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(143, 191, 77, 0.3)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green-hover)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(143, 191, 77, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(143, 191, 77, 0.3)';
                   }}
                   >
-                    <Upload size={16} />
-                    문서 업로드
+                    <Upload size={18} />
+                    <span>문서 업로드</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-bg-white)',
                     color: 'var(--color-text-primary)',
                     border: '2px solid var(--color-border)',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent-green)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-green-light)';
                     e.currentTarget.style.color = 'var(--color-accent-green)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-bg-white)';
                     e.currentTarget.style.color = 'var(--color-text-primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
                   }}
                   >
-                    <FileText size={16} />
-                    문서 조회
+                    <FileText size={18} />
+                    <span>문서 조회</span>
                   </button>
 
                   <button style={{
-                    padding: 'clamp(12px, 2vw, 14px)',
+                    padding: 'clamp(14px, 2.5vw, 16px)',
                     backgroundColor: 'var(--color-info)',
                     color: 'white',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     fontSize: 'clamp(13px, 2vw, 14px)',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 'var(--spacing-xs)'
+                    gap: 'var(--spacing-sm)',
+                    boxShadow: '0 2px 8px rgba(125, 168, 184, 0.3)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.backgroundColor = '#6A9FB0';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(125, 168, 184, 0.4)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.backgroundColor = 'var(--color-info)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(125, 168, 184, 0.3)';
                   }}
                   >
-                    <Search size={16} />
-                    문서 분석
+                    <Search size={18} />
+                    <span>문서 분석</span>
                   </button>
                 </div>
               </div>
