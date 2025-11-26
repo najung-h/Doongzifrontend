@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileText, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
+import { X, Upload, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
 
 interface InsuranceCheckModalProps {

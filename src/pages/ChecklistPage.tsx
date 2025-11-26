@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Download,
@@ -344,10 +344,6 @@ export default function ChecklistPage() {
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
-
-  // [추가] 파일 업로드 및 보증금 임시 저장을 위한 ref와 state
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [checkInsuranceDeposit, setCheckInsuranceDeposit] = useState<number | null>(null);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
