@@ -396,7 +396,6 @@ export default function ChecklistPage() {
     })));
   };
 
-  // Function definition (no shadowing)
   const checkIsGroupCompleted = (item: ChecklistItem) => {
     if (!item.subItems) return false;
     return item.subItems.every(sub => sub.completed);
@@ -418,14 +417,12 @@ export default function ChecklistPage() {
 
   const handleExportPDF = async () => {
     try {
-      // 2024-11-26: userId 추가 (API_USAGE.md 참고)
       const result = await checklistAPI.exportPDF(checklist);
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
       } else {
-        // 실패 시에도 사용자 경험을 위해 가짜 성공 처리 (해커톤 시연용)
-        alert('PDF 생성이 요청되었습니다. (Demo)');
+        alert('PDF 생성에 실패했습니다. (서버 연결 확인 필요)');
       }
     } catch (error) {
       console.error('PDF 생성 실패:', error);
@@ -435,10 +432,11 @@ export default function ChecklistPage() {
 
   const handleSendEmail = async () => {
     try {
-      // 2024-11-26: userId는 api/checklist.ts에서 처리됨
       const result = await checklistAPI.sendEmail('user@example.com', checklist);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
+      } else {
+        alert('이메일 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('이메일 전송 실패:', error);
@@ -448,7 +446,6 @@ export default function ChecklistPage() {
 
   const handleCheckInsurance = async () => {
     try {
-      // Note: checkInsurance expects object (JSON), not FormData
       const result = await checklistAPI.checkInsurance({
         address: '',
         deposit: 0,
@@ -457,6 +454,8 @@ export default function ChecklistPage() {
 
       if (result.success) {
         alert(`${result.message}\n\n${result.details || ''}`);
+      } else {
+        alert('보증보험 확인에 실패했습니다.');
       }
     } catch (error) {
       console.error('보증보험 확인 실패:', error);
@@ -513,7 +512,6 @@ export default function ChecklistPage() {
 
         {isExpanded && (
           <div className="px-4 pb-4 border-t border-gray-100 bg-gray-50">
-            {/* What is it */}
             <div className="bg-blue-50 rounded-lg p-4 mt-4 mb-3 border border-blue-100">
               <div className="flex items-start gap-2">
                 <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -526,7 +524,6 @@ export default function ChecklistPage() {
               </div>
             </div>
 
-            {/* Why do it */}
             <div className="bg-orange-50 rounded-lg p-4 mb-3 border border-orange-100">
               <div className="flex items-start gap-2">
                 <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -564,7 +561,6 @@ export default function ChecklistPage() {
     <div className="min-h-screen bg-[var(--color-bg-primary)]">
       <Navigation />
 
-      {/* Header */}
       <div className="text-center pt-12 pb-10 px-5 bg-[var(--color-bg-secondary)] border-b border-gray-200">
         <div className="flex flex-col md:flex-row items-center justify-center gap-3 mb-3">
           <img src="/baby.png" alt="아기새" className="w-12 h-12 object-contain drop-shadow-md" />
@@ -577,11 +573,9 @@ export default function ChecklistPage() {
         </p>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-[800px] mx-auto px-4 md:px-5 -mt-8 pb-20 relative z-10">
         <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-gray-100">
 
-          {/* Actions */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
               전월세 계약 체크리스트
@@ -602,7 +596,6 @@ export default function ChecklistPage() {
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="grid grid-cols-3 gap-2 p-1.5 bg-gray-100 rounded-2xl mb-8">
             {checklist.map((tab) => (
               <button
@@ -619,7 +612,6 @@ export default function ChecklistPage() {
             ))}
           </div>
 
-          {/* Progress Bar */}
           <div className="mb-10 px-2">
             <div className="h-3 bg-gray-200 rounded-full relative overflow-visible">
               <div
@@ -649,13 +641,10 @@ export default function ChecklistPage() {
             )}
           </div>
 
-          {/* Checklist Items List */}
           <div className="flex flex-col gap-4">
             {currentTab?.items.map((item) => {
               const isExpanded = expandedItems.has(item.id);
               const isGroup = item.isGroup && item.subItems;
-              
-              // Renamed to avoid shadowing
               const isThisGroupFinished = isGroup && checkIsGroupCompleted(item);
               const isImportant = item.title.includes('확인') || item.title.includes('계약');
 
@@ -668,7 +657,6 @@ export default function ChecklistPage() {
                       : 'border-gray-200 hover:border-gray-300'
                     }`}
                 >
-                  {/* Header */}
                   <div
                     onClick={() => toggleExpand(item.id)}
                     className={`p-5 flex items-center gap-4 cursor-pointer transition-colors
@@ -717,7 +705,6 @@ export default function ChecklistPage() {
                     )}
                   </div>
 
-                  {/* Expanded Content */}
                   {isExpanded && (
                     <div className="px-5 pb-6 border-t border-gray-100 bg-white">
                       {isGroup ? (
@@ -743,7 +730,6 @@ export default function ChecklistPage() {
                         </>
                       )}
 
-                      {/* Action Buttons */}
                       {item.buttons && (
                         <div className="flex flex-wrap gap-2 mt-4">
                           {item.buttons.map((btn, idx) => (
@@ -798,7 +784,6 @@ export default function ChecklistPage() {
         </div>
       </div>
 
-      {/* Modals */}
       <RiskAnalysisModal isOpen={isRiskModalOpen} onClose={() => setIsRiskModalOpen(false)} />
       <RegistryAnalysisModal isOpen={isRegistryModalOpen} onClose={() => setIsRegistryModalOpen(false)} />
       <ContractAnalysisModal isOpen={isContractModalOpen} onClose={() => setIsContractModalOpen(false)} />
