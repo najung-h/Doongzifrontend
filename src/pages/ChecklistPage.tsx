@@ -432,7 +432,7 @@ export default function ChecklistPage() {
   const handleSendEmail = async () => {
     try {
       // TODO: 실제 userId 사용
-      const result = await checklistAPI.sendEmail('user@example.com', checklist);
+      const result = await checklistAPI.sendEmail('asgi.doongzi@gmail.com', checklist);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       }

@@ -229,44 +229,60 @@ export default function MyPage() {
         maxWidth: '1000px',
         margin: '0 auto'
       }}>
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <div>
+      {activeTab === 'profile' && (
+        <div>
+          <div style={{
+            backgroundColor: 'var(--color-bg-white)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'clamp(20px, 4vw, 32px)',
+            marginBottom: 'var(--spacing-md)',
+            boxShadow: 'var(--shadow-md)'
+          }}>
             <div style={{
-              backgroundColor: 'var(--color-bg-white)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'clamp(20px, 4vw, 32px)',
-              marginBottom: 'var(--spacing-md)',
-              boxShadow: 'var(--shadow-md)'
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              marginBottom: 'clamp(24px, 4vw, 32px)',
+              textAlign: 'center'
             }}>
+              {/* 프로필 이미지 수정 부분 */}
               <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                marginBottom: 'clamp(24px, 4vw, 32px)',
-                textAlign: 'center'
+                width: 'clamp(80px, 15vw, 120px)',
+                height: 'clamp(80px, 15vw, 120px)',
+                borderRadius: '50%',
+                overflow: 'hidden', // 이미지가 원 밖으로 나가지 않게 자름
+                marginBottom: 'clamp(16px, 3vw, 20px)',
+                boxShadow: 'var(--shadow-md)',
+                border: '4px solid white',
+                backgroundColor: '#E0E0E0' // 이미지 로드 전 배경색
               }}>
-                <div style={{
-                  width: 'clamp(80px, 15vw, 120px)',
-                  height: 'clamp(80px, 15vw, 120px)',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--color-accent-green-light) 0%, var(--color-accent-green) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 'clamp(40px, 8vw, 56px)',
-                  marginBottom: 'clamp(16px, 3vw, 20px)',
-                  boxShadow: 'var(--shadow-md)',
-                  border: '4px solid white'
-                }}>
-                  👤
-                </div>
-                <h2 style={{ 
-                  marginBottom: 'clamp(8px, 1.5vw, 12px)',
-                  fontSize: 'clamp(20px, 4vw, 26px)'
-                }}>
-                  {user.name}
-                </h2>
+                <img 
+                  src="/profile.png" 
+                  alt="프로필 이미지"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover' // 이미지를 꽉 채우도록 설정
+                  }}
+                  onError={(e) => {
+                    // 이미지가 없을 경우 기본 이미지(이모지)로 대체하는 폴백 (선택사항)
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement!.style.display = 'flex';
+                    e.currentTarget.parentElement!.style.alignItems = 'center';
+                    e.currentTarget.parentElement!.style.justifyContent = 'center';
+                    e.currentTarget.parentElement!.style.background = 'linear-gradient(135deg, var(--color-accent-green-light) 0%, var(--color-accent-green) 100%)';
+                    e.currentTarget.parentElement!.innerText = '👤';
+                    e.currentTarget.parentElement!.style.fontSize = 'clamp(40px, 8vw, 56px)';
+                  }}
+                />
+              </div>
+              
+              <h2 style={{ 
+                marginBottom: 'clamp(8px, 1.5vw, 12px)',
+                fontSize: 'clamp(20px, 4vw, 26px)'
+              }}>
+                {user.name}
+              </h2>
                 <p style={{ 
                   fontSize: 'clamp(12px, 2vw, 14px)', 
                   color: 'var(--color-text-secondary)' 
