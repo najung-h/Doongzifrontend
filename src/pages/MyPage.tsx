@@ -878,7 +878,7 @@ export default function MyPage() {
               backgroundColor: 'var(--color-bg-white)',
               borderRadius: 'var(--radius-lg)',
               width: '100%',
-              maxWidth: '1200px',
+              maxWidth: '600px',
               maxHeight: '90vh',
               overflow: 'auto',
               boxShadow: 'var(--shadow-lg)'
@@ -886,8 +886,8 @@ export default function MyPage() {
           >
             {/* Modal Header */}
             <div style={{
-              padding: 'clamp(20px, 3vw, 24px)',
-              borderBottom: '2px solid var(--color-border)',
+              padding: '20px 24px',
+              borderBottom: '1px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
@@ -1090,27 +1090,27 @@ export default function MyPage() {
               </button>
             </div>
 
-            {/* Modal Content - 3 Column Layout */}
+            {/* Modal Content */}
             <div style={{
-              padding: 'clamp(20px, 3vw, 24px)',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-              gap: 'clamp(16px, 2vw, 20px)'
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
             }}>
               {/* 등기부등본 Section */}
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'clamp(18px, 2.5vw, 20px)',
-                border: '2px solid var(--color-border)'
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  marginBottom: '12px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--spacing-xs)',
+                  gap: '8px',
                   color: 'var(--color-text-primary)'
                 }}>
                   📋 등기부등본
@@ -1218,17 +1218,17 @@ export default function MyPage() {
               {/* 건축물대장 Section */}
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'clamp(18px, 2.5vw, 20px)',
-                border: '2px solid var(--color-border)'
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  marginBottom: '12px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--spacing-xs)',
+                  gap: '8px',
                   color: 'var(--color-text-primary)'
                 }}>
                   🏗️ 건축물대장
@@ -1336,17 +1336,17 @@ export default function MyPage() {
               {/* 계약서 Section */}
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'clamp(18px, 2.5vw, 20px)',
-                border: '2px solid var(--color-border)'
+                borderRadius: '12px',
+                padding: '16px',
+                border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: 'clamp(16px, 2.5vw, 18px)',
+                  fontSize: '16px',
                   fontWeight: '700',
-                  marginBottom: 'clamp(12px, 2vw, 16px)',
+                  marginBottom: '12px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 'var(--spacing-xs)',
+                  gap: '8px',
                   color: 'var(--color-text-primary)'
                 }}>
                   📝 계약서
