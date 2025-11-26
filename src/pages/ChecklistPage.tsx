@@ -22,7 +22,10 @@ import {
   Send,
   Pin,
   ScrollText,
-  CheckCircle
+  CheckCircle,
+  Lightbulb, // Added Lightbulb
+  HelpCircle, // Added HelpCircle
+  Info, // Added Info
 } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
@@ -31,6 +34,8 @@ import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
 import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
 import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
 import InsuranceCheckModal from '../components/common/InsuranceCheckModal';
+import CustomCheckbox from '../components/common/CustomCheckbox'; // Import CustomCheckbox
+
 
 type SubChecklistItem = {
   id: string;
@@ -39,6 +44,7 @@ type SubChecklistItem = {
   whyDoIt: string;
   additionalNote?: string;
   completed: boolean;
+  isImportant?: boolean; // 중요 항목 표시 여부
 };
 
 type ChecklistItem = {
@@ -56,6 +62,7 @@ type ChecklistItem = {
     type?: 'primary' | 'secondary' | 'modal';
   }>;
   isGroup?: boolean; // 그룹 헤더인지 여부
+  isImportant?: boolean; // 중요 항목 표시 여부
 };
 
 type ChecklistTab = {
@@ -106,6 +113,7 @@ const initialChecklist: ChecklistTab[] = [
         whatIsIt: '이 집이 실제로 얼마에 팔리는지 시세를 알아보는 거예요. 내가 낼 전세금이 집값에 비해 너무 비싼지 확인해서, 위험한 \'깡통전세\'를 피하려는 거예요.',
         whyDoIt: '\'깡통전세\'는 집주인 빚이 너무 많거나 집값이 떨어져서, 나중에 내가 낸 전세금을 돌려받기 어려운 위험한 집을 말해요. 만약 집값(예: 3억)이랑 전세금(예: 2억 8천)이 별 차이 안 나면, 집이 경매로 넘어갔을 때 내 보증금을 다 못 받을 수도 있어요.',
         completed: false,
+        isImportant: true,
         buttons: [
           { label: '국토교통부 전월세 실거래가 조회', url: 'https://rt.molit.go.kr/pt/gis/gis.do?srhThingSecd=A&mobileAt=', type: 'secondary' },
           { label: '깡통전세 위험도 분석', type: 'primary' }
@@ -117,6 +125,7 @@ const initialChecklist: ChecklistTab[] = [
         whatIsIt: '내가 낸 전세금을 나중에 집주인 대신 보증 기관(HUG 등)이 꼭 돌려주겠다고 약속하는 \'보험\'에 가입할 수 있는지 미리 알아보는 거예요.',
         whyDoIt: '만약 이 집에 \'보증보험\' 가입이 안 된다면, 그건 집주인 빚이 너무 많거나, 집에 다른 문제가 있을 가능성이 높다는 신호예요. 이런 집은 나중에 보증금을 돌려받기 더 위험할 수 있어요.',
         completed: false,
+        isImportant: true,
         buttons: [
           { label: 'HUG 전세보증보험', url: 'https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp', type: 'secondary' },
           { label: 'SGI 전세보증보험', url: 'https://www.sgic.co.kr/biz/ccp/index.html?p=CCPPRD040301F01', type: 'secondary' },
@@ -134,14 +143,16 @@ const initialChecklist: ChecklistTab[] = [
             title: '선순위 권리관계 확인하기',
             whatIsIt: '집에 이미 설정된 전세권·근저당·임차권(선순위 보증금) 같은 권리들이 있는지 확인하는 절차예요. 누가 먼저 돈을 돌려받을 권리가 있는지 등기부에서 순서를 확인하는 과정입니다.',
             whyDoIt: '선순위 권리가 많으면 내 보증금이 후순위로 밀려 돌려받지 못할 위험이 커져요. 특히 선순위 보증금이나 근저당 합계가 시세를 넘으면 전세사기 위험이 매우 높기 때문입니다.',
-            completed: false
+            completed: false,
+            isImportant: true
           },
           {
             id: 'before-3-2',
             title: '집과 소유자에 관련된 돈문제가 있는지 확인하기',
             whatIsIt: '소유자에게 가압류·압류·강제경매·세금 체납 등이 걸려있는지 확인하는 과정이에요. 즉, 집주인의 재정 상태가 위험해서 집이 공매·경매로 넘어갈 가능성을 확인하는 단계입니다.',
             whyDoIt: '이런 기록이 있으면 집주인이 경제적으로 위험한 상태일 확률이 높아요. 결과적으로 전세보증금을 제대로 돌려받지 못할 가능성이 높아지기 때문에 반드시 확인해야 합니다.',
-            completed: false
+            completed: false,
+            isImportant: true
           }
         ],
         buttons: [
@@ -186,7 +197,8 @@ const initialChecklist: ChecklistTab[] = [
             title: '이 집에 소유권은 누구에게 있는지 확인하기',
             whatIsIt: '소유권을 가진 사람이 누구인지, 몇 명인지 등기부등본을 통해 확인하는 과정이에요. 소유자가 두 명 이상이면 모든 공유자와 계약해야 한다는 점도 함께 확인해야 해요.',
             whyDoIt: '실제 집주인이 아닌 사람과 계약하면 계약이 무효가 될 수 있고, 보증금을 돌려받지 못할 위험이 커져요. 또 공유주택인 경우 모든 공유자의 동의 없이 계약하면 법적 효력이 없기 때문에 반드시 확인해야 해요.',
-            completed: false
+            completed: false,
+            isImportant: true
           },
           {
             id: 'during-1-2',
@@ -194,7 +206,8 @@ const initialChecklist: ChecklistTab[] = [
             whatIsIt: '등기부등본에서 이 집이 신탁회사에 맡겨진 상태인지(신탁등기) 확인하는 절차예요. 신탁등기면 겉보기 집주인이 아니라 신탁회사가 실제 권한을 가지고 있는 구조예요.',
             whyDoIt: '신탁된 집을 집주인과만 계약하면 계약이 무효가 될 수 있어, 보증금을 한순간에 잃을 위험이 있어요. 반드시 신탁회사 동의가 필요한 집이므로, 이를 모르고 계약하면 추후 강제퇴거·보증금 미반환 위험이 매우 커져요.',
             additionalNote: '신탁등기 상태가 확인되었다면 주민센터가서 신탁원부 확인하는거 필요합니다.',
-            completed: false
+            completed: false,
+            isImportant: true
           }
         ],
         buttons: [
@@ -207,7 +220,8 @@ const initialChecklist: ChecklistTab[] = [
         title: '임대인 확인하기',
         whatIsIt: '지금 나와 계약하는 사람이 이 집의 진짜 주인이 맞는지 신분증으로 확인하는 과정이에요. 등기부등본의 소유자 정보와 실제 계약 상대가 동일한지 대조하는 절차예요.',
         whyDoIt: '가짜 임대인에게 속아 계약하면 전세보증금을 통째로 잃는 전형적인 전세사기 유형이기 때문이에요. 임대인 확인은 전세사기를 막기 위한 가장 기본이면서도 가장 중요한 체크 단계예요.',
-        completed: false
+        completed: false,
+        isImportant: true
       },
       {
         id: 'during-3',
@@ -247,14 +261,16 @@ const initialChecklist: ChecklistTab[] = [
             title: '계약 내용 꼼꼼히 확인하기',
             whatIsIt: '계약서에 적힌 주소, 보증금, 이사 날짜, 임대인 정보 등이 실제 사실과 정확히 일치하는지 글자 하나까지 확인하는 과정이에요. 등기부에서 확인한 정보와 계약서 내용이 동일한지도 반드시 대조해야 해요.',
             whyDoIt: '숫자·주소 하나만 틀려도 분쟁이 발생하거나 계약 효력이 흔들릴 수 있어 큰 금전적 피해로 이어질 수 있어요. 특히 주소, 동·호수, 보증금 오기입은 전세사기에서 가장 흔한 피해 유형이에요.',
-            completed: false
+            completed: false,
+            isImportant: true
           },
           {
             id: 'during-6-2',
             title: '특약사항 위험 요소 확인하기',
             whatIsIt: '계약서 특약에 임차인에게 불리한 조항, 책임을 떠넘기는 내용, 모호한 문구가 있는지 점검하는 과정이에요. 특약은 일반 조항보다 우선 적용되기 때문에 매우 중요한 부분이에요.',
             whyDoIt: '특약이 잘못 적혀 있으면 법적 분쟁 시 임차인이 불리해지고, 보증금 반환·수리비 부담 문제가 발생할 수 있어요. 특히 전세사기에서 악성 특약이 숨어 있는 경우가 많아 반드시 사전 점검이 필요해요.',
-            completed: false
+            completed: false,
+            isImportant: true
           }
         ],
         buttons: [
@@ -273,6 +289,7 @@ const initialChecklist: ChecklistTab[] = [
         whatIsIt: '전세 잔금을 최종 지급하기 직전에 다시 한번 확인하는 과정이에요. 잔금을 내는 순간부터 임대차 계약이 실제로 성립되며, 그 즉시 발생하는 위험요소를 미리 차단하는 단계에요.',
         whyDoIt: '계약서만 작성한 상태에서는 아직 법적 보호를 받지 못하기 때문에, 잔금을 지급하기 전에 집의 권리관계가 안전하게 유지되고 있는지 반드시 다시 확인해야 해요. 등기부등본을 새로 발급해 소유권 변경·근저당 설정·압류 등 위험 요소가 생기지 않았는지, 기존 세입자가 정확히 퇴거했는지, 그리고 계약서에 적힌 특약사항들이 실제로 이행되었는지 점검해야 잔금 지급 이후 내 보증금을 안전하게 보호할 수 있어요.',
         completed: false,
+        isImportant: true,
         buttons: [
           { label: '등기부등본 발급하러가기', url: 'https://www.iros.go.kr/index.jsp', type: 'secondary' },
           { label: '등기부등본 분석하러가기', type: 'primary' }
@@ -290,7 +307,8 @@ const initialChecklist: ChecklistTab[] = [
         title: '전입신고하여 대항력 확보하기',
         whatIsIt: '①그 집에 진짜 이사해서 살고, ②주민센터에 "저 이 집으로 이사 왔어요"라고 신고(전입신고)하는 거예요.',
         whyDoIt: '이 두 가지를 완료해야 \'대항력\'이라는 힘이 생겨요. 이 힘이 있으면, 계약 기간 중에 집주인이 바뀌어도 "난 계약 기간 끝날 때까지 여기서 살 거예요!"라고 당당하게 말할 수 있어요. 새 주인이 나가라고 해도 안 나가도 돼요.',
-        completed: false
+        completed: false,
+        isImportant: true
       },
       {
         id: 'after-4',
@@ -319,7 +337,8 @@ const initialChecklist: ChecklistTab[] = [
         title: '확정일자 받기',
         whatIsIt: '계약서에 \'확정일자\'라는 도장을 받아서, \'내 보증금을 다른 채권자들보다 먼저 돌려받을 수 있는 권리\'인 우선변제권을 확보하는 거예요.',
         whyDoIt: '전입신고만 하면 보증금 반환 순서가 다른 채권자들보다 뒤로 밀릴 수 있어요. 확정일자를 받아두어야 경매가 진행될 때 내 보증금을 우선해서 돌려받을 수 있는 권리가 생겨요.',
-        completed: false
+        completed: false,
+        isImportant: true
       },
       {
         id: 'after-6',
@@ -460,7 +479,6 @@ export default function ChecklistPage() {
         key={subItem.id}
         style={{
           marginBottom: '8px',
-          marginLeft: '4px',
           border: '1px solid #E8E8E8',
           borderRadius: '12px',
           overflow: 'hidden',
@@ -509,9 +527,24 @@ export default function ChecklistPage() {
               fontWeight: '600',
               color: subItem.completed ? '#999999' : '#2C2C2C',
               textDecoration: subItem.completed ? 'line-through' : 'none',
-              margin: 0
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
               {subItem.title}
+              {subItem.isImportant && (
+                <span style={{
+                  backgroundColor: '#EF4444',
+                  color: '#FFFFFF',
+                  fontSize: '10px',
+                  fontWeight: '700',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  marginLeft: '4px',
+                  flexShrink: 0
+                }}>[필수]</span>
+              )}
             </h5>
           </div>
 
@@ -528,20 +561,10 @@ export default function ChecklistPage() {
           </div>
 
           {/* Checkbox */}
-          <input
-            type="checkbox"
+          <CustomCheckbox
             checked={subItem.completed}
-            onChange={(e) => {
-              e.stopPropagation();
-              toggleSubItem(parentId, subItem.id);
-            }}
-            style={{
-              width: '18px',
-              height: '18px',
-              cursor: 'pointer',
-              accentColor: '#8FBF4D',
-              flexShrink: 0
-            }}
+            onChange={(newChecked) => toggleSubItem(parentId, subItem.id)}
+            size={18}
           />
         </div>
 
@@ -573,11 +596,9 @@ export default function ChecklistPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  Q
+                  <HelpCircle size={14} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
@@ -621,11 +642,9 @@ export default function ChecklistPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '11px',
-                  fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  A
+                  <Info size={14} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
@@ -662,9 +681,12 @@ export default function ChecklistPage() {
                   color: '#F57C00',
                   lineHeight: '1.5',
                   margin: 0,
-                  fontWeight: '500'
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}>
-                  💡 {subItem.additionalNote}
+                  <Lightbulb size={12} color="#F57C00" /> {subItem.additionalNote}
                 </p>
               </div>
             )}
@@ -952,18 +974,21 @@ export default function ChecklistPage() {
                 
                 return (
                   <div key={item.id} style={{
-                    marginBottom: '16px',
-                    borderLeft: '4px solid #8FBF4D',
+                    marginBottom: isGroupExpanded ? '16px' : '12px',
                     borderRadius: '12px',
-                    paddingLeft: '16px'
+                    overflow: 'hidden',
+                    backgroundColor: '#FFFFFF', // Ensures no default background
+                    boxShadow: isGroupExpanded ? '0 2px 12px rgba(0, 0, 0, 0.08)' : 'none',
+                    border: isGroupExpanded ? '1px solid #E8E8E8' : 'none',
+                    transition: 'all 0.2s ease',
                   }}>
                     {/* Group Header - 클릭 가능 */}
                     <div
                       style={{
-                        padding: '16px 20px 16px 4px',
+                        padding: '16px 20px',
                         borderRadius: '12px',
-                        marginBottom: isGroupExpanded ? '12px' : '0',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        backgroundColor: '#FFFFFF',
                       }}
                       onClick={() => toggleExpand(item.id)}
                     >
@@ -1019,7 +1044,6 @@ export default function ChecklistPage() {
                             flexWrap: 'wrap',
                             gap: '10px',
                             marginTop: '12px',
-                            marginLeft: '4px',
                             marginBottom: '12px'
                           }}>
                             {item.buttons.map((button, btnIndex) => (
@@ -1112,9 +1136,24 @@ export default function ChecklistPage() {
                         fontWeight: '600',
                         color: item.completed ? '#999999' : '#2C2C2C',
                         textDecoration: item.completed ? 'line-through' : 'none',
-                        margin: 0
+                        margin: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
                       }}>
                         {item.title}
+                        {item.isImportant && (
+                          <span style={{
+                            backgroundColor: '#EF4444',
+                            color: '#FFFFFF',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                            marginLeft: '4px',
+                            flexShrink: 0
+                          }}>[필수]</span>
+                        )}
                       </h4>
                     </div>
 
@@ -1124,20 +1163,10 @@ export default function ChecklistPage() {
                     </div>
 
                     {/* Checkbox */}
-                    <input
-                      type="checkbox"
+                    <CustomCheckbox
                       checked={item.completed || false}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleItem(item.id);
-                      }}
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        cursor: 'pointer',
-                        accentColor: '#8FBF4D',
-                        flexShrink: 0
-                      }}
+                      onChange={(newChecked) => toggleItem(item.id)}
+                      size={20}
                     />
                   </div>
 
@@ -1169,11 +1198,9 @@ export default function ChecklistPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '12px',
-                            fontWeight: '700',
                             flexShrink: 0
                           }}>
-                            Q
+                            <HelpCircle size={16} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h5 style={{
@@ -1217,11 +1244,9 @@ export default function ChecklistPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '12px',
-                            fontWeight: '700',
                             flexShrink: 0
                           }}>
-                            A
+                            <Info size={16} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h5 style={{
