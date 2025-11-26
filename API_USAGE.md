@@ -70,7 +70,7 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 
 ### 2. Document Service (문서 분석)
 - Endpoint: `VITE_N8N_SCAN_WEBHOOK_URL`
-- 담당 기능: 둥지 스캔, 계약서 정밀 진단 (PRD 4.3, 4.4-MVP1)
+- 담당 기능: 둥지 스캔, 계약서/등기부/건축물대장 정밀 진단 (PRD 4.3, 4.4-MVP1)
 - n8n Switch Logic (`actionType`)
   - 주의: 파일 업로드이므로 `Content-Type: multipart/form-data`를 사용합니다. `actionType`은 FormData의 필드로 전송합니다.
   - `scanDocuments`: (둥지 스캔) 등기부등본/건축물대장/계약서 통합 분석 및 체크리스트 자동 완료. 처리 방식은 비동기 (Asynchronous) - 요청 즉시 200 OK 응답, 분석은 백그라운드에서 진행됨.
