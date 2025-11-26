@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
+import AnalysisLoadingView from './AnalysisLoadingView';
 
 interface ContractAnalysisModalProps {
   isOpen: boolean;
@@ -173,14 +174,18 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
-        alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
-      }}
-      onClick={handleClose}
-    >
+    <>
+      {/* 로딩 오버레이 */}
+      <AnalysisLoadingView isLoading={isAnalyzing} analysisType="contract" />
+
+      <div
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
+        }}
+        onClick={handleClose}
+      >
       <div
         style={{
           backgroundColor: '#FFFFFF', borderRadius: '16px', width: '100%', maxWidth: '700px',
@@ -279,5 +284,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
         </div>
       </div>
     </div>
+    </>
   );
 }
