@@ -1,6 +1,6 @@
 import { apiClient } from './index';
 import { env } from '../config/env';
-import type { ChecklistTab, ScanResponse } from '../types';
+import type { ChecklistTab, ScanResponse, DocumentDataType } from '../types';
 
 /**
  * 체크리스트 관련 API
@@ -53,7 +53,7 @@ export const checklistAPI = {
   },
 
   /**
-   * PDF 다운로드
+   * PDF 다운로드 (전체 체크리스트)
    * actionType: "exportPDF"
    */
   exportPDF: async (checklistData: ChecklistTab[]): Promise<{ success: boolean; pdfUrl?: string }> => {
@@ -71,7 +71,7 @@ export const checklistAPI = {
   },
 
   /**
-   * 이메일 전송
+   * 이메일 전송 (전체 체크리스트)
    * actionType: "sendEmail"
    */
   sendEmail: async (email: string, checklistData: ChecklistTab[]): Promise<{ success: boolean; message: string }> => {
@@ -157,128 +157,59 @@ export const checklistAPI = {
     }
   },
 
+  // === [문서 분석 결과 후속 처리 통합 함수] ===
+  
   /**
-   * 등기부등본 분석 결과 PDF 다운로드
-   * actionType: "exportRegistryAnalysisPDF"
+   * 문서 분석 결과 PDF 다운로드 (통합)
+   * actionType: "exportAnalysisPDF"
+   * @param dataType 'registry' | 'contract' | 'building'
+   * @param analysisResult 분석 결과 데이터
    */
-  exportRegistryAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  exportAnalysisPDF: async (
+    dataType: DocumentDataType,
+    analysisResult: ScanResponse['analysis']
+  ): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportRegistryAnalysisPDF',
+        actionType: 'exportAnalysisPDF',
+        dataType, // 보고서 종류 명시
         analysisResult,
       });
-
       return response.data;
     } catch (error) {
-      console.error('Failed to export registry analysis PDF:', error);
+      console.error(`Failed to export ${dataType} analysis PDF:`, error);
       return {
         success: false,
-        message: '등기부등본 분석 결과 PDF 생성에 실패했습니다.',
+        message: `${dataType} 분석 결과 PDF 생성에 실패했습니다.`,
       };
     }
   },
-
+  
   /**
-   * 등기부등본 분석 결과 이메일 전송
-   * actionType: "sendRegistryAnalysisEmail"
+   * 문서 분석 결과 이메일 전송 (통합)
+   * actionType: "sendAnalysisEmail"
+   * @param dataType 'registry' | 'contract' | 'building'
+   * @param analysisResult 분석 결과 데이터
+   * @param email 수신자 이메일
    */
-  sendRegistryAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+  sendAnalysisEmail: async (
+    dataType: DocumentDataType,
+    analysisResult: ScanResponse['analysis'],
+    email: string = 'user@example.com' // 이메일은 모달에서 입력받아야 함
+  ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendRegistryAnalysisEmail',
+        actionType: 'sendAnalysisEmail',
+        dataType, // 보고서 종류 명시
+        email,
         analysisResult,
       });
-
       return response.data;
     } catch (error) {
-      console.error('Failed to send registry analysis email:', error);
+      console.error(`Failed to send ${dataType} analysis email:`, error);
       return {
         success: false,
-        message: '등기부등본 분석 결과 이메일 전송에 실패했습니다.',
-      };
-    }
-  },
-
-  /**
-   * 계약서 분석 결과 PDF 다운로드
-   * actionType: "exportContractAnalysisPDF"
-   */
-  exportContractAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportContractAnalysisPDF',
-        analysisResult,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to export contract analysis PDF:', error);
-      return {
-        success: false,
-        message: '계약서 분석 결과 PDF 생성에 실패했습니다.',
-      };
-    }
-  },
-
-  /**
-   * 계약서 분석 결과 이메일 전송
-   * actionType: "sendContractAnalysisEmail"
-   */
-  sendContractAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendContractAnalysisEmail',
-        analysisResult,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to send contract analysis email:', error);
-      return {
-        success: false,
-        message: '계약서 분석 결과 이메일 전송에 실패했습니다.',
-      };
-    }
-  },
-
-  /**
-   * 건축물대장 분석 결과 PDF 다운로드
-   * actionType: "exportBuildingAnalysisPDF"
-   */
-  exportBuildingAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportBuildingAnalysisPDF',
-        analysisResult,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to export building analysis PDF:', error);
-      return {
-        success: false,
-        message: '건축물대장 분석 결과 PDF 생성에 실패했습니다.',
-      };
-    }
-  },
-
-  /**
-   * 건축물대장 분석 결과 이메일 전송
-   * actionType: "sendBuildingAnalysisEmail"
-   */
-  sendBuildingAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendBuildingAnalysisEmail',
-        analysisResult,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to send building analysis email:', error);
-      return {
-        success: false,
-        message: '건축물대장 분석 결과 이메일 전송에 실패했습니다.',
+        message: `${dataType} 분석 결과 이메일 전송에 실패했습니다.`,
       };
     }
   },
