@@ -148,7 +148,25 @@ export interface InsuranceCheckRequest {
   monthlyRent?: number;
 }
 
+// 보증보험 체크 결과 타입
+export type InsuranceVerdict = 'PASS' | 'FAIL' | 'REVIEW_REQUIRED';
+
+export interface InsuranceFailedItem {
+  id: string;
+  question: string;
+  reason: string;
+}
+
+export interface InsuranceReviewItem {
+  id: string;
+  question: string;
+  reason_why: string;
+}
+
 export interface InsuranceCheckResponse extends BaseResponse {
+  status: InsuranceVerdict;
+  failedItems?: InsuranceFailedItem[];
+  reviewItems?: InsuranceReviewItem[];
   details?: string;
 }
 

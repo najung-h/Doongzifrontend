@@ -30,6 +30,7 @@ import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
 import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
 import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
 import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
+import InsuranceCheckModal from '../components/common/InsuranceCheckModal';
 
 type SubChecklistItem = {
   id: string;
@@ -344,6 +345,7 @@ export default function ChecklistPage() {
   const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
+  const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
@@ -443,23 +445,6 @@ export default function ChecklistPage() {
     }
   };
 
-  // 보증보험 확인 핸들러
-  const handleCheckInsurance = async () => {
-    try {
-      const result = await checklistAPI.checkInsurance({
-        address: '',
-        deposit: 0,
-        monthlyRent: 0
-      });
-      
-      if (result.success) {
-        alert(`${result.message}\n\n${result.details || ''}`);
-      }
-    } catch (error) {
-      console.error('보증보험 확인 실패:', error);
-      alert('보증보험 확인 중 오류가 발생했습니다.');
-    }
-  };
 
   // 위험도 분석 핸들러 - 모달 열기
   const handleAnalyzeRisk = () => {
@@ -1274,7 +1259,7 @@ export default function ChecklistPage() {
                                 if (button.url) {
                                   window.open(button.url, '_blank');
                                 } else if (button.label === '보증보험 가입 가능 여부 확인') {
-                                  handleCheckInsurance();
+                                  setIsInsuranceModalOpen(true);
                                 } else if (button.label === '깡통전세 위험도 분석') {
                                   handleAnalyzeRisk();
                                 } else if (button.label === '등기부등본 분석하러가기') {
@@ -1362,6 +1347,12 @@ export default function ChecklistPage() {
       <BuildingAnalysisModal
         isOpen={isBuildingModalOpen}
         onClose={() => setIsBuildingModalOpen(false)}
+      />
+
+      {/* Insurance Check Modal */}
+      <InsuranceCheckModal
+        isOpen={isInsuranceModalOpen}
+        onClose={() => setIsInsuranceModalOpen(false)}
       />
     </div>
   );
