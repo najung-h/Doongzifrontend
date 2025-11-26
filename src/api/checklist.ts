@@ -11,10 +11,13 @@ export const checklistAPI = {
    * actionType: "analyzeDocuments"
    * URL: /api/scan
    */
-  analyzeContract: async (files: File[]): Promise<ScanResponse> => {
+  analyzeContract: async (files: File[], docType?: string): Promise<ScanResponse> => {
     try {
       const formData = new FormData();
       formData.append('actionType', 'analyzeDocuments');
+      if (docType) {
+        formData.append('doc_type', docType);
+      }
       files.forEach((file) => {
         formData.append('files', file);
       });

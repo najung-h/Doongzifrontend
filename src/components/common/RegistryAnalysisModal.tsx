@@ -88,7 +88,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
     try {
       // 수정됨: scanAPI.analyzeDocuments -> checklistAPI.analyzeContract
       // (인자 개수 오류 해결 및 checklistAPI로 통합)
-      const result = await checklistAPI.analyzeContract([file]);
+      const result = await checklistAPI.analyzeContract([file], '등기부등본');
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);

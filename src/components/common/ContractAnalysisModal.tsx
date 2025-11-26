@@ -86,7 +86,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await checklistAPI.analyzeContract([file]);
+      const result = await checklistAPI.analyzeContract([file], '임대차계약서');
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
