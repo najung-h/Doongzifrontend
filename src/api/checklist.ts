@@ -108,7 +108,7 @@ export const checklistAPI = {
 
   /**
    * [수정됨] 깡통전세 위험도 분석
-   * n8n 요구 변수명: 주소, 전용면적_m2, type, deposit
+   * n8n 요구 변수명: address, exclusiveArea, type, deposit
    */
   analyzeRisk: async (propertyInfo: {
     address: string;
@@ -126,9 +126,9 @@ export const checklistAPI = {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'analyzeRisk',
         // n8n 변수명 매핑
-        '주소': propertyInfo.address,
+        'address': propertyInfo.address,
         'deposit': propertyInfo.deposit,
-        '전용면적_m2': propertyInfo.area,
+        'exclusiveArea': propertyInfo.area,
         'type': propertyInfo.propertyType,
       });
       return response.data;
