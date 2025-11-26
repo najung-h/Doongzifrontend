@@ -23,7 +23,7 @@ export const checklistAPI = {
         formData.append('files', file);
       });
 
-      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+      const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -111,7 +111,7 @@ export const checklistAPI = {
     details?: string;
   }> => {
     try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
+      const response = await apiClient.post(env.scanWebhookUrl, {
         actionType: 'checkInsurance',
         propertyInfo,
       });
