@@ -12,6 +12,8 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   const [files, setFiles] = useState<File[]>([]);
   const [deposit, setDeposit] = useState('');
   const [landlordName, setLandlordName] = useState('');
+  const [address, setAddress] = useState('');
+  const [exclusiveArea, setExclusiveArea] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
     success: boolean;
@@ -19,7 +21,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
     message: string;
     details?: string;
   } | null>(null);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -31,8 +33,8 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   };
 
   const handleCheck = async () => {
-    if (files.length === 0 || !deposit) {
-      alert('파일(등기부등본, 건축물대장)과 보증금을 모두 입력해주세요.');
+    if (files.length === 0 || !deposit || !address || !exclusiveArea) {
+      alert('파일(등기부등본, 건축물대장), 보증금, 주소, 전용면적을 모두 입력해주세요.');
       return;
     }
 
@@ -41,7 +43,9 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
       const formData = new FormData();
       formData.append('target_deposit', deposit);
       formData.append('target_landlord_name', landlordName);
-      
+      formData.append('주소', address);
+      formData.append('전용면적_m2', exclusiveArea);
+
       files.forEach((file) => {
         formData.append('files', file);
       });
@@ -60,6 +64,8 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
     setFiles([]);
     setDeposit('');
     setLandlordName('');
+    setAddress('');
+    setExclusiveArea('');
     setResult(null);
     onClose();
   };
@@ -119,6 +125,24 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 <input
                   type="text" placeholder="임대인 성명" value={landlordName}
                   onChange={e => setLandlordName(e.target.value)}
+                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>주소</label>
+                <input
+                  type="text" placeholder="예: 서울특별시 강남구 테헤란로 123" value={address}
+                  onChange={e => setAddress(e.target.value)}
+                  style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px' }}>전용면적 (m²)</label>
+                <input
+                  type="number" placeholder="예: 84.5" value={exclusiveArea}
+                  onChange={e => setExclusiveArea(e.target.value)}
                   style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '8px' }}
                 />
               </div>

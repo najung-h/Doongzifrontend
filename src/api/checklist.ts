@@ -15,6 +15,7 @@ export const checklistAPI = {
     try {
       const formData = new FormData();
       formData.append('actionType', 'analyzeDocuments');
+      formData.append('userId', '61a8fc1d-67b0-45db-b913-602654b45c3c');
       if (docType) {
         formData.append('doc_type', docType);
       }
@@ -87,8 +88,9 @@ export const checklistAPI = {
     details?: string;
   }> => {
     try {
-      // n8n 워크플로우에 맞춰 actionType 추가
+      // n8n 워크플로우에 맞춰 actionType, userId 추가
       formData.append('actionType', 'checkInsurance');
+      formData.append('userId', '61a8fc1d-67b0-45db-b913-602654b45c3c');
 
       const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
