@@ -86,7 +86,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await checklistAPI.analyzeContract([file]);
+      const result = await checklistAPI.analyzeDocuments([file], '등기부등본');
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);

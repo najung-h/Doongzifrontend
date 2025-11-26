@@ -40,10 +40,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
 
     setIsLoading(true);
     try {
-      const response = await checklistAPI.checkInsurance({
-        address,
-        deposit: Number(deposit),
-      });
+      const response = await checklistAPI.checkInsurance(files, Number(deposit));
       setResult(response);
     } catch (error) {
       console.error(error);
