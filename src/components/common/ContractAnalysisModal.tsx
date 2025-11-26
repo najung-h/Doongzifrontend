@@ -3,6 +3,7 @@ import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
 import AnalysisLoadingView from './AnalysisLoadingView';
+import AnalysisResultModal from './AnalysisResultModal';
 
 interface ContractAnalysisModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
+  const [htmlOutput, setHtmlOutput] = useState<string>('');
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -23,6 +26,8 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     setFile(null);
     setPreviewUrl(null);
     setAnalysisResult(null);
+    setHtmlOutput('');
+    setIsResultModalOpen(false);
     onClose();
   };
 
@@ -85,9 +90,19 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     setIsAnalyzing(true);
+    setAnalysisResult(null);
+    setHtmlOutput('');
+
     try {
-      const result = await checklistAPI.analyzeContract([file], '임대차계약서');
-      setAnalysisResult(result);
+      // Let's assume the API response has the HTML content in an 'output' field.
+      const result = await checklistAPI.analyzeContract([file], '임대차계약서') as any;
+      if (result && result.output) {
+        setHtmlOutput(result.output);
+        setIsResultModalOpen(true);
+      } else {
+        // Fallback to old result display if no html output
+        setAnalysisResult(result);
+      }
     } catch (error) {
       console.error('Analysis error:', error);
       alert('분석 중 오류가 발생했습니다.');
@@ -96,87 +111,15 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
-  const handleDownloadPDF = async () => {
-    if (!analysisResult) {
-      alert('분석 결과가 없습니다.');
-      return;
-    }
-
-    // fileKey 추출 (API 응답에 fileKey가 포함되어 있다고 가정)
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-
-    try {
-      // 수정됨: fileKey 문자열 하나만 전달
-      const result = await checklistAPI.exportAnalysisPDF(fileKey);
-      
-      if (result.success && result.pdfUrl) {
-        window.open(result.pdfUrl, '_blank');
-        alert('PDF가 생성되었습니다!');
-      } else {
-        alert(result.message || 'PDF 생성에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('PDF 다운로드 실패:', error);
-      alert('PDF 다운로드 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleSendEmail = async () => {
-    if (!analysisResult) {
-      alert('분석 결과가 없습니다.');
-      return;
-    }
-
-    // fileKey 추출
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-    // 사용자 이메일 (실제로는 로그인 정보에서 가져와야 함)
-    const userEmail = "user@example.com"; 
-
-    try {
-      // 수정됨: fileKey와 email 문자열 전달
-      const result = await checklistAPI.sendAnalysisEmail(fileKey, userEmail);
-      
-      if (result.success) {
-        alert(result.message || '이메일이 전송되었습니다!');
-      } else {
-        alert(result.message || '이메일 전송에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('이메일 전송 실패:', error);
-      alert('이메일 전송 중 오류가 발생했습니다.');
-    }
-  };
-
-  const getRiskColor = (grade: 'low' | 'medium' | 'high') => {
-    switch (grade) {
-      case 'low': return '#4CAF50';
-      case 'medium': return '#FFC107';
-      case 'high': return '#F44336';
-      default: return '#999999';
-    }
-  };
-
-  const getRiskLabel = (grade: 'low' | 'medium' | 'high') => {
-    switch (grade) {
-      case 'low': return '안전';
-      case 'medium': return '주의';
-      case 'high': return '위험';
-      default: return '알 수 없음';
-    }
-  };
-
-  const getRiskIcon = (grade: 'low' | 'medium' | 'high') => {
-    switch (grade) {
-      case 'low': return <Shield size={24} />;
-      case 'medium': return <AlertTriangle size={24} />;
-      case 'high': return <AlertTriangle size={24} />;
-    }
-  };
-
   return (
     <>
-      {/* 로딩 오버레이 */}
       <AnalysisLoadingView isLoading={isAnalyzing} analysisType="contract" />
+
+      <AnalysisResultModal
+        isOpen={isResultModalOpen}
+        onClose={() => setIsResultModalOpen(false)}
+        htmlContent={htmlOutput}
+      />
 
       <div
         style={{
@@ -225,65 +168,15 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
             </div>
           )}
 
-          {file && !analysisResult && (
+          {file && (
             <button onClick={handleAnalyze} disabled={isAnalyzing} style={{ width: '100%', padding: '14px', borderRadius: '8px', border: 'none', backgroundColor: isAnalyzing ? '#CCCCCC' : '#8FBF4D', color: '#FFFFFF', fontSize: '15px', fontWeight: '600', cursor: isAnalyzing ? 'not-allowed' : 'pointer', marginBottom: '20px' }}>
               {isAnalyzing ? '분석 중...' : '즉시 분석하기'}
             </button>
           )}
 
-          {analysisResult && (
-            <div style={{ padding: '24px', borderRadius: '12px', backgroundColor: '#F8F8F8', border: `2px solid ${getRiskColor(analysisResult.analysis.riskGrade)}`, marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: getRiskColor(analysisResult.analysis.riskGrade), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>
-                  {getRiskIcon(analysisResult.analysis.riskGrade)}
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: getRiskColor(analysisResult.analysis.riskGrade), margin: '0 0 4px 0' }}>
-                    {getRiskLabel(analysisResult.analysis.riskGrade)}
-                  </h3>
-                  <p style={{ fontSize: '14px', color: '#666666', margin: 0 }}>계약서 분석 완료</p>
-                </div>
-              </div>
-
-              <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#FFFFFF', marginBottom: '16px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', marginBottom: '8px' }}>요약</h4>
-                <p style={{ fontSize: '14px', color: '#424242', lineHeight: '1.6', margin: 0 }}>{analysisResult.analysis.summary}</p>
-              </div>
-
-              {analysisResult.analysis.issues.length > 0 && (
-                <div>
-                  <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', marginBottom: '12px' }}>주요 발견사항</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {analysisResult.analysis.issues.map((issue, index) => (
-                      <div key={index} style={{ padding: '12px', borderRadius: '8px', backgroundColor: '#FFFFFF', borderLeft: `3px solid ${issue.severity === 'danger' ? '#F44336' : '#FFC107'}` }}>
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                          {issue.severity === 'danger' ? <AlertTriangle size={16} color="#F44336" style={{ marginTop: '2px', flexShrink: 0 }} /> : <CheckCircle size={16} color="#FFC107" style={{ marginTop: '2px', flexShrink: 0 }} />}
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: '13px', fontWeight: '600', color: '#2C2C2C', margin: '0 0 4px 0' }}>{issue.title}</p>
-                            <p style={{ fontSize: '12px', color: '#666666', lineHeight: '1.5', margin: 0 }}>{issue.description}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {analysisResult && (
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={handleDownloadPDF} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: '1px solid #8FBF4D', backgroundColor: '#FFFFFF', color: '#8FBF4D', fontSize: '15px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Download size={18} /> 분석결과 PDF로 다운받기
-              </button>
-              <button onClick={handleSendEmail} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', backgroundColor: '#8FBF4D', color: '#FFFFFF', fontSize: '15px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Mail size={18} /> 분석결과 이메일로 전송하기
-              </button>
-            </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
