@@ -7,6 +7,7 @@ import MyPage from './pages/MyPage';
 import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import AnalysisResultPage from './pages/AnalysisResultPage';
 import { AuthProvider } from './context/AuthContext';
 
 function AppContent() {
@@ -20,6 +21,7 @@ function AppContent() {
       <Route path="/scan" element={<ScanPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/analysis-result" element={<AnalysisResultPage />} />
     </Routes>
   );
 }
