@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
+import { scanAPI } from '../../api/scan';
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
 
@@ -90,7 +91,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await checklistAPI.analyzeContract([file]);
+      const result = await scanAPI.analyzeDocuments([file], '임대차계약서');
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);

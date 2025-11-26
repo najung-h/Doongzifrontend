@@ -10,13 +10,19 @@ export const scanAPI = {
    * 문서 분석 (등기부등본, 계약서, 건축물대장)
    * actionType: "analyzeDocuments"
    */
-  analyzeDocuments: async (files: File[]): Promise<ScanResponse> => {
+  analyzeDocuments: async (
+    files: File[],
+    docType: '등기부등본' | '임대차계약서' | '건축물대장',
+    userId: string = '61a8fc1d-67b0-45db-b913-602654b45c3c' // 하드코딩된 테스트 userId
+  ): Promise<ScanResponse> => {
     try {
       const formData = new FormData();
-      
-      // actionType 추가
+
+      // actionType, userId, docType 추가
       formData.append('actionType', 'analyzeDocuments');
-      
+      formData.append('userId', userId);
+      formData.append('docType', docType);
+
       // 파일들 추가
       files.forEach((file) => {
         formData.append('files', file);

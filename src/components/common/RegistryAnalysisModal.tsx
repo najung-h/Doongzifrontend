@@ -91,7 +91,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await scanAPI.analyzeDocuments([file]);
+      const result = await scanAPI.analyzeDocuments([file], '등기부등본');
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -108,7 +108,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
     }
 
     try {
-      const result = await checklistAPI.exportAnalysisPDF("registry", analysisResult);
+      const result = await checklistAPI.exportAnalysisPDF("registry", analysisResult.analysis);
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
@@ -128,7 +128,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
     }
 
     try {
-      const result = await checklistAPI.sendAnalysisEmail("registry", analysisResult);
+      const result = await checklistAPI.sendAnalysisEmail("registry", analysisResult.analysis);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {

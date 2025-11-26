@@ -145,10 +145,12 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 // Request Body:
 {
   "actionType": "analyzeRisk",
-  "address": "서울특별시 관악구 쑥고개로 123",
-  "exclusiveArea": 20.74,
-  "type": "오피스텔",      // '아파트' | '단독/다가구' | '연립/다세대' | '오피스텔' 
-  "deposit": 12000        // 보증금 (단위: 만 원)
+  "propertyInfo": {
+    "address": "서울특별시 관악구 쑥고개로 123",
+    "deposit": 12000,       // 보증금 (단위: 만 원)
+    "area": 20.74,          // 전용면적 (m²)
+    "propertyType": "오피스텔"  // '아파트' | '오피스텔' | '연립/다세대' | '단독/다가구'
+  }
 }
 ```
 
@@ -156,18 +158,12 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 // Response:
 {
   "success": true,
-  "result": {
-    "riskLevel": "safe",  // 'safe' | 'warning' | 'danger'
-    "ratio": 66.3,
-    "message": "매매가 대비 전세가율이 70% 이하로 비교적 안전한 편입니다.",
-    "graphData": {
-      "safeLine": 70,
-      "current": 66.3
-    },
-    "extraToWarning_만원": 670,
-    "extraToDanger_만원": 0,
-    "mortgageMessage": "현재 보증금 기준으로 약 670만 원 이상 추가되는 근저당·선순위 채권이 잡히면 전세가율이 70%를 넘어 '주의' 단계로 올라갈 수 있어요. 등기부등본에서 근저당 설정 금액이 이 금액을 넘지 않는지 꼭 확인해보세요."
-  }
+  "riskLevel": "safe",  // 'safe' | 'warning' | 'danger'
+  "riskScore": 66.3,
+  "message": "매매가 대비 전세가율이 70% 이하로 비교적 안전한 편입니다.",
+  "recommendations": [
+    "현재 보증금 기준으로 약 670만 원 이상 추가되는 근저당·선순위 채권이 잡히면 전세가율이 70%를 넘어 '주의' 단계로 올라갈 수 있어요."
+  ]
 }
 ```
 
@@ -221,13 +217,13 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
   - 모든 질문에 YES → PASS 처리
   - 하나라도 NO → 해당 reason_why를 누적하여 FINAL_FAIL 처리
 
-#### 3.4 PDF 내보내기 (`exportPDF`)
+#### 3.3 PDF 내보내기 (`exportPDF`)
 
 ```json
 // Request Body:
 {
   "actionType": "exportPDF",
-  "userId": "61a8fc1d-67b0-45db-b913-602654b45c3c"
+  "checklistData": { /* 체크리스트 전체 데이터 */ }
 }
 ```
 
@@ -235,17 +231,18 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 // Response:
 {
   "success": true,
-  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
+  "pdfUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
 }
 ```
 
-#### 3.5 이메일 전송 (`sendEmail`)
+#### 3.4 이메일 전송 (`sendEmail`)
 
 ```json
 // Request Body:
 {
   "actionType": "sendEmail",
-  "userId": "61a8fc1d-67b0-45db-b913-602654b45c3c"
+  "email": "user@example.com",
+  "checklistData": { /* 체크리스트 전체 데이터 */ }
 }
 ```
 
@@ -254,6 +251,45 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 {
   "success": true,
   "message": "user@example.com으로 리포트가 발송되었습니다."
+}
+```
+
+#### 3.5 분석결과 PDF 다운로드 (`exportAnalysisPDF`)
+
+```json
+// Request Body:
+{
+  "actionType": "exportAnalysisPDF",
+  "dataType": "registry",  // 'registry' | 'contract' | 'building'
+  "fileKey": "doongzi/1764137808434"  // 분석 API 응답에서 받은 fileKey
+}
+```
+
+```json
+// Response:
+{
+  "success": true,
+  "pdfUrl": "https://n8n-server.com/files/registry_report_20241126.pdf",
+  "message": "PDF가 성공적으로 생성되었습니다."
+}
+```
+
+#### 3.6 분석결과 이메일 전송 (`sendAnalysisEmail`)
+
+```json
+// Request Body:
+{
+  "actionType": "sendAnalysisEmail",
+  "dataType": "contract",  // 'registry' | 'contract' | 'building'
+  "fileKey": "doongzi/1764137808434"  // 분석 API 응답에서 받은 fileKey
+}
+```
+
+```json
+// Response:
+{
+  "success": true,
+  "message": "user@example.com으로 보고서가 성공적으로 발송되었습니다."
 }
 ```
 

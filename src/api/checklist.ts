@@ -1,6 +1,6 @@
 import { apiClient } from './index';
 import { env } from '../config/env';
-import type { ChecklistTab, ScanResponse, DocumentDataType, InsuranceCheckResponse } from '../types';
+import type { ScanResponse, DocumentDataType, InsuranceCheckResponse } from '../types';
 
 /**
  * 체크리스트 관련 API
@@ -56,7 +56,7 @@ export const checklistAPI = {
    * PDF 다운로드 (전체 체크리스트)
    * actionType: "exportPDF"
    */
-  exportPDF: async (checklistData: ChecklistTab[]): Promise<{ success: boolean; pdfUrl?: string }> => {
+  exportPDF: async (checklistData: any): Promise<{ success: boolean; pdfUrl?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportPDF',
@@ -74,7 +74,7 @@ export const checklistAPI = {
    * 이메일 전송 (전체 체크리스트)
    * actionType: "sendEmail"
    */
-  sendEmail: async (email: string, checklistData: ChecklistTab[]): Promise<{ success: boolean; message: string }> => {
+  sendEmail: async (email: string, checklistData: any): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'sendEmail',
@@ -127,10 +127,10 @@ export const checklistAPI = {
     address: string;
     deposit: number;
     area: number;
-    propertyType: '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
+    propertyType: '아파트' | '오피스텔' | '연립/다세대' | '단독/다가구';
   }): Promise<{
     success: boolean;
-    riskLevel: 'low' | 'medium' | 'high';
+    riskLevel: 'safe' | 'warning' | 'danger';
     riskScore: number;
     message: string;
     recommendations?: string[];
@@ -146,7 +146,7 @@ export const checklistAPI = {
       console.error('Failed to analyze risk:', error);
       return {
         success: false,
-        riskLevel: 'medium',
+        riskLevel: 'warning',
         riskScore: 0,
         message: '위험도 분석에 실패했습니다.',
       };
@@ -159,17 +159,17 @@ export const checklistAPI = {
    * 문서 분석 결과 PDF 다운로드 (통합)
    * actionType: "exportAnalysisPDF"
    * @param dataType 'registry' | 'contract' | 'building'
-   * @param analysisResult 분석 결과 데이터
+   * @param fileKey 분석 API 응답에서 받은 fileKey
    */
   exportAnalysisPDF: async (
     dataType: DocumentDataType,
-    analysisResult: ScanResponse['analysis']
+    fileKey: string
   ): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportAnalysisPDF',
-        dataType, // 보고서 종류 명시
-        analysisResult,
+        dataType,
+        fileKey,
       });
       return response.data;
     } catch (error) {
@@ -180,25 +180,22 @@ export const checklistAPI = {
       };
     }
   },
-  
+
   /**
    * 문서 분석 결과 이메일 전송 (통합)
    * actionType: "sendAnalysisEmail"
    * @param dataType 'registry' | 'contract' | 'building'
-   * @param analysisResult 분석 결과 데이터
-   * @param email 수신자 이메일
+   * @param fileKey 분석 API 응답에서 받은 fileKey
    */
   sendAnalysisEmail: async (
     dataType: DocumentDataType,
-    analysisResult: ScanResponse['analysis'],
-    email: string = 'user@example.com' // 이메일은 모달에서 입력받아야 함
+    fileKey: string
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'sendAnalysisEmail',
-        dataType, // 보고서 종류 명시
-        email,
-        analysisResult,
+        dataType,
+        fileKey,
       });
       return response.data;
     } catch (error) {

@@ -101,6 +101,7 @@ export interface AnalysisResult {
 // API Response Types
 export interface ScanResponse extends BaseResponse {
   analysis: AnalysisResult;
+  fileKey?: string;  // 분석 결과 파일 키 (PDF/이메일 전송에 사용)
   uploadedFiles?: Array<{
     filename: string;
     url: string;

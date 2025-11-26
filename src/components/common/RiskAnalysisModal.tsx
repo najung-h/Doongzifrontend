@@ -8,7 +8,7 @@ interface RiskAnalysisModalProps {
   onClose: () => void;
 }
 
-type PropertyType = '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
+type PropertyType = '아파트' | '오피스텔' | '연립/다세대' | '단독/다가구';
 
 export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModalProps) {
   const [address, setAddress] = useState('');
@@ -17,7 +17,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
   const [propertyType, setPropertyType] = useState<PropertyType>('아파트');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
-    riskLevel: 'low' | 'medium' | 'high';
+    riskLevel: 'safe' | 'warning' | 'danger';
     riskScore: number;
     message: string;
     recommendations?: string[];
@@ -36,16 +36,16 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
       const response = await checklistAPI.analyzeRisk({
         address,
         deposit: Number(deposit),
-        area: Number(area),
-        propertyType,
+        exclusiveArea: Number(area),
+        type: propertyType,
       });
 
       if (response.success) {
         setResult({
-          riskLevel: response.riskLevel,
-          riskScore: response.riskScore,
-          message: response.message,
-          recommendations: response.recommendations,
+          riskLevel: response.result.riskLevel,
+          riskScore: response.result.ratio,
+          message: response.result.message,
+          recommendations: response.result.mortgageMessage ? [response.result.mortgageMessage] : undefined,
         });
       } else {
         alert('분석에 실패했습니다. 다시 시도해주세요.');
@@ -120,7 +120,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
     return -90 + (score * 1.8); // 0% = -90도, 100% = 90도
   };
 
-  const propertyTypes: PropertyType[] = ['아파트', '오피스텔', '연립,다세대주택', '단독,다가구'];
+  const propertyTypes: PropertyType[] = ['아파트', '오피스텔', '연립/다세대', '단독/다가구'];
 
   return (
     <div

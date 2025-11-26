@@ -35,9 +35,10 @@ export default function ScanPage() {
     if (uploadedFiles.length === 0) return;
     
     setIsAnalyzing(true);
-    
+
     try {
-      const result = await scanAPI.analyzeDocuments(uploadedFiles);
+      // docType은 파일명이나 사용자 선택으로 결정 가능 (현재는 임대차계약서로 기본값)
+      const result = await scanAPI.analyzeDocuments(uploadedFiles, '임대차계약서');
 
       if (result.success) {
         alert(`분석 완료!\n등급: ${result.analysis.riskGrade}`);

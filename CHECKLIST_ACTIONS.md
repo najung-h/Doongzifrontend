@@ -137,17 +137,7 @@ Switch (actionType 분기 - 6 branches)
 {
   "actionType": "exportAnalysisPDF",
   "dataType": "registry", // 'registry' | 'contract' | 'building' 중 하나
-  "analysisResult": {
-    "riskGrade": "medium",
-    "summary": "등기부 분석 결과, 근저당 설정 비율이 높습니다.",
-    "issues": [
-      {
-        "title": "근저당 설정 확인",
-        "severity": "warning",
-        "description": "..."
-      }
-    ]
-  }
+  "fileKey": "doongzi/1764137808434"
 }
 
 // 응답 예시 (Response Body)
@@ -165,12 +155,7 @@ Switch (actionType 분기 - 6 branches)
 {
   "actionType": "sendAnalysisEmail",
   "dataType": "contract", // 'registry' | 'contract' | 'building' 중 하나
-  "email": "user@example.com",
-  "analysisResult": {
-    "riskGrade": "low",
-    "summary": "계약서 분석 결과, 독소조항이 발견되지 않았습니다.",
-    "issues": []
-  }
+  "fileKey": "doongzi/1764137808434"
 }
 
 // 응답 예시 (Response Body)
