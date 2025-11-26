@@ -19,37 +19,41 @@ export default function HomePage() {
     }
   };
 
+  // [수정] 파일 선택 후 '다음' 버튼 클릭 시 (API 호출 X, 이메일 단계로 이동 O)
   const handleFileSubmit = async () => {
     if (!selectedFile) return;
-    
-    setIsUploading(true);
-    try {
-      // 파일 업로드 API 호출 (둥지 스캔하기 - 빠른 분석)
-      // docType은 파일명이나 사용자 선택으로 결정 가능 (현재는 임대차계약서로 기본값)
-      const result = await scanAPI.scanDocuments([selectedFile], '임대차계약서');
-      
-      if (result.success) {
-        // 업로드 성공시 이메일 입력 단계로 이동
-        setUploadStep('email');
-      } else {
-        alert('파일 업로드에 실패했습니다. 다시 시도해주세요.');
-      }
-    } catch (error) {
-      console.error('파일 업로드 오류:', error);
-      alert('파일 업로드 중 오류가 발생했습니다.');
-    } finally {
-      setIsUploading(false);
-    }
+    // 바로 전송하지 않고 이메일 입력 단계로 이동
+    setUploadStep('email');
   };
-
-  const handleEmailSubmit = () => {
+// [수정] 이메일 입력 후 '결과 받기' 클릭 시 (API 호출 O)
+  const handleEmailSubmit = async () => {
     if (!email || !email.includes('@')) {
       alert('올바른 이메일을 입력해주세요.');
       return;
     }
     
-    // 완료 단계로 이동
-    setUploadStep('complete');
+    if (!selectedFile) {
+      alert('파일이 선택되지 않았습니다.');
+      return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+      // [중요] 여기서 파일과 이메일을 함께 전송!
+      const result = await scanAPI.scanDocuments([selectedFile], email);
+      
+      if (result.success) {
+        setUploadStep('complete');
+      } else {
+        alert(result.message || '전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('오류가 발생했습니다.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleModalClose = () => {

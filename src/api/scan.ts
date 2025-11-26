@@ -13,6 +13,7 @@ export const scanAPI = {
    */
   scanDocuments: async (
     files: File[],
+    email?: string, // [추가] 이메일 파라미터 (선택적)
     docType?: '등기부등본' | '임대차계약서' | '건축물대장', // n8n AI가 자동 분류하므로 Optional 처리
     userId: string = '61a8fc1d-67b0-45db-b913-602654b45c3c' // 하드코딩된 테스트 userId
   ): Promise<ScanResponse> => {
@@ -22,6 +23,11 @@ export const scanAPI = {
       // actionType, userId 추가
       formData.append('actionType', 'scanDocuments');
       formData.append('userId', userId);
+      
+      // [추가] 이메일이 있으면 FormData에 추가
+      if (email) {
+        formData.append('email', email);
+      }
       
       if (docType) {
         formData.append('docType', docType);
