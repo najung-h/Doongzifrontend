@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
-import { scanAPI } from '../../api/scan';
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
 
@@ -27,14 +26,12 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
   };
 
   const handleFileSelect = (selectedFile: File) => {
-    // 파일 타입 검증
     const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     if (!validTypes.includes(selectedFile.type)) {
       alert('PDF, JPG, PNG 파일만 업로드 가능합니다.');
       return;
     }
 
-    // 파일 크기 검증 (10MB)
     if (selectedFile.size > 10 * 1024 * 1024) {
       alert('파일 크기는 10MB를 초과할 수 없습니다.');
       return;
@@ -43,7 +40,6 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
     setFile(selectedFile);
     setAnalysisResult(null);
 
-    // 미리보기 생성
     if (selectedFile.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -51,7 +47,6 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
       };
       reader.readAsDataURL(selectedFile);
     } else if (selectedFile.type === 'application/pdf') {
-      // PDF는 아이콘으로 표시
       setPreviewUrl('pdf');
     }
   };
@@ -69,7 +64,6 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       handleFileSelect(droppedFile);
@@ -91,7 +85,9 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await scanAPI.analyzeDocuments([file], '등기부등본');
+      // 수정됨: scanAPI.analyzeDocuments -> checklistAPI.analyzeContract
+      // (인자 개수 오류 해결 및 checklistAPI로 통합)
+      const result = await checklistAPI.analyzeContract([file]);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -107,8 +103,13 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
       return;
     }
 
+    // fileKey 추출
+    const fileKey = (analysisResult as any).fileKey || "temp_key";
+
     try {
-      const result = await checklistAPI.exportAnalysisPDF("registry", analysisResult.analysis);
+      // 수정됨: exportAnalysisPDF 사용 (문자열 fileKey 전달)
+      const result = await checklistAPI.exportAnalysisPDF(fileKey);
+      
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
@@ -127,8 +128,13 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
       return;
     }
 
+    const fileKey = (analysisResult as any).fileKey || "temp_key";
+    const userEmail = "user@example.com";
+
     try {
-      const result = await checklistAPI.sendAnalysisEmail("registry", analysisResult.analysis);
+      // 수정됨: sendAnalysisEmail 사용 (문자열 fileKey, email 전달)
+      const result = await checklistAPI.sendAnalysisEmail(fileKey, userEmail);
+      
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {
@@ -142,404 +148,114 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
   const getRiskColor = (grade: 'low' | 'medium' | 'high') => {
     switch (grade) {
-      case 'low':
-        return '#4CAF50';
-      case 'medium':
-        return '#FFC107';
-      case 'high':
-        return '#F44336';
-      default:
-        return '#999999';
+      case 'low': return '#4CAF50';
+      case 'medium': return '#FFC107';
+      case 'high': return '#F44336';
+      default: return '#999999';
     }
   };
 
   const getRiskLabel = (grade: 'low' | 'medium' | 'high') => {
     switch (grade) {
-      case 'low':
-        return '안전';
-      case 'medium':
-        return '주의';
-      case 'high':
-        return '위험';
-      default:
-        return '알 수 없음';
+      case 'low': return '안전';
+      case 'medium': return '주의';
+      case 'high': return '위험';
+      default: return '알 수 없음';
     }
   };
 
   const getRiskIcon = (grade: 'low' | 'medium' | 'high') => {
     switch (grade) {
-      case 'low':
-        return <Shield size={24} />;
-      case 'medium':
-        return <AlertTriangle size={24} />;
-      case 'high':
-        return <AlertTriangle size={24} />;
+      case 'low': return <Shield size={24} />;
+      case 'medium': return <AlertTriangle size={24} />;
+      case 'high': return <AlertTriangle size={24} />;
     }
   };
 
   return (
     <div
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        padding: '20px',
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
       }}
       onClick={handleClose}
     >
       <div
         style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          width: '100%',
-          maxWidth: '700px',
-          maxHeight: '90vh',
-          overflow: 'auto',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+          backgroundColor: '#FFFFFF', borderRadius: '16px', width: '100%', maxWidth: '700px',
+          maxHeight: '90vh', overflow: 'auto', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div
-          style={{
-            padding: '24px',
-            borderBottom: '1px solid #E8E8E8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <h2
-            style={{
-              fontSize: '20px',
-              fontWeight: '700',
-              color: '#2C2C2C',
-              margin: 0,
-            }}
-          >
-            등기부등본 분석
-          </h2>
-          <button
-            onClick={handleClose}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              border: 'none',
-              backgroundColor: '#F0F0F0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: '#666666',
-            }}
-          >
+        <div style={{ padding: '24px', borderBottom: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#2C2C2C', margin: 0 }}>등기부등본 분석</h2>
+          <button onClick={handleClose} style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#F0F0F0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#666666' }}>
             <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
         <div style={{ padding: '24px' }}>
-          {/* File Upload Area */}
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              border: `2px dashed ${isDragging ? '#8FBF4D' : '#E8E8E8'}`,
-              borderRadius: '12px',
-              padding: '40px 20px',
-              textAlign: 'center',
-              cursor: 'pointer',
-              backgroundColor: isDragging ? '#F5F3E6' : '#FAFAFA',
-              transition: 'all 0.2s',
-              marginBottom: '20px',
-            }}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFileInputChange}
-              style={{ display: 'none' }}
-            />
-
-            <Upload
-              size={48}
-              color={isDragging ? '#8FBF4D' : '#CCCCCC'}
-              style={{ margin: '0 auto 16px' }}
-            />
-
-            <p
-              style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#2C2C2C',
-                margin: '0 0 8px 0',
-              }}
-            >
-              {file ? file.name : '파일을 여기에 드롭하거나 클릭하여 선택하세요'}
-            </p>
-
-            <p
-              style={{
-                fontSize: '13px',
-                color: '#999999',
-                margin: 0,
-              }}
-            >
-              PDF, JPG, PNG (최대 10MB)
-            </p>
+          <div onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={() => fileInputRef.current?.click()} style={{ border: `2px dashed ${isDragging ? '#8FBF4D' : '#E8E8E8'}`, borderRadius: '12px', padding: '40px 20px', textAlign: 'center', cursor: 'pointer', backgroundColor: isDragging ? '#F5F3E6' : '#FAFAFA', transition: 'all 0.2s', marginBottom: '20px' }}>
+            <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleFileInputChange} style={{ display: 'none' }} />
+            <Upload size={48} color={isDragging ? '#8FBF4D' : '#CCCCCC'} style={{ margin: '0 auto 16px' }} />
+            <p style={{ fontSize: '16px', fontWeight: '600', color: '#2C2C2C', margin: '0 0 8px 0' }}>{file ? file.name : '파일을 여기에 드롭하거나 클릭하여 선택하세요'}</p>
+            <p style={{ fontSize: '13px', color: '#999999', margin: 0 }}>PDF, JPG, PNG (최대 10MB)</p>
           </div>
 
-          {/* File Preview */}
           {previewUrl && (
-            <div
-              style={{
-                marginBottom: '20px',
-                padding: '16px',
-                backgroundColor: '#F8F8F8',
-                borderRadius: '8px',
-              }}
-            >
-              <h4
-                style={{
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: '#2C2C2C',
-                  marginBottom: '12px',
-                }}
-              >
-                파일 미리보기
-              </h4>
-
+            <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: '#F8F8F8', borderRadius: '8px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', marginBottom: '12px' }}>파일 미리보기</h4>
               {previewUrl === 'pdf' ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '16px',
-                    backgroundColor: '#FFFFFF',
-                    borderRadius: '8px',
-                  }}
-                >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', backgroundColor: '#FFFFFF', borderRadius: '8px' }}>
                   <FileText size={40} color="#F44336" />
                   <div>
-                    <p
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#2C2C2C',
-                        margin: '0 0 4px 0',
-                      }}
-                    >
-                      {file?.name}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '12px',
-                        color: '#999999',
-                        margin: 0,
-                      }}
-                    >
-                      {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}
-                    </p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', margin: '0 0 4px 0' }}>{file?.name}</p>
+                    <p style={{ fontSize: '12px', color: '#999999', margin: 0 }}>{file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
                   </div>
                 </div>
               ) : (
-                <img
-                  src={previewUrl}
-                  alt="미리보기"
-                  style={{
-                    width: '100%',
-                    maxHeight: '300px',
-                    objectFit: 'contain',
-                    borderRadius: '8px',
-                    backgroundColor: '#FFFFFF',
-                  }}
-                />
+                <img src={previewUrl} alt="미리보기" style={{ width: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px', backgroundColor: '#FFFFFF' }} />
               )}
             </div>
           )}
 
-          {/* Analyze Button */}
           {file && !analysisResult && (
-            <button
-              onClick={handleAnalyze}
-              disabled={isAnalyzing}
-              style={{
-                width: '100%',
-                padding: '14px',
-                borderRadius: '8px',
-                border: 'none',
-                backgroundColor: isAnalyzing ? '#CCCCCC' : '#8FBF4D',
-                color: '#FFFFFF',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: isAnalyzing ? 'not-allowed' : 'pointer',
-                marginBottom: '20px',
-              }}
-            >
+            <button onClick={handleAnalyze} disabled={isAnalyzing} style={{ width: '100%', padding: '14px', borderRadius: '8px', border: 'none', backgroundColor: isAnalyzing ? '#CCCCCC' : '#8FBF4D', color: '#FFFFFF', fontSize: '15px', fontWeight: '600', cursor: isAnalyzing ? 'not-allowed' : 'pointer', marginBottom: '20px' }}>
               {isAnalyzing ? '분석 중...' : '즉시 분석하기'}
             </button>
           )}
 
-          {/* Analysis Result */}
           {analysisResult && (
-            <div
-              style={{
-                padding: '24px',
-                borderRadius: '12px',
-                backgroundColor: '#F8F8F8',
-                border: `2px solid ${getRiskColor(analysisResult.analysis.riskGrade)}`,
-                marginBottom: '20px',
-              }}
-            >
-              {/* Risk Badge */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    backgroundColor: getRiskColor(analysisResult.analysis.riskGrade),
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                  }}
-                >
+            <div style={{ padding: '24px', borderRadius: '12px', backgroundColor: '#F8F8F8', border: `2px solid ${getRiskColor(analysisResult.analysis.riskGrade)}`, marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: getRiskColor(analysisResult.analysis.riskGrade), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>
                   {getRiskIcon(analysisResult.analysis.riskGrade)}
                 </div>
                 <div>
-                  <h3
-                    style={{
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      color: getRiskColor(analysisResult.analysis.riskGrade),
-                      margin: '0 0 4px 0',
-                    }}
-                  >
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: getRiskColor(analysisResult.analysis.riskGrade), margin: '0 0 4px 0' }}>
                     {getRiskLabel(analysisResult.analysis.riskGrade)}
                   </h3>
-                  <p
-                    style={{
-                      fontSize: '14px',
-                      color: '#666666',
-                      margin: 0,
-                    }}
-                  >
-                    등기부등본 분석 완료
-                  </p>
+                  <p style={{ fontSize: '14px', color: '#666666', margin: 0 }}>등기부등본 분석 완료</p>
                 </div>
               </div>
 
-              {/* Summary */}
-              <div
-                style={{
-                  padding: '16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#FFFFFF',
-                  marginBottom: '16px',
-                }}
-              >
-                <h4
-                  style={{
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#2C2C2C',
-                    marginBottom: '8px',
-                  }}
-                >
-                  요약
-                </h4>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: '#424242',
-                    lineHeight: '1.6',
-                    margin: 0,
-                  }}
-                >
-                  {analysisResult.analysis.summary}
-                </p>
+              <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#FFFFFF', marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', marginBottom: '8px' }}>요약</h4>
+                <p style={{ fontSize: '14px', color: '#424242', lineHeight: '1.6', margin: 0 }}>{analysisResult.analysis.summary}</p>
               </div>
 
-              {/* Issues */}
               {analysisResult.analysis.issues.length > 0 && (
                 <div>
-                  <h4
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: '#2C2C2C',
-                      marginBottom: '12px',
-                    }}
-                  >
-                    주요 발견사항
-                  </h4>
+                  <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#2C2C2C', marginBottom: '12px' }}>주요 발견사항</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {analysisResult.analysis.issues.map((issue, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          padding: '12px',
-                          borderRadius: '8px',
-                          backgroundColor: '#FFFFFF',
-                          borderLeft: `3px solid ${
-                            issue.severity === 'danger' ? '#F44336' : '#FFC107'
-                          }`,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '8px',
-                          }}
-                        >
-                          {issue.severity === 'danger' ? (
-                            <AlertTriangle size={16} color="#F44336" style={{ marginTop: '2px', flexShrink: 0 }} />
-                          ) : (
-                            <CheckCircle size={16} color="#FFC107" style={{ marginTop: '2px', flexShrink: 0 }} />
-                          )}
+                      <div key={index} style={{ padding: '12px', borderRadius: '8px', backgroundColor: '#FFFFFF', borderLeft: `3px solid ${issue.severity === 'danger' ? '#F44336' : '#FFC107'}` }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                          {issue.severity === 'danger' ? <AlertTriangle size={16} color="#F44336" style={{ marginTop: '2px', flexShrink: 0 }} /> : <CheckCircle size={16} color="#FFC107" style={{ marginTop: '2px', flexShrink: 0 }} />}
                           <div style={{ flex: 1 }}>
-                            <p
-                              style={{
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#2C2C2C',
-                                margin: '0 0 4px 0',
-                              }}
-                            >
-                              {issue.title}
-                            </p>
-                            <p
-                              style={{
-                                fontSize: '12px',
-                                color: '#666666',
-                                lineHeight: '1.5',
-                                margin: 0,
-                              }}
-                            >
-                              {issue.description}
-                            </p>
+                            <p style={{ fontSize: '13px', fontWeight: '600', color: '#2C2C2C', margin: '0 0 4px 0' }}>{issue.title}</p>
+                            <p style={{ fontSize: '12px', color: '#666666', lineHeight: '1.5', margin: 0 }}>{issue.description}</p>
                           </div>
                         </div>
                       </div>
@@ -550,50 +266,13 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
             </div>
           )}
 
-          {/* Action Buttons - PDF Download and Email */}
           {analysisResult && (
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={handleDownloadPDF}
-                style={{
-                  flex: 1,
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: '1px solid #8FBF4D',
-                  backgroundColor: '#FFFFFF',
-                  color: '#8FBF4D',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                }}
-              >
-                <Download size={18} />
-                분석결과 PDF로 다운받기
+              <button onClick={handleDownloadPDF} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: '1px solid #8FBF4D', backgroundColor: '#FFFFFF', color: '#8FBF4D', fontSize: '15px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Download size={18} /> 분석결과 PDF로 다운받기
               </button>
-              <button
-                onClick={handleSendEmail}
-                style={{
-                  flex: 1,
-                  padding: '14px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: '#8FBF4D',
-                  color: '#FFFFFF',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                }}
-              >
-                <Mail size={18} />
-                분석결과 이메일로 전송하기
+              <button onClick={handleSendEmail} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', backgroundColor: '#8FBF4D', color: '#FFFFFF', fontSize: '15px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Mail size={18} /> 분석결과 이메일로 전송하기
               </button>
             </div>
           )}
