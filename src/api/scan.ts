@@ -8,7 +8,7 @@ import type { ScanResponse } from '../types';
 export const scanAPI = {
   /**
    * 문서 분석 (등기부등본, 계약서, 건축물대장)
-   * actionType: "analyzeDocuments"
+   * actionType: "scanDocuments"
    */
   analyzeDocuments: async (
     files: File[],
@@ -19,7 +19,7 @@ export const scanAPI = {
       const formData = new FormData();
 
       // actionType, userId, docType 추가
-      formData.append('actionType', 'analyzeDocuments');
+      formData.append('actionType', 'scanDocuments');
       formData.append('userId', userId);
       formData.append('docType', docType);
 
