@@ -117,10 +117,18 @@ export const checklistAPI = {
     propertyType: string;
   }): Promise<{
     success: boolean;
-    riskLevel: 'low' | 'medium' | 'high';
-    riskScore: number;
-    message: string;
-    recommendations?: string[];
+    result: {
+      riskLevel: 'safe' | 'warning' | 'danger';
+      ratio: number;
+      message: string;
+      graphData: {
+        safeLine: number;
+        current: number;
+      };
+      extraToWarning_만원: number;
+      extraToDanger_만원: number;
+      mortgageMessage: string;
+    };
   }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
@@ -136,9 +144,18 @@ export const checklistAPI = {
       console.error('Failed to analyze risk:', error);
       return {
         success: false,
-        riskLevel: 'medium',
-        riskScore: 0,
-        message: '위험도 분석에 실패했습니다.',
+        result: {
+          riskLevel: 'warning',
+          ratio: 0,
+          message: '위험도 분석에 실패했습니다.',
+          graphData: {
+            safeLine: 70,
+            current: 0,
+          },
+          extraToWarning_만원: 0,
+          extraToDanger_만원: 0,
+          mortgageMessage: '',
+        },
       };
     }
   },

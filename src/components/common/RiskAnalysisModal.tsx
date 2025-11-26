@@ -17,10 +17,16 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
   const [propertyType, setPropertyType] = useState<PropertyType>('아파트');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
-    riskLevel: 'low' | 'medium' | 'high';
-    riskScore: number;
+    riskLevel: 'safe' | 'warning' | 'danger';
+    ratio: number;
     message: string;
-    recommendations?: string[];
+    graphData: {
+      safeLine: number;
+      current: number;
+    };
+    extraToWarning_만원: number;
+    extraToDanger_만원: number;
+    mortgageMessage: string;
   } | null>(null);
 
   if (!isOpen) return null;
@@ -40,13 +46,8 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
         propertyType,
       });
 
-      if (response.success) {
-        setResult({
-          riskLevel: response.riskLevel,
-          riskScore: response.riskScore,
-          message: response.message,
-          recommendations: response.recommendations,
-        });
+      if (response.success && response.result) {
+        setResult(response.result);
       } else {
         alert('분석에 실패했습니다. 다시 시도해주세요.');
       }
@@ -67,29 +68,29 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
     onClose();
   };
 
-  const getRiskColor = (level: 'low' | 'medium' | 'high') => {
+  const getRiskColor = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-      case 'low': return '#4CAF50';
-      case 'medium': return '#FFC107';
-      case 'high': return '#F44336';
+      case 'safe': return '#4CAF50';
+      case 'warning': return '#FFC107';
+      case 'danger': return '#F44336';
       default: return '#999999';
     }
   };
 
-  const getRiskLabel = (level: 'low' | 'medium' | 'high') => {
+  const getRiskLabel = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-      case 'low': return '안전';
-      case 'medium': return '주의';
-      case 'high': return '위험';
+      case 'safe': return '안전';
+      case 'warning': return '주의';
+      case 'danger': return '위험';
       default: return '알 수 없음';
     }
   };
 
-  const getRiskIcon = (level: 'low' | 'medium' | 'high') => {
+  const getRiskIcon = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-      case 'low': return <Shield size={24} />;
-      case 'medium': return <TrendingUp size={24} />;
-      case 'high': return <AlertTriangle size={24} />;
+      case 'safe': return <Shield size={24} />;
+      case 'warning': return <TrendingUp size={24} />;
+      case 'danger': return <AlertTriangle size={24} />;
     }
   };
 
@@ -104,8 +105,10 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
 
   // 바늘 각도 계산 (0-100% -> -90도 ~ 90도)
   const getNeedleAngle = () => {
-    const score = result?.riskScore || 0;
-    return -90 + (score * 1.8);
+    const ratio = result?.ratio || 0;
+    // ratio가 100을 넘을 수 있으므로 최대값을 100으로 제한
+    const normalizedRatio = Math.min(ratio, 100);
+    return -90 + (normalizedRatio * 1.8);
   };
 
   const propertyTypes: PropertyType[] = ['아파트', '오피스텔', '연립,다세대주택', '단독,다가구'];
@@ -278,9 +281,12 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <div style={{ marginBottom: '12px' }}>
                   <div style={{ fontSize: '48px', fontWeight: '700', color: getRiskColor(result.riskLevel), lineHeight: '1' }}>
-                    {result.riskScore}%
+                    {result.ratio.toFixed(1)}%
                   </div>
-                  <div style={{ fontSize: '18px', fontWeight: '600', color: getRiskColor(result.riskLevel), marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '14px', color: '#666666', marginTop: '4px', marginBottom: '8px' }}>
+                    전세가율
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: getRiskColor(result.riskLevel), display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     {getRiskIcon(result.riskLevel)}
                     {getRiskLabel(result.riskLevel)}
                   </div>
@@ -335,18 +341,35 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                 </p>
               </div>
 
-              {result.recommendations && result.recommendations.length > 0 && (
-                <div>
-                  <h4 style={{ fontSize: '15px', fontWeight: '600', color: '#2C2C2C', marginBottom: '12px' }}>
-                    권장사항
+              {/* 추가 정보 섹션 */}
+              {(result.extraToWarning_만원 > 0 || result.extraToDanger_만원 > 0) && (
+                <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#FFF9E6', border: '1px solid #FFE082', marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#F57C00', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <AlertTriangle size={16} />
+                    위험도 변화 예측
                   </h4>
-                  <ul style={{ margin: 0, paddingLeft: '20px', listStyle: 'disc' }}>
-                    {result.recommendations.map((rec, index) => (
-                      <li key={index} style={{ fontSize: '14px', color: '#424242', lineHeight: '1.6', marginBottom: '8px' }}>
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
+                  {result.extraToWarning_만원 > 0 && (
+                    <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: '0 0 6px 0' }}>
+                      • <strong style={{ color: '#FFC107' }}>주의 단계</strong>까지: 추가 근저당 <strong>{result.extraToWarning_만원.toLocaleString()}만원</strong>
+                    </p>
+                  )}
+                  {result.extraToDanger_만원 > 0 && (
+                    <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: 0 }}>
+                      • <strong style={{ color: '#F44336' }}>위험 단계</strong>까지: 추가 근저당 <strong>{result.extraToDanger_만원.toLocaleString()}만원</strong>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* 근저당 안내 메시지 */}
+              {result.mortgageMessage && (
+                <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#E3F2FD', border: '1px solid #90CAF9' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#1976D2', marginBottom: '8px' }}>
+                    💡 근저당 확인 안내
+                  </h4>
+                  <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: 0 }}>
+                    {result.mortgageMessage}
+                  </p>
                 </div>
               )}
             </div>
