@@ -128,8 +128,13 @@ export const checklistAPI = {
   },
 
   /**
+<<<<<<< HEAD
    * 깡통전세 위험도 분석
    * actionType: "analyzeRisk"
+=======
+   * [수정됨] 깡통전세 위험도 분석
+   * n8n 요구 변수명: address, exclusiveArea, type, deposit
+>>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
    */
   analyzeRisk: async (propertyInfo: {
     address: string;
@@ -138,15 +143,31 @@ export const checklistAPI = {
     propertyType: '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
   }): Promise<{
     success: boolean;
-    riskLevel: 'low' | 'medium' | 'high';
-    riskScore: number;
-    message: string;
-    recommendations?: string[];
+    result: {
+      riskLevel: 'safe' | 'warning' | 'danger';
+      ratio: number;
+      message: string;
+      graphData: {
+        safeLine: number;
+        current: number;
+      };
+      extraToWarning_만원: number;
+      extraToDanger_만원: number;
+      mortgageMessage: string;
+    };
   }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'analyzeRisk',
+<<<<<<< HEAD
         propertyInfo,
+=======
+        // n8n 변수명 매핑
+        'address': propertyInfo.address,
+        'deposit': propertyInfo.deposit,
+        'exclusiveArea': propertyInfo.area,
+        'type': propertyInfo.propertyType,
+>>>>>>> fcd75c8411f697eae19c029ebca084c143e209e1
       });
 
       return response.data;
@@ -154,9 +175,18 @@ export const checklistAPI = {
       console.error('Failed to analyze risk:', error);
       return {
         success: false,
-        riskLevel: 'medium',
-        riskScore: 0,
-        message: '위험도 분석에 실패했습니다.',
+        result: {
+          riskLevel: 'warning',
+          ratio: 0,
+          message: '위험도 분석에 실패했습니다.',
+          graphData: {
+            safeLine: 70,
+            current: 0,
+          },
+          extraToWarning_만원: 0,
+          extraToDanger_만원: 0,
+          mortgageMessage: '',
+        },
       };
     }
   },
