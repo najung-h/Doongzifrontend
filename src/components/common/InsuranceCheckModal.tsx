@@ -40,17 +40,10 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
 
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('target_deposit', deposit);
-      formData.append('target_landlord_name', landlordName);
-      formData.append('주소', address);
-      formData.append('전용면적_m2', exclusiveArea);
-
-      files.forEach((file) => {
-        formData.append('files', file);
+      const response = await checklistAPI.checkInsurance({
+        address,
+        deposit: Number(deposit),
       });
-
-      const response = await checklistAPI.checkInsurance(formData);
       setResult(response);
     } catch (error) {
       console.error(error);

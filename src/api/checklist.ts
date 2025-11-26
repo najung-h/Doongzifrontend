@@ -186,7 +186,7 @@ export const checklistAPI = {
    * [통합됨] 분석 결과 PDF 다운로드
    * n8n actionType: exportAnalysisPDF
    */
-  exportAnalysisPDF: async (fileKey: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  exportAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportBuildingAnalysisPDF',

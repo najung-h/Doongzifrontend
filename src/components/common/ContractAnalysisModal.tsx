@@ -86,7 +86,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
 
     setIsAnalyzing(true);
     try {
-      const result = await checklistAPI.analyzeContract([file], '임대차계약서');
+      const result = await checklistAPI.analyzeContract([file]);
       setAnalysisResult(result);
     } catch (error) {
       console.error('Analysis error:', error);
@@ -127,20 +127,9 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
       return;
     }
 
-    // fileKey 추출
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-    // 사용자 이메일 (실제로는 로그인 정보에서 가져와야 함)
-    const userEmail = "user@example.com"; 
-
     try {
-      // 수정됨: fileKey와 email 문자열 전달
-      const result = await checklistAPI.sendAnalysisEmail(fileKey, userEmail);
-      
-      if (result.success) {
-        alert(result.message || '이메일이 전송되었습니다!');
-      } else {
-        alert(result.message || '이메일 전송에 실패했습니다.');
-      }
+      // TODO: 계약서 분석 이메일 전송 API 구현 필요
+      alert('이메일 전송 기능이 준비 중입니다.');
     } catch (error) {
       console.error('이메일 전송 실패:', error);
       alert('이메일 전송 중 오류가 발생했습니다.');
