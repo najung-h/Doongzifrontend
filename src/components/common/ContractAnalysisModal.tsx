@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
+import { X, Upload, FileText } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
-import type { ScanResponse } from '../../types';
 import AnalysisLoadingView from './AnalysisLoadingView';
 import AnalysisResultModal from './AnalysisResultModal';
 
@@ -15,7 +14,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
   const [htmlOutput, setHtmlOutput] = useState<string>('');
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +23,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   const handleClose = () => {
     setFile(null);
     setPreviewUrl(null);
-    setAnalysisResult(null);
     setHtmlOutput('');
     setIsResultModalOpen(false);
     onClose();
@@ -44,7 +41,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     setFile(selectedFile);
-    setAnalysisResult(null);
 
     if (selectedFile.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -90,18 +86,15 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     setIsAnalyzing(true);
-    setAnalysisResult(null);
     setHtmlOutput('');
 
     try {
-      // Let's assume the API response has the HTML content in an 'output' field.
-      const result = await checklistAPI.analyzeContract([file], '임대차계약서') as any;
+      const result = await checklistAPI.analyzeContract([file], '임대차계약서') as { output?: string };
       if (result && result.output) {
         setHtmlOutput(result.output);
         setIsResultModalOpen(true);
       } else {
-        // Fallback to old result display if no html output
-        setAnalysisResult(result);
+        alert('분석 결과에 HTML 출력이 없습니다.');
       }
     } catch (error) {
       console.error('Analysis error:', error);
