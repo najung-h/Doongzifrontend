@@ -10,14 +10,13 @@ export type ActionType =
 
   // SCAN Service (문서 분석)
   | 'analyzeDocuments'                                                // 문서 통합 분석 (등기부/계약서/건축물대장)
-  | 'analyzeDetailedDocument'                                         // 상세 문서 분석 (이메일 리포트)
-
+  | 'scanDocuments'                                         // 상세 문서 분석 (이메일 리포트)
+  | 'checkInsurance'                                                  // 보증보험 가입 확인
+  
   // CHECKLIST Service
-  | 'analyzeContract'                                                 // 계약서 분석 (체크리스트용)
-  | 'analyzeRisk'                                                     // 깡통전세 위험도 분석
   | 'exportPDF'                                                       // 체크리스트 PDF 다운로드
   | 'sendEmail'                                                       // 체크리스트 이메일 전송
-  | 'checkInsurance'                                                  // 보증보험 가입 확인
+  | 'analyzeRisk'                                                     // 깡통전세 위험도 분석
   | 'exportAnalysisPDF'                                               // 통합: 분석 결과 PDF 다운로드 (dataType 구분)
   | 'sendAnalysisEmail';                                              // 통합: 분석 결과 이메일 전송 (dataType 구분)
   
@@ -102,7 +101,7 @@ export interface AnalysisResult {
 // API Response Types
 export interface ScanResponse extends BaseResponse {
   analysis: AnalysisResult;
-  fileKey?: string;  // 분석 결과 파일 키 (PDF/이메일 전송에 사용)
+  output?: string; // [추가] n8n에서 생성된 HTML 리포트
   uploadedFiles?: Array<{
     filename: string;
     url: string;
