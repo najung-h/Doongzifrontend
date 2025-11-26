@@ -878,7 +878,7 @@ export default function MyPage() {
               backgroundColor: 'var(--color-bg-white)',
               borderRadius: 'var(--radius-lg)',
               width: '100%',
-              maxWidth: '600px',
+              maxWidth: '900px',
               maxHeight: '90vh',
               overflow: 'auto',
               boxShadow: 'var(--shadow-lg)'
@@ -1093,24 +1093,24 @@ export default function MyPage() {
             {/* Modal Content */}
             <div style={{
               padding: '24px',
-              display: 'flex',
-              flexDirection: 'column',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '16px'
             }}>
               {/* 등기부등본 Section */}
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
                 borderRadius: '12px',
-                padding: '16px',
+                padding: '18px',
                 border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: '16px',
+                  fontSize: '15px',
                   fontWeight: '700',
-                  marginBottom: '12px',
+                  marginBottom: '14px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   color: 'var(--color-text-primary)'
                 }}>
                   📋 등기부등본
@@ -1219,16 +1219,16 @@ export default function MyPage() {
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
                 borderRadius: '12px',
-                padding: '16px',
+                padding: '18px',
                 border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: '16px',
+                  fontSize: '15px',
                   fontWeight: '700',
-                  marginBottom: '12px',
+                  marginBottom: '14px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   color: 'var(--color-text-primary)'
                 }}>
                   🏗️ 건축물대장
@@ -1337,16 +1337,16 @@ export default function MyPage() {
               <div style={{
                 backgroundColor: 'var(--color-bg-secondary)',
                 borderRadius: '12px',
-                padding: '16px',
+                padding: '18px',
                 border: '1px solid var(--color-border)'
               }}>
                 <h3 style={{
-                  fontSize: '16px',
+                  fontSize: '15px',
                   fontWeight: '700',
-                  marginBottom: '12px',
+                  marginBottom: '14px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   color: 'var(--color-text-primary)'
                 }}>
                   📝 계약서
