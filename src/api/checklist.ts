@@ -7,18 +7,19 @@ import type { ChecklistTab, ScanResponse } from '../types';
  */
 export const checklistAPI = {
   /**
-   * 계약서 분석
-   * actionType: "analyzeContract"
+   * 계약서 분석 (파일 업로드)
+   * actionType: "analyzeDocuments"
+   * URL: /api/scan
    */
   analyzeContract: async (files: File[]): Promise<ScanResponse> => {
     try {
       const formData = new FormData();
-      formData.append('actionType', 'analyzeContract');
+      formData.append('actionType', 'analyzeDocuments');
       files.forEach((file) => {
         formData.append('files', file);
       });
 
-      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+      const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data;
@@ -72,8 +73,9 @@ export const checklistAPI = {
     }
   },
 /**
-   * [수정됨] 보증보험 가입 가능 여부 확인
+   * [수정됨] 보증보험 가입 가능 여부 확인 (파일 업로드)
    * n8n 요구사항: 파일(등기부, 건축물대장) + target_deposit
+   * URL: /api/scan
    */
   checkInsurance: async (formData: FormData): Promise<{
     success: boolean;
@@ -84,8 +86,8 @@ export const checklistAPI = {
     try {
       // n8n 워크플로우에 맞춰 actionType 추가
       formData.append('actionType', 'checkInsurance');
-      
-      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+
+      const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data;

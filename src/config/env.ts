@@ -1,9 +1,9 @@
 // 환경 변수 관리
 export const env = {
-  // n8n Webhook URLs
-  chatbotWebhookUrl: import.meta.env.VITE_N8N_CHATBOT_WEBHOOK_URL || '',
-  scanWebhookUrl: import.meta.env.VITE_N8N_SCAN_WEBHOOK_URL || '',
-  checklistWebhookUrl: import.meta.env.VITE_N8N_CHECKLIST_WEBHOOK_URL || '',
+  // n8n Webhook URLs (Docker 빌드 시 환경변수 누락 대비 fallback 설정)
+  chatbotWebhookUrl: import.meta.env.VITE_N8N_CHATBOT_WEBHOOK_URL || '/api/chatbot',
+  scanWebhookUrl: import.meta.env.VITE_N8N_SCAN_WEBHOOK_URL || '/api/scan',
+  checklistWebhookUrl: import.meta.env.VITE_N8N_CHECKLIST_WEBHOOK_URL || '/api/checklist',
   legalWebhookUrl: import.meta.env.VITE_N8N_LEGAL_WEBHOOK_URL || '',
 };
 
