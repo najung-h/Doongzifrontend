@@ -74,8 +74,7 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 - n8n Switch Logic (`actionType`)
   - 주의: 파일 업로드이므로 `Content-Type: multipart/form-data`를 사용합니다. `actionType`은 FormData의 필드로 전송합니다.
   - `scanDocuments`: (둥지 스캔) 등기부등본/건축물대장/계약서 통합 분석 및 체크리스트 자동 완료. 처리 방식은 비동기 (Asynchronous) - 요청 즉시 200 OK 응답, 분석은 백그라운드에서 진행됨.
-  - `deepAnalyzeContract`: (체크리스트 내부) 계약서 독소조항 정밀 진단
-  - `deepAnalyzeRegistry`: (체크리스트 내부) 등기부등본 근저당 정밀 진단
+  - `analyzeDocuments`: (체크리스트 내부) 계약서 독소조항 정밀 진단 / 등기부등본 근저당 정밀 진단 / 건축물대장 정밀 진단. doc_type 필드로 구분함.
 
 #### 2.1 둥지 스캔 (`scanDocuments`)
 프론트엔드는 파일만 전송하고 연결을 종료합니다. 로딩 화면 대신 "분석이 시작되었습니다. 결과는 이메일로 전송됩니다."라는 안내가 필요합니다.
@@ -96,13 +95,15 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 }
 ```
 
-#### 2.2 계약서 정밀 진단 (`deepAnalyzeContract`)
+#### 2.2 계약서 정밀 진단 (`analyzeDocuments`)
 
 ```json
 // Request (FormData):
 {
-  "actionType": "deepAnalyzeContract",
-  "files": [Contract File Object]
+  "actionType": "analyzeDocuments",
+  "userId": "61a8fc1d-67b0-45db-b913-602654b45c3c",
+  "file": [File Object],
+  "docType": "등기부등본" // '등기부등본' | '임대차계약서' | '건축물대장'
 }
 ```
 
@@ -110,24 +111,19 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 // Response:
 {
   "success": true,
-  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
-}
-```
-
-#### 2.3 등기부등본 정밀 분석 (`deepAnalyzeRegistry`)
-```json
-// Request (FormData):
-{
-  "actionType": "deepAnalyzeRegistry",
-  "files": [Registry File Object]
-}
-```
-
-```json
-// Response:
-{
-  "success": true,
-  "downloadUrl": "https://n8n-server.com/files/checklist_20231124.pdf"
+  "analysis": {
+    "riskGrade": "low",
+    "summary": "문서 분석 완료. 위험 등급: low",
+    "issues": [],
+    "autoCheckItems": [
+      {
+        "id": "owner_match",
+        "completed": false,
+        "reason": "문서에서 소유자 정보를 추출했습니다."
+      }
+    ]
+  },
+  "schedule": {}
 }
 ```
 
