@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertTriangle, CheckCircle, Shield, Mail, Download } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
-import AnalysisLoadingView from './AnalysisLoadingView';
 
 interface ContractAnalysisModalProps {
   isOpen: boolean;
@@ -27,14 +26,12 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   };
 
   const handleFileSelect = (selectedFile: File) => {
-    // 파일 타입 검증
     const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
     if (!validTypes.includes(selectedFile.type)) {
       alert('PDF, JPG, PNG 파일만 업로드 가능합니다.');
       return;
     }
 
-    // 파일 크기 검증 (10MB)
     if (selectedFile.size > 10 * 1024 * 1024) {
       alert('파일 크기는 10MB를 초과할 수 없습니다.');
       return;
@@ -43,7 +40,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     setFile(selectedFile);
     setAnalysisResult(null);
 
-    // 미리보기 생성
     if (selectedFile.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -51,7 +47,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
       };
       reader.readAsDataURL(selectedFile);
     } else if (selectedFile.type === 'application/pdf') {
-      // PDF는 아이콘으로 표시
       setPreviewUrl('pdf');
     }
   };
@@ -69,6 +64,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       handleFileSelect(droppedFile);
@@ -90,12 +86,8 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
 
     setIsAnalyzing(true);
     try {
-      // [수정] docType: '임대차계약서' 추가
       const result = await checklistAPI.analyzeDocuments([file], '임대차계약서');
-      
-      // 성공 여부와 관계없이 결과가 있으면 표시 (n8n 응답 구조에 따라 success가 없을 수도 있음 대비)
       setAnalysisResult(result);
-
     } catch (error) {
       console.error('Analysis error:', error);
       alert('분석 중 오류가 발생했습니다.');
@@ -110,13 +102,8 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
       return;
     }
 
-    // fileKey 추출 (API 응답에 fileKey가 포함되어 있다고 가정)
-    const fileKey = (analysisResult as any).fileKey || "temp_key";
-
     try {
-      // 수정됨: fileKey 문자열 하나만 전달
-      const result = await checklistAPI.exportAnalysisPDF(fileKey);
-      
+      const result = await checklistAPI.exportAnalysisPDF(analysisResult.analysis);
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
@@ -136,8 +123,12 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     try {
-      // TODO: 계약서 분석 이메일 전송 API 구현 필요
-      alert('이메일 전송 기능이 준비 중입니다.');
+      const result = await checklistAPI.sendAnalysisEmail(analysisResult.analysis);
+      if (result.success) {
+        alert(result.message || '이메일이 전송되었습니다!');
+      } else {
+        alert(result.message || '이메일 전송에 실패했습니다.');
+      }
     } catch (error) {
       console.error('이메일 전송 실패:', error);
       alert('이메일 전송 중 오류가 발생했습니다.');
@@ -171,35 +162,72 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   };
 
   return (
-    <>
-      {/* 로딩 오버레이 */}
-      <AnalysisLoadingView isLoading={isAnalyzing} analysisType="contract" />
-
-      <div
-        style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
-        }}
-        onClick={handleClose}
-      >
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '20px',
+      }}
+      onClick={handleClose}
+    >
       <div
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '16px',
           width: '100%',
-          maxWidth: '800px', // HTML 리포트를 위해 너비 확장
+          maxWidth: '800px',
           maxHeight: '90vh',
-          overflow: 'hidden', // iframe 스크롤을 위해 hidden
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ padding: '24px', borderBottom: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#2C2C2C', margin: 0 }}>계약서 분석</h2>
-          <button onClick={handleClose} style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#F0F0F0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#666666' }}>
+        {/* Header */}
+        <div
+          style={{
+            padding: '24px',
+            borderBottom: '1px solid #E8E8E8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexShrink: 0,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#2C2C2C',
+              margin: 0,
+            }}
+          >
+            계약서 분석
+          </h2>
+          <button
+            onClick={handleClose}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              border: 'none',
+              backgroundColor: '#F0F0F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#666666',
+            }}
+          >
             <X size={20} />
           </button>
         </div>
@@ -210,7 +238,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
           {/* 1. 파일 업로드 영역 (결과가 없을 때만 표시) */}
           {!analysisResult && (
             <>
-              {/* File Upload Area */}
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -263,6 +290,77 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                 </p>
               </div>
 
+              {/* File Preview (복구됨) */}
+              {previewUrl && (
+                <div
+                  style={{
+                    marginBottom: '20px',
+                    padding: '16px',
+                    backgroundColor: '#F8F8F8',
+                    borderRadius: '8px',
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: '#2C2C2C',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    파일 미리보기
+                  </h4>
+
+                  {previewUrl === 'pdf' ? (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '16px',
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      <FileText size={40} color="#F44336" />
+                      <div>
+                        <p
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#2C2C2C',
+                            margin: '0 0 4px 0',
+                          }}
+                        >
+                          {file?.name}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: '12px',
+                            color: '#999999',
+                            margin: 0,
+                          }}
+                        >
+                          {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <img
+                      src={previewUrl}
+                      alt="미리보기"
+                      style={{
+                        width: '100%',
+                        maxHeight: '300px',
+                        objectFit: 'contain',
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+
               {/* Analyze Button */}
               {file && (
                 <button
@@ -290,7 +388,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
           {/* 2. 분석 결과 표시 */}
           {analysisResult && (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              {/* [HTML 리포트 렌더링] output 필드가 있으면 iframe으로 표시 */}
               {analysisResult.output ? (
                 <div style={{ flex: 1, minHeight: '500px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #E8E8E8' }}>
                   <iframe
@@ -300,7 +397,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                   />
                 </div>
               ) : (
-                /* output이 없으면 기존 UI (Fallback) */
+                /* output이 없으면 기존 UI */
                 <div
                   style={{
                     padding: '24px',
@@ -310,7 +407,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                     marginBottom: '20px',
                   }}
                 >
-                  {/* Risk Badge */}
                   <div
                     style={{
                       display: 'flex',
@@ -356,7 +452,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                     </div>
                   </div>
 
-                  {/* Summary */}
                   <div
                     style={{
                       padding: '16px',
@@ -387,7 +482,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                     </p>
                   </div>
 
-                  {/* Issues */}
                   {analysisResult.analysis?.issues?.length > 0 && (
                     <div>
                       <h4
@@ -455,11 +549,56 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                   )}
                 </div>
               )}
+
+              {/* Action Buttons (주석 해제됨) */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button
+                  onClick={handleDownloadPDF}
+                  style={{
+                    flex: 1,
+                    padding: '14px',
+                    borderRadius: '8px',
+                    border: '1px solid #8FBF4D',
+                    backgroundColor: '#FFFFFF',
+                    color: '#8FBF4D',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Download size={18} />
+                  분석결과 PDF로 다운받기
+                </button>
+                <button
+                  onClick={handleSendEmail}
+                  style={{
+                    flex: 1,
+                    padding: '14px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: '#8FBF4D',
+                    color: '#FFFFFF',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Mail size={18} />
+                  분석결과 이메일로 전송하기
+                </button>
+              </div>
             </div>
           )}
         </div>
       </div>
     </div>
-    </>
   );
 }
