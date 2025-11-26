@@ -118,7 +118,7 @@ const initialChecklist: ChecklistTab[] = [
         buttons: [
           { label: 'HUG 전세보증보험', url: 'https://www.khug.or.kr/hug/web/ig/dr/igdr000001.jsp', type: 'secondary' },
           { label: 'SGI 전세보증보험', url: 'https://www.sgic.co.kr/biz/ccp/index.html?p=CCPPRD040301F01', type: 'secondary' },
-          { label: '보증보험 가입 가능 여부 확인', type: 'modal' }
+          { label: '보증보험 가입 가능 여부 확인', type: 'primary' }
         ]
       },
       {

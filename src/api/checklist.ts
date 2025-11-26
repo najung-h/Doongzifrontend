@@ -7,22 +7,25 @@ import type { ChecklistTab, ScanResponse } from '../types';
  * 모든 요청은 동일한 웹훅 URL로 전송되며, actionType으로 분기됨
  */
 export const checklistAPI = {
-  /**
-   * 계약서 분석
-   * actionType: "analyzeContract"
+/**
+   * 문서 정밀 분석 (계약서, 등기부등본, 건축물대장 꼼꼼히 살펴보기)
+   * actionType: "analyzeDocuments"
+   * n8n Workflow: 문서로직0500.json -> Switch Node (analyzeDocuments)
    */
-  analyzeContract: async (files: File[]): Promise<ScanResponse> => {
+  analyzeDocuments: async (files: File[], docType: '임대차계약서' | '등기부등본' | '건축물대장'): Promise<ScanResponse> => {
     try {
       const formData = new FormData();
 
-      // actionType 추가
-      formData.append('actionType', 'analyzeContract');
+      // actionType 및 docType 추가
+      formData.append('actionType', 'analyzeDocuments');
+      formData.append('docType', docType);
 
-      // 파일들 추가
+      // 파일들 추가 (n8n Webhook의 binaryPropertyName: "file" 설정에 따름)
       files.forEach((file) => {
-        formData.append('files', file);
+        formData.append('file', file);
       });
 
+      // 문서 분석은 Scan Webhook Endpoint 사용
       const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -31,18 +34,18 @@ export const checklistAPI = {
 
       return response.data;
     } catch (error) {
-      console.error('Failed to analyze contract:', error);
-      // Mock response for development
+      console.error('Failed to analyze document:', error);
+      // Mock response for development or error fallback
       return {
         success: false,
-        message: '계약서 분석 서버와 연결할 수 없습니다.',
+        message: '문서 정밀 분석 서버와 연결할 수 없습니다.',
         analysis: {
           riskGrade: 'low',
           summary: '서버 연결 오류',
           issues: [
             {
               title: '서버 연결 오류',
-              description: '계약서 분석 서버와 연결할 수 없습니다.',
+              description: '문서 정밀 분석 서버와 연결할 수 없습니다.',
               severity: 'warning',
             },
           ],
@@ -100,20 +103,30 @@ export const checklistAPI = {
    * 보증보험 가입 가능 여부 확인
    * actionType: "checkInsurance"
    */
-  checkInsurance: async (propertyInfo: {
-    address: string;
-    deposit: number;
-    monthlyRent?: number;
-  }): Promise<{
+  checkInsurance: async (files: File[], deposit: number): Promise<{
     success: boolean;
     eligible: boolean;
     message: string;
     details?: string;
   }> => {
     try {
-      const response = await apiClient.post(env.scanWebhookUrl, {
-        actionType: 'checkInsurance',
-        propertyInfo,
+      const formData = new FormData();
+      
+      formData.append('actionType', 'checkInsurance');
+      
+      // 파일들 추가 (등기부등본, 건축물대장)
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+      
+      // 보증금 및 고정된 사용자 ID 추가
+      formData.append('target_deposit', deposit.toString());
+      formData.append('userId', '61a8fc1d-67b0-45db-b913-602654b45c3c');
+
+      const response = await apiClient.post(env.scanWebhookUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       return response.data;
@@ -126,7 +139,7 @@ export const checklistAPI = {
       };
     }
   },
-
+  
   /**
    * [수정됨] 깡통전세 위험도 분석
    * n8n 요구 변수명: address, exclusiveArea, type, deposit
@@ -189,38 +202,38 @@ export const checklistAPI = {
   exportAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportBuildingAnalysisPDF',
+        actionType: 'exportAnalysisPDF',
         analysisResult,
       });
 
       return response.data;
     } catch (error) {
-      console.error('Failed to export building analysis PDF:', error);
+      console.error('Failed to export document analysis PDF:', error);
       return {
         success: false,
-        message: '건축물대장 분석 결과 PDF 생성에 실패했습니다.',
+        message: '문서 분석 결과 PDF 생성에 실패했습니다.',
       };
     }
   },
 
   /**
-   * 건축물대장 분석 결과 이메일 전송
-   * actionType: "sendBuildingAnalysisEmail"
+   * [통합됨] 분석 결과 이메일 전송
+   * n8n actionType: sendAnalysisEmail
    */
-  sendBuildingAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+  sendAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendBuildingAnalysisEmail',
+        actionType: 'sendAnalysisEmail',
         analysisResult,
       });
 
       return response.data;
     } catch (error) {
-      console.error('Failed to send building analysis email:', error);
+      console.error('Failed to send document analysis email:', error);
       return {
         success: false,
-        message: '건축물대장 분석 결과 이메일 전송에 실패했습니다.',
+        message: '문서 분석 결과 이메일 전송에 실패했습니다.',
       };
     }
-  },
+  }
 };

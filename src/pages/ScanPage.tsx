@@ -155,9 +155,6 @@ export default function ScanPage() {
             <p style={{ fontSize: '13px', lineHeight: '1.6' }}>
               <strong>분석 가능한 서류:</strong> 등기부등본, 임대차계약서, 토지대장
             </p>
-            <p style={{ fontSize: '13px', lineHeight: '1.6', marginTop: 'var(--spacing-xs)' }}>
-              여러 파일을 한 번에 업로드하면 종합 분석을 받을 수 있습니다.
-            </p>
           </div>
         </div>
 
