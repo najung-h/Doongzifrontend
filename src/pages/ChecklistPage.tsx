@@ -30,8 +30,8 @@ import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
 import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
 import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
 import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
+import InsuranceCheckModal from '../components/common/InsuranceCheckModal';
 
-// --- Types ---
 type SubChecklistItem = {
   id: string;
   title: string;
@@ -64,10 +64,8 @@ type ChecklistTab = {
   items: ChecklistItem[];
 };
 
-// --- Icon Helper ---
 const getItemIcon = (title: string) => {
-  const iconProps = { size: 20, strokeWidth: 2 };
-
+  const iconProps = { size: 18, strokeWidth: 2 };
   if (title.includes('매매가격')) return <DollarSign {...iconProps} />;
   if (title.includes('보증보험')) return <Shield {...iconProps} />;
   if (title.includes('선순위') || title.includes('권리')) return <Search {...iconProps} />;
@@ -95,7 +93,8 @@ const getItemIcon = (title: string) => {
   return <CheckCircle {...iconProps} />;
 };
 
-// --- Initial Data ---
+// NOTE: Using abbreviated initialChecklist for brevity.
+// Ensure the full initialChecklist data structure is maintained.
 const initialChecklist: ChecklistTab[] = [
   {
     id: 'before',
@@ -346,14 +345,14 @@ export default function ChecklistPage() {
   const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
+  const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
-
-  // 현재 탭의 진행률 계산
+  
   const getAllCheckableItems = () => {
     let totalItems = 0;
     let completedItems = 0;
-
+    
     currentTab?.items.forEach(item => {
       if (item.isGroup && item.subItems) {
         totalItems += item.subItems.length;
@@ -363,10 +362,10 @@ export default function ChecklistPage() {
         completedItems += item.completed ? 1 : 0;
       }
     });
-
+    
     return { totalItems, completedItems };
   };
-
+  
   const { totalItems: currentTabItems, completedItems: currentTabCompleted } = getAllCheckableItems();
   const currentTabProgress = currentTabItems > 0 ? (currentTabCompleted / currentTabItems) * 100 : 0;
 
@@ -378,7 +377,7 @@ export default function ChecklistPage() {
       )
     })));
   };
-
+  
   const toggleSubItem = (itemId: string, subItemId: string) => {
     setChecklist(prev => prev.map(tab => ({
       ...tab,
@@ -395,8 +394,8 @@ export default function ChecklistPage() {
       })
     })));
   };
-
-  const checkIsGroupCompleted = (item: ChecklistItem) => {
+  
+  const isGroupCompleted = (item: ChecklistItem) => {
     if (!item.subItems) return false;
     return item.subItems.every(sub => sub.completed);
   };
@@ -421,8 +420,6 @@ export default function ChecklistPage() {
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
-      } else {
-        alert('PDF 생성에 실패했습니다. (서버 연결 확인 필요)');
       }
     } catch (error) {
       console.error('PDF 생성 실패:', error);
@@ -435,8 +432,6 @@ export default function ChecklistPage() {
       const result = await checklistAPI.sendEmail('user@example.com', checklist);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
-      } else {
-        alert('이메일 전송에 실패했습니다.');
       }
     } catch (error) {
       console.error('이메일 전송 실패:', error);
@@ -444,59 +439,83 @@ export default function ChecklistPage() {
     }
   };
 
-  const handleCheckInsurance = async () => {
-    try {
-      const result = await checklistAPI.checkInsurance({
-        address: '',
-        deposit: 0,
-        monthlyRent: 0
-      });
-
-      if (result.success) {
-        alert(`${result.message}\n\n${result.details || ''}`);
-      } else {
-        alert('보증보험 확인에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('보증보험 확인 실패:', error);
-      alert('보증보험 확인 중 오류가 발생했습니다.');
-    }
+  const handleCheckInsurance = () => {
+    setIsInsuranceModalOpen(true);
   };
 
   const handleAnalyzeRisk = () => {
     setIsRiskModalOpen(true);
   };
 
-  // Sub Item Renderer
   const renderSubItem = (parentId: string, subItem: SubChecklistItem) => {
     const isExpanded = expandedItems.has(subItem.id);
-
+    
     return (
       <div
         key={subItem.id}
-        className={`mb-3 ml-1 border rounded-xl overflow-hidden transition-all duration-200
-          ${subItem.completed ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-200'}`}
+        style={{
+          marginBottom: '8px',
+          marginLeft: '4px',
+          border: '1px solid #E8E8E8',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          backgroundColor: subItem.completed ? '#F8F8F8' : '#FFFFFF'
+        }}
       >
-        <div className="p-4 flex items-center gap-3">
+        <div
+          style={{
+            padding: '14px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}
+        >
           <div
             onClick={(e) => {
               e.stopPropagation();
               toggleSubItem(parentId, subItem.id);
             }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer transition-colors
-              ${subItem.completed ? 'bg-[var(--color-accent-green)] text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
-          >
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: subItem.completed ? '#8FBF4D' : '#E8E8E8',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              cursor: 'pointer',
+              color: subItem.completed ? '#FFFFFF' : '#5A7A3C'
+            }}>
             {getItemIcon(subItem.title)}
           </div>
 
-          <div onClick={() => toggleExpand(subItem.id)} className="flex-1 cursor-pointer">
-            <h5 className={`text-sm font-bold m-0 ${subItem.completed ? 'text-gray-400 line-through' : 'text-[var(--color-text-primary)]'}`}>
+          <div
+            onClick={() => toggleExpand(subItem.id)}
+            style={{
+              flex: 1,
+              cursor: 'pointer'
+            }}>
+            <h5 style={{
+              fontSize: '14px',
+              fontWeight: '600',
+              color: subItem.completed ? '#999999' : '#2C2C2C',
+              textDecoration: subItem.completed ? 'line-through' : 'none',
+              margin: 0
+            }}>
               {subItem.title}
             </h5>
           </div>
 
-          <div onClick={() => toggleExpand(subItem.id)} className="text-gray-400 cursor-pointer">
-            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          <div
+            onClick={() => toggleExpand(subItem.id)}
+            style={{
+              color: '#999999',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+            {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
 
           <input
@@ -506,39 +525,131 @@ export default function ChecklistPage() {
               e.stopPropagation();
               toggleSubItem(parentId, subItem.id);
             }}
-            className="w-5 h-5 cursor-pointer accent-[var(--color-accent-green)] shrink-0"
+            style={{
+              width: '18px',
+              height: '18px',
+              cursor: 'pointer',
+              accentColor: '#8FBF4D',
+              flexShrink: 0
+            }}
           />
         </div>
 
         {isExpanded && (
-          <div className="px-4 pb-4 border-t border-gray-100 bg-gray-50">
-            <div className="bg-blue-50 rounded-lg p-4 mt-4 mb-3 border border-blue-100">
-              <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div style={{
+            padding: '0 18px 16px',
+            borderTop: '1px solid #F0F0F0'
+          }}>
+            <div style={{
+              backgroundColor: '#E3F2FD',
+              borderRadius: '8px',
+              padding: '14px',
+              marginTop: '14px',
+              marginBottom: '10px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px'
+              }}>
+                <div style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  backgroundColor: '#2196F3',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  flexShrink: 0
+                }}>
                   Q
                 </div>
-                <div className="flex-1">
-                  <h6 className="text-xs font-bold text-blue-700 mb-1">이게 뭐예요?</h6>
-                  <p className="text-xs text-gray-700 leading-relaxed m-0">{subItem.whatIsIt}</p>
+                <div style={{ flex: 1 }}>
+                  <h6 style={{
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    color: '#1976D2',
+                    margin: '0 0 6px 0'
+                  }}>
+                    이게 뭐예요?
+                  </h6>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#424242',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {subItem.whatIsIt}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-orange-50 rounded-lg p-4 mb-3 border border-orange-100">
-              <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
+            <div style={{
+              backgroundColor: '#FFF3E0',
+              borderRadius: '8px',
+              padding: '14px',
+              marginBottom: '12px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px'
+              }}>
+                <div style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FF9800',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  flexShrink: 0
+                }}>
                   A
                 </div>
-                <div className="flex-1">
-                  <h6 className="text-xs font-bold text-orange-800 mb-1">왜 해야 하나요?</h6>
-                  <p className="text-xs text-gray-700 leading-relaxed m-0">{subItem.whyDoIt}</p>
+                <div style={{ flex: 1 }}>
+                  <h6 style={{
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    color: '#E65100',
+                    margin: '0 0 6px 0'
+                  }}>
+                    왜 해야 하나요?
+                  </h6>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#424242',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {subItem.whyDoIt}
+                  </p>
                 </div>
               </div>
             </div>
-
+            
             {subItem.additionalNote && (
-              <div className="bg-yellow-50 rounded-lg p-3 mb-3 border-l-4 border-yellow-400">
-                <p className="text-xs text-yellow-800 leading-relaxed m-0 font-medium">
+              <div style={{
+                backgroundColor: '#FFF8E1',
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '12px',
+                borderLeft: '3px solid #FFC107'
+              }}>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#F57C00',
+                  lineHeight: '1.5',
+                  margin: 0,
+                  fontWeight: '500'
+                }}>
                   💡 {subItem.additionalNote}
                 </p>
               </div>
@@ -546,7 +657,21 @@ export default function ChecklistPage() {
 
             <button
               onClick={() => navigate('/chatbot')}
-              className="w-full py-2.5 rounded-lg border border-[var(--color-accent-green)] bg-white text-[var(--color-accent-green)] text-xs font-bold flex items-center justify-center gap-2 hover:bg-[var(--color-bg-secondary)] transition-colors"
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '1px solid #8FBF4D',
+                backgroundColor: '#FFFFFF',
+                color: '#8FBF4D',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
             >
               <MessageCircle size={14} />
               어미새에게 자세히 물어보기
@@ -558,223 +683,584 @@ export default function ChecklistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)]">
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg-primary)' }}>
       <Navigation />
 
-      <div className="text-center pt-12 pb-10 px-5 bg-[var(--color-bg-secondary)] border-b border-gray-200">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-3 mb-3">
-          <img src="/baby.png" alt="아기새" className="w-12 h-12 object-contain drop-shadow-md" />
-          <h1 className="text-3xl font-extrabold text-[var(--color-text-primary)] tracking-tight">
-            둥지 짓기 플랜
-          </h1>
+      <div style={{ textAlign: 'center', padding: '60px 20px 40px', backgroundColor: 'var(--color-bg-secondary)' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          marginBottom: '12px'
+        }}>
+          <img
+            src="/baby.png"
+            alt="아기새"
+            style={{
+              width: '56px',
+              height: '56px',
+              objectFit: 'contain'
+            }}
+          />
+          <h1 style={{ fontSize: '36px', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+          둥지 짓기 플랜
+        </h1>
         </div>
-        <p className="text-sm md:text-base text-[var(--color-text-secondary)]">
+        <p style={{ fontSize: '16px', color: 'var(--color-text-secondary)' }}>
           집 구하는 순서대로 하나씩 따라해보세요
         </p>
       </div>
 
-      <div className="max-w-[800px] mx-auto px-4 md:px-5 -mt-8 pb-20 relative z-10">
-        <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-gray-100">
-
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
-              전월세 계약 체크리스트
-            </h3>
-            <div className="flex gap-3 self-end md:self-auto">
-              <button
-                onClick={handleExportPDF}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] text-xs font-bold hover:bg-gray-50 transition-colors"
-              >
-                <Download size={14} /> PDF
-              </button>
-              <button
-                onClick={handleSendEmail}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-accent-green)] text-white text-xs font-bold hover:bg-[#689F38] transition-colors shadow-md"
-              >
-                <Mail size={14} /> 메일
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 p-1.5 bg-gray-100 rounded-2xl mb-8">
-            {checklist.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap
-                  ${activeTab === tab.id
-                    ? 'bg-white text-[var(--color-accent-green)] shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                  }`}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="mb-10 px-2">
-            <div className="h-3 bg-gray-200 rounded-full relative overflow-visible">
-              <div
-                className="absolute left-0 top-0 h-full rounded-full transition-all duration-700 ease-out"
-                style={{
-                  width: `${currentTabProgress}%`,
-                  background: 'linear-gradient(90deg, #AED581 0%, var(--color-accent-green) 100%)'
-                }}
-              >
-                {currentTabProgress < 100 && (
-                  <div className="absolute -right-5 top-1/2 -translate-y-1/2 drop-shadow-md transform transition-all">
-                    <img src="/baby.png" alt="아기새" className="w-10 h-10 object-contain" />
-                  </div>
-                )}
+      <div style={{ maxWidth: '800px', margin: '-30px auto 60px', padding: '0 20px', position: 'relative', zIndex: 10 }}>
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '24px 28px',
+            borderBottom: '1px solid #E8E8E8'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#2C2C2C'
+              }}>
+                전월세 계약 체크리스트
+              </h3>
+              <div style={{
+                display: 'flex',
+                gap: '8px'
+              }}>
+                <button
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #8FBF4D',
+                    borderRadius: '20px',
+                    color: '#8FBF4D',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                  onClick={handleExportPDF}
+                >
+                  <Download size={14} />
+                  PDF
+                </button>
+                <button
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    backgroundColor: '#8FBF4D',
+                    border: 'none',
+                    borderRadius: '20px',
+                    color: '#FFFFFF',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                  onClick={handleSendEmail}
+                >
+                  <Mail size={14} />
+                  메일
+                </button>
               </div>
             </div>
-            <div className="text-right mt-3 text-xs font-bold text-[var(--color-text-secondary)]">
-              <span className="text-[var(--color-accent-green)]">{Math.round(currentTabProgress)}%</span> 달성 ({currentTabCompleted} / {currentTabItems})
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              marginBottom: '20px'
+            }}>
+              {checklist.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: '12px',
+                    backgroundColor: activeTab === tab.id ? '#8FBF4D' : '#FFFFFF',
+                    color: activeTab === tab.id ? '#FFFFFF' : '#666666',
+                    border: activeTab === tab.id ? 'none' : '1px solid #E8E8E8',
+                    borderRadius: '8px',
+                    fontSize: '15px',
+                    fontWeight: activeTab === tab.id ? '700' : '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {tab.name}
+                </button>
+              ))}
             </div>
-            
+
+            <div style={{
+              position: 'relative',
+              marginBottom: '32px', // 아이콘 공간 확보를 위해 여백 증가
+              marginTop: '12px',
+              marginLeft: '12px'
+            }}>
+              <div style={{
+                height: '14px',
+                backgroundColor: '#F0F0F0',
+                borderRadius: '16px',
+                width: '85%',
+                marginTop: '32px',
+                position: 'relative'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  height: '100%',
+                  width: `${currentTabProgress}%`,
+                  backgroundColor: '#8FBF4D',
+                  transition: 'width 0.3s ease',
+                  borderRadius: '16px'
+                }} />
+                {/* Baby Bird Icon (크기 확대 & 위치 조정) */}
+                {currentTabProgress < 100 && (
+                  <img
+                    src="/baby.png"
+                    alt="아기새"
+                    style={{
+                      position: 'absolute',
+                      left: `calc(${currentTabProgress}% - 25px)`, // 중앙 정렬 보정
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '52px', // 크기 확대 (40px -> 52px)
+                      height: '52px',
+                      objectFit: 'contain',
+                      zIndex: 2,
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
+                      transition: 'left 0.3s ease'
+                    }}
+                  />
+                )}
+                {/* Nest Icon (크기 확대 & 위치 조정) */}
+                <img
+                  src={currentTabProgress >= 100 ? "/rest.png" : "/nest.png"}
+                  alt="둥지"
+                  style={{
+                    position: 'absolute',
+                    right: '-20px', // 바 밖으로 살짝 나가게
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '58px', // 크기 확대 (40px -> 58px)
+                    height: '58px',
+                    objectFit: 'contain',
+                    zIndex: 1,
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                  }}
+                />
+              </div>
+              <div style={{
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: '#2C2C2C'
+              }}>
+                {currentTabCompleted} / {currentTabItems} 완료
+              </div>
+            </div>
+
             {isAllCompleted && (
-              <div className="mt-4 text-center p-3 bg-green-50 rounded-xl border border-green-100">
-                <span className="text-sm font-bold text-green-700 flex items-center justify-center gap-2">
+              <div style={{
+                textAlign: 'center',
+                padding: '8px',
+                backgroundColor: '#E8F5E9',
+                borderRadius: '8px',
+                marginTop: '12px'
+              }}>
+                <span style={{
+                  fontSize: '14px',
+                  color: '#2E7D32',
+                  fontWeight: '600'
+                }}>
                   🎉 축하합니다! 아기새가 둥지에 안착했어요!
                 </span>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div style={{
+            padding: '20px 28px 28px'
+          }}>
             {currentTab?.items.map((item) => {
-              const isExpanded = expandedItems.has(item.id);
-              const isGroup = item.isGroup && item.subItems;
-              const isThisGroupFinished = isGroup && checkIsGroupCompleted(item);
-              const isImportant = item.title.includes('확인') || item.title.includes('계약');
+              if (item.isGroup && item.subItems) {
+                const isGroupExpanded = expandedItems.has(item.id);
+                const groupCompleted = isGroupCompleted(item);
+                
+                return (
+                  <div key={item.id} style={{
+                    marginBottom: '16px',
+                    borderLeft: '4px solid #8FBF4D',
+                    borderTop: '1px solid #E8E8E8',
+                    borderRight: '1px solid #E8E8E8',
+                    borderBottom: '1px solid #E8E8E8',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '12px',
+                    paddingLeft: '16px',
+                    paddingRight: '16px',
+                    marginRight: '2px' // [수정] margin-right 적용 (미세한 간격)
+                  }}>
+                    <div
+                      style={{
+                        padding: '16px 4px 16px 4px',
+                        borderRadius: '12px',
+                        marginBottom: isGroupExpanded ? '12px' : '0',
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => toggleExpand(item.id)}
+                    >
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}>
+                        <div style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          backgroundColor: groupCompleted ? '#8FBF4D' : '#7AA83F',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: '#FFFFFF'
+                        }}>
+                          {getItemIcon(item.title)}
+                        </div>
 
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{
+                            fontSize: '15px',
+                            fontWeight: '700',
+                            color: groupCompleted ? '#999999' : '#5A7A3C',
+                            textDecoration: groupCompleted ? 'line-through' : 'none',
+                            margin: 0
+                          }}>
+                            {item.title}
+                          </h4>
+                        </div>
+
+                        <div style={{ color: '#7AA83F' }}>
+                          {isGroupExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </div>
+                      </div>
+                    </div>
+
+                    {isGroupExpanded && (
+                      <>
+                        {item.subItems.map(subItem => renderSubItem(item.id, subItem))}
+
+                        {item.buttons && item.buttons.length > 0 && (
+                          <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '10px',
+                            marginTop: '12px',
+                            marginLeft: '4px',
+                            marginBottom: '12px'
+                          }}>
+                            {item.buttons.map((button, btnIndex) => (
+                              <button
+                                key={btnIndex}
+                                onClick={() => {
+                                  if (button.url) {
+                                    window.open(button.url, '_blank');
+                                  } else if (button.label === '등기부등본 분석하러가기') {
+                                    setIsRegistryModalOpen(true);
+                                  } else if (button.label === '계약서 분석하러가기') {
+                                    setIsContractModalOpen(true);
+                                  } else if (button.label === '건축물대장 분석하러가기') {
+                                    setIsBuildingModalOpen(true);
+                                  } else if (button.type === 'primary') {
+                                    console.log('문서 분석 요청:', button.label);
+                                  } else if (button.type === 'modal') {
+                                    alert('준비 중입니다.');
+                                  }
+                                }}
+                                style={{
+                                  flex: '1 1 auto',
+                                  minWidth: '140px',
+                                  padding: '12px 20px',
+                                  borderRadius: '8px',
+                                  border: button.type === 'primary' ? 'none' : '1px solid #8FBF4D',
+                                  backgroundColor: button.type === 'primary' ? '#8FBF4D' : '#FFFFFF',
+                                  color: button.type === 'primary' ? '#FFFFFF' : '#8FBF4D',
+                                  fontSize: '14px',
+                                  fontWeight: '600',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {button.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              }
+              
+              const isExpanded = expandedItems.has(item.id);
+              
               return (
                 <div
                   key={item.id}
-                  className={`bg-white border rounded-2xl overflow-hidden transition-all duration-200
-                    ${isExpanded
-                      ? 'border-[var(--color-accent-green)] shadow-md ring-1 ring-[var(--color-accent-green)]'
-                      : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                  style={{
+                    marginBottom: '12px',
+                    border: '1px solid #E8E8E8',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    backgroundColor: item.completed ? '#F8F8F8' : '#FFFFFF'
+                  }}
                 >
                   <div
+                    style={{
+                      padding: '16px 20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      cursor: 'pointer'
+                    }}
                     onClick={() => toggleExpand(item.id)}
-                    className={`p-5 flex items-center gap-4 cursor-pointer transition-colors
-                      ${item.completed ? 'bg-gray-50' : 'bg-white'}`}
                   >
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors
-                        ${(item.completed || isThisGroupFinished)
-                          ? 'bg-[var(--color-accent-green)] text-white'
-                          : 'bg-gray-100 text-gray-400'
-                        }`}
-                    >
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: item.completed ? '#8FBF4D' : '#E8E8E8',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      color: item.completed ? '#FFFFFF' : '#5A7A3C'
+                    }}>
                       {getItemIcon(item.title)}
                     </div>
 
-                    <div className="flex-1">
-                      <h4 className={`text-base font-bold m-0 flex items-center flex-wrap gap-2
-                        ${(item.completed || isThisGroupFinished)
-                          ? 'text-gray-400 line-through decoration-2 decoration-gray-300'
-                          : 'text-[var(--color-text-primary)]'
-                        }`}
-                      >
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        color: item.completed ? '#999999' : '#2C2C2C',
+                        textDecoration: item.completed ? 'line-through' : 'none',
+                        margin: 0
+                      }}>
                         {item.title}
-                        {!item.completed && !isThisGroupFinished && isImportant && (
-                          <span className="text-[10px] text-red-500 bg-red-50 px-2 py-0.5 rounded-md border border-red-100 whitespace-nowrap">
-                            필수
-                          </span>
-                        )}
                       </h4>
                     </div>
 
-                    <div className="text-gray-400 shrink-0">
+                    <div style={{ color: '#999999' }}>
                       {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
 
-                    {!isGroup && (
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          toggleItem(item.id);
-                        }}
-                        className="w-6 h-6 cursor-pointer accent-[var(--color-accent-green)] shrink-0 ml-2 rounded-md"
-                      />
-                    )}
+                    <input
+                      type="checkbox"
+                      checked={item.completed || false}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        toggleItem(item.id);
+                      }}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer',
+                        accentColor: '#8FBF4D',
+                        flexShrink: 0
+                      }}
+                    />
                   </div>
 
                   {isExpanded && (
-                    <div className="px-5 pb-6 border-t border-gray-100 bg-white">
-                      {isGroup ? (
-                        <div className="mt-4 flex flex-col gap-2">
-                          {item.subItems?.map(subItem => renderSubItem(item.id, subItem))}
-                        </div>
-                      ) : (
-                        <>
-                          <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
-                            <h5 className="text-xs font-bold text-blue-700 mb-1 flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px]">Q</span>
+                    <div style={{
+                      padding: '0 20px 20px',
+                      borderTop: '1px solid #F0F0F0'
+                    }}>
+                      <div style={{
+                        backgroundColor: '#E3F2FD',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        marginTop: '16px',
+                        marginBottom: '12px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '8px'
+                        }}>
+                          <div style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            backgroundColor: '#2196F3',
+                            color: '#FFFFFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            flexShrink: 0
+                          }}>
+                            Q
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <h5 style={{
+                              fontSize: '13px',
+                              fontWeight: '700',
+                              color: '#1976D2',
+                              margin: '0 0 8px 0'
+                            }}>
                               이게 뭐예요?
                             </h5>
-                            <p className="text-sm text-gray-700 leading-relaxed pl-7 m-0">{item.whatIsIt}</p>
+                            <p style={{
+                              fontSize: '13px',
+                              color: '#424242',
+                              lineHeight: '1.6',
+                              margin: 0
+                            }}>
+                              {item.whatIsIt}
+                            </p>
                           </div>
-                          <div className="mt-3 mb-4 bg-orange-50 rounded-xl p-4 border border-orange-100">
-                            <h5 className="text-xs font-bold text-orange-800 mb-1 flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px]">A</span>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        backgroundColor: '#FFF3E0',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        marginBottom: '16px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '8px'
+                        }}>
+                          <div style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            backgroundColor: '#FF9800',
+                            color: '#FFFFFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            flexShrink: 0
+                          }}>
+                            A
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <h5 style={{
+                              fontSize: '13px',
+                              fontWeight: '700',
+                              color: '#E65100',
+                              margin: '0 0 8px 0'
+                            }}>
                               왜 해야 하나요?
                             </h5>
-                            <p className="text-sm text-gray-700 leading-relaxed pl-7 m-0">{item.whyDoIt}</p>
+                            <p style={{
+                              fontSize: '13px',
+                              color: '#424242',
+                              lineHeight: '1.6',
+                              margin: 0
+                            }}>
+                              {item.whyDoIt}
+                            </p>
                           </div>
-                        </>
-                      )}
+                        </div>
+                      </div>
 
-                      {item.buttons && (
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          {item.buttons.map((btn, idx) => (
+                      {item.buttons && item.buttons.length > 0 && (
+                        <div style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '10px',
+                          marginBottom: '12px'
+                        }}>
+                          {item.buttons.map((button, btnIndex) => (
                             <button
-                              key={idx}
+                              key={btnIndex}
                               onClick={() => {
-                                if (btn.url) {
-                                  window.open(btn.url, '_blank');
-                                } else if (btn.label === '보증보험 가입 가능 여부 확인') {
+                                if (button.url) {
+                                  window.open(button.url, '_blank');
+                                } else if (button.label === '보증보험 가입 가능 여부 확인') {
                                   handleCheckInsurance();
-                                } else if (btn.label === '깡통전세 위험도 분석') {
+                                } else if (button.label === '깡통전세 위험도 분석') {
                                   handleAnalyzeRisk();
-                                } else if (btn.label === '등기부등본 분석하러가기') {
+                                } else if (button.label === '등기부등본 분석하러가기') {
                                   setIsRegistryModalOpen(true);
-                                } else if (btn.label === '계약서 분석하러가기') {
+                                } else if (button.label === '계약서 분석하러가기') {
                                   setIsContractModalOpen(true);
-                                } else if (btn.label === '건축물대장 분석하러가기') {
+                                } else if (button.label === '건축물대장 분석하러가기') {
                                   setIsBuildingModalOpen(true);
-                                } else if (btn.type === 'primary') {
-                                  console.log('문서 분석 요청:', btn.label);
-                                } else if (btn.type === 'modal') {
+                                } else if (button.type === 'primary') {
+                                  console.log('문서 분석 요청:', button.label);
+                                } else if (button.type === 'modal') {
                                   alert('준비 중입니다.');
                                 }
                               }}
-                              className={`flex-1 min-w-[140px] py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200
-                                ${btn.type === 'primary'
-                                  ? 'bg-[var(--color-accent-green)] text-white hover:bg-[#689F38] shadow-md'
-                                  : 'bg-white text-[var(--color-accent-green)] border border-[var(--color-accent-green)] hover:bg-green-50'
-                                }`}
+                              style={{
+                                flex: '1 1 auto',
+                                minWidth: '140px',
+                                padding: '12px 20px',
+                                borderRadius: '8px',
+                                border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
+                                backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
+                                color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer'
+                              }}
                             >
-                              {btn.label}
+                              {button.label}
                             </button>
                           ))}
                         </div>
                       )}
-                      
-                      {!isGroup && (
-                        <button
-                          onClick={() => navigate('/chatbot')}
-                          className="w-full mt-3 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
-                        >
-                          <MessageCircle size={16} />
-                          어미새에게 자세히 물어보기
-                        </button>
-                      )}
+
+                      <button
+                        onClick={() => navigate('/chatbot')}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          borderRadius: '8px',
+                          border: '1px solid #8FBF4D',
+                          backgroundColor: '#FFFFFF',
+                          color: '#8FBF4D',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <MessageCircle size={16} />
+                        어미새에게 자세히 물어보기
+                      </button>
                     </div>
                   )}
                 </div>
@@ -784,10 +1270,30 @@ export default function ChecklistPage() {
         </div>
       </div>
 
-      <RiskAnalysisModal isOpen={isRiskModalOpen} onClose={() => setIsRiskModalOpen(false)} />
-      <RegistryAnalysisModal isOpen={isRegistryModalOpen} onClose={() => setIsRegistryModalOpen(false)} />
-      <ContractAnalysisModal isOpen={isContractModalOpen} onClose={() => setIsContractModalOpen(false)} />
-      <BuildingAnalysisModal isOpen={isBuildingModalOpen} onClose={() => setIsBuildingModalOpen(false)} />
+      <RiskAnalysisModal
+        isOpen={isRiskModalOpen}
+        onClose={() => setIsRiskModalOpen(false)}
+      />
+
+      <RegistryAnalysisModal
+        isOpen={isRegistryModalOpen}
+        onClose={() => setIsRegistryModalOpen(false)}
+      />
+
+      <ContractAnalysisModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+      />
+
+      <BuildingAnalysisModal
+        isOpen={isBuildingModalOpen}
+        onClose={() => setIsBuildingModalOpen(false)}
+      />
+      
+      <InsuranceCheckModal 
+        isOpen={isInsuranceModalOpen} 
+        onClose={() => setIsInsuranceModalOpen(false)} 
+      />
     </div>
   );
 }
