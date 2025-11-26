@@ -71,38 +71,43 @@ export const checklistAPI = {
       return { success: false, message: '이메일 전송에 실패했습니다.' };
     }
   },
-
-  /**
-   * 보증보험 가입 가능 여부 확인
-   * actionType: "checkInsurance"
+/**
+   * [수정됨] 보증보험 가입 가능 여부 확인
+   * n8n 요구사항: 파일(등기부, 건축물대장) + target_deposit
    */
-  checkInsurance: async (propertyInfo: {
-    address: string;
-    deposit: number;
-    monthlyRent?: number;
-  }): Promise<{ success: boolean; eligible: boolean; message: string; details?: string }> => {
+  checkInsurance: async (formData: FormData): Promise<{
+    success: boolean;
+    eligible: boolean;
+    message: string;
+    details?: string;
+  }> => {
     try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'checkInsurance',
-        propertyInfo,
+      // n8n 워크플로우에 맞춰 actionType 추가
+      formData.append('actionType', 'checkInsurance');
+      
+      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data;
     } catch (error) {
-      console.error('Failed to check insurance eligibility:', error);
-      return { success: false, eligible: false, message: '보증보험 확인에 실패했습니다.' };
+      console.error('Failed to check insurance:', error);
+      return {
+        success: false,
+        eligible: false,
+        message: '보증보험 확인에 실패했습니다.',
+      };
     }
   },
 
   /**
-   * 깡통전세 위험도 분석
-   * actionType: "analyzeRisk"
-   * Note: 프론트엔드 Modal은 'area'를 사용하고, 반환값으로 'low'|'medium'|'high'를 기대함
+   * [수정됨] 깡통전세 위험도 분석
+   * n8n 요구 변수명: 주소, 전용면적_m2, type, deposit
    */
   analyzeRisk: async (propertyInfo: {
     address: string;
     deposit: number;
     area: number;
-    propertyType: '아파트' | '오피스텔' | '연립,다세대주택' | '단독,다가구';
+    propertyType: string;
   }): Promise<{
     success: boolean;
     riskLevel: 'low' | 'medium' | 'high';
@@ -113,11 +118,12 @@ export const checklistAPI = {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'analyzeRisk',
-        propertyInfo,
+        // n8n 변수명 매핑
+        '주소': propertyInfo.address,
+        'deposit': propertyInfo.deposit,
+        '전용면적_m2': propertyInfo.area,
+        'type': propertyInfo.propertyType,
       });
-      
-      // API 응답이 safe/warning/danger로 올 경우를 대비한 매핑 (혹은 그대로 반환)
-      // n8n에서 low/medium/high로 준다면 그대로 사용
       return response.data;
     } catch (error) {
       console.error('Failed to analyze risk:', error);
@@ -131,13 +137,14 @@ export const checklistAPI = {
   },
 
   /**
-   * 등기부등본 분석 결과 PDF 다운로드
+   * [통합됨] 분석 결과 PDF 다운로드
+   * n8n actionType: exportAnalysisPDF
    */
-  exportRegistryAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  exportAnalysisPDF: async (fileKey: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportRegistryAnalysisPDF',
-        analysisResult,
+        actionType: 'exportAnalysisPDF',
+        fileKey,
       });
       return response.data;
     } catch (error) {
@@ -146,73 +153,15 @@ export const checklistAPI = {
   },
 
   /**
-   * 등기부등본 분석 결과 이메일 전송
+   * [통합됨] 분석 결과 이메일 전송
+   * n8n actionType: sendAnalysisEmail
    */
-  sendRegistryAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
+  sendAnalysisEmail: async (fileKey: string, email: string): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendRegistryAnalysisEmail',
-        analysisResult,
-      });
-      return response.data;
-    } catch (error) {
-      return { success: false, message: '이메일 전송 실패' };
-    }
-  },
-
-  /**
-   * 계약서 분석 결과 PDF 다운로드
-   */
-  exportContractAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportContractAnalysisPDF',
-        analysisResult,
-      });
-      return response.data;
-    } catch (error) {
-      return { success: false, message: 'PDF 생성 실패' };
-    }
-  },
-
-  /**
-   * 계약서 분석 결과 이메일 전송
-   */
-  sendContractAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendContractAnalysisEmail',
-        analysisResult,
-      });
-      return response.data;
-    } catch (error) {
-      return { success: false, message: '이메일 전송 실패' };
-    }
-  },
-
-  /**
-   * 건축물대장 분석 결과 PDF 다운로드
-   */
-  exportBuildingAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'exportBuildingAnalysisPDF',
-        analysisResult,
-      });
-      return response.data;
-    } catch (error) {
-      return { success: false, message: 'PDF 생성 실패' };
-    }
-  },
-
-  /**
-   * 건축물대장 분석 결과 이메일 전송
-   */
-  sendBuildingAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; message: string }> => {
-    try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
-        actionType: 'sendBuildingAnalysisEmail',
-        analysisResult,
+        actionType: 'sendAnalysisEmail',
+        fileKey,
+        email
       });
       return response.data;
     } catch (error) {
