@@ -37,19 +37,19 @@ export default function ScanPage() {
     setIsAnalyzing(true);
 
     try {
-      // [수정] scanAPI.analyzeDocuments로 함수명 변경 (scan.ts 정의와 일치)
-      // docType은 n8n 워크플로우에서 처리되거나 기본값으로 동작하도록 생략
+      // [수정] 비동기 요청: 결과 데이터(riskGrade 등)를 기다리지 않음
       const result = await scanAPI.scanDocuments(uploadedFiles);
 
       if (result.success) {
-        // 분석 결과 표출 (등급에 따라 이모지 추가 등 UI 개선 가능)
-        alert(`[분석 완료]\n위험 등급: ${result.analysis.riskGrade}\n\n${result.analysis.summary}`);
+        // [수정] 즉시 완료 메시지 및 이메일 안내 표시
+        alert(`[분석 요청 완료]\n\n${result.message}\n분석이 완료되면 이메일로 리포트가 발송됩니다.`);
+        setUploadedFiles([]); // 파일 목록 초기화
       } else {
-        alert(`분석 실패: ${result.message}`);
+        alert(`요청 실패: ${result.message}`);
       }
     } catch (error) {
-      console.error('문서 분석 실패:', error);
-      alert('문서 분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('문서 분석 요청 실패:', error);
+      alert('서버 연결 중 오류가 발생했습니다.');
     } finally {
       setIsAnalyzing(false);
     }
@@ -157,7 +157,10 @@ export default function ScanPage() {
           <AlertCircle size={20} color="var(--color-info)" style={{ flexShrink: 0 }} />
           <div>
             <p style={{ fontSize: '13px', lineHeight: '1.6' }}>
-              <strong>분석 가능한 서류:</strong> 등기부등본, 임대차계약서, 토지대장
+              <strong>분석 가능한 서류:</strong> 등기부등본, 임대차계약서, 건축물대장
+            </p>
+            <p style={{ fontSize: '13px', lineHeight: '1.6', marginTop: 'var(--spacing-xs)', color: 'var(--color-text-secondary)' }}>
+              * 파일 업로드 시 분석이 시작되며, 결과는 이메일로 발송됩니다.
             </p>
           </div>
         </div>
@@ -229,11 +232,11 @@ export default function ScanPage() {
               transition: 'all 0.2s ease'
             }}
           >
-            {isAnalyzing ? '분석 중...' : '🔍 둥지 스캔 시작하기'}
+            {isAnalyzing ? '전송 중...' : '🔍 둥지 스캔 시작하기'}
           </button>
         )}
 
-        {/* Sample Analysis Result (placeholder) */}
+        {/* Processing Indicator */}
         {isAnalyzing && (
           <div style={{
             marginTop: 'var(--spacing-lg)',
@@ -252,7 +255,7 @@ export default function ScanPage() {
               animation: 'spin 1s linear infinite'
             }} />
             <p style={{ color: 'var(--color-text-secondary)' }}>
-              서류를 분석하고 있습니다...
+              서류를 전송하고 있습니다...
             </p>
           </div>
         )}

@@ -30,7 +30,7 @@ export const scanAPI = {
       // 파일들 추가
       // 중요: n8n의 '[S3]사용자_파일_적재1' 노드가 'file0' 키를 참조하므로 키 이름을 'file0'로 설정
       files.forEach((file) => {
-        formData.append('file', file);
+        formData.append('file0', file);
       });
 
       const response = await apiClient.post(env.scanWebhookUrl, formData, {
@@ -39,25 +39,34 @@ export const scanAPI = {
         },
       });
 
-      return response.data;
+      // n8n의 즉시 응답(message only)을 ScanResponse 형식에 맞게 변환
+      return {
+        success: true,
+        message: response.data.message || '문서가 성공적으로 접수되었습니다.',
+        // @ts-ignore: 비동기 처리로 인해 fileKey가 즉시 반환되지 않을 수 있음
+        fileKey: '',
+        // 비동기 처리이므로 분석 결과는 더미 데이터로 채움 (이메일로 결과 전송됨)
+        analysis: {
+          riskGrade: 'low',
+          summary: '분석이 시작되었습니다. 결과는 이메일로 전송됩니다.',
+          issues: [],
+          autoCheckItems: []
+        }
+      };
     } catch (error) {
       console.error('Failed to analyze documents:', error);
-      // Mock response for development
+      
+      // 타임아웃 에러일 경우 (n8n 응답 노드가 없는 경우 대비) 성공으로 간주하는 로직 추가 가능
+      // 현재는 에러 처리 유지
       return {
         success: false,
         message: '문서 분석 서버와 연결할 수 없습니다.',
-        // @ts-ignore: types definition mismatch fix
+        // @ts-ignore
         fileKey: '',
         analysis: {
           riskGrade: 'low',
           summary: '서버 연결 오류',
-          issues: [
-            {
-              title: '서버 연결 오류',
-              description: '문서 분석 서버와 연결할 수 없습니다.',
-              severity: 'warning',
-            },
-          ],
+          issues: [],
           autoCheckItems: [],
         },
       };
