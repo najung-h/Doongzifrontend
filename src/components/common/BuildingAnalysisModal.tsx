@@ -108,7 +108,7 @@ export default function BuildingAnalysisModal({ isOpen, onClose }: BuildingAnaly
     }
 
     try {
-      const result = await checklistAPI.exportBuildingAnalysisPDF(analysisResult);
+      const result = await checklistAPI.exportAnalysisPDF("building", analysisResult);
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
@@ -128,7 +128,7 @@ export default function BuildingAnalysisModal({ isOpen, onClose }: BuildingAnaly
     }
 
     try {
-      const result = await checklistAPI.sendBuildingAnalysisEmail(analysisResult);
+      const result = await checklistAPI.sendAnalysisEmail("building", analysisResult);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {

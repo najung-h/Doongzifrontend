@@ -107,7 +107,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     try {
-      const result = await checklistAPI.exportContractAnalysisPDF(analysisResult.analysis);
+      const result = await checklistAPI.exportAnalysisPDF("contract", analysisResult.analysis);
       if (result.success && result.pdfUrl) {
         window.open(result.pdfUrl, '_blank');
         alert('PDF가 생성되었습니다!');
@@ -127,7 +127,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     try {
-      const result = await checklistAPI.sendContractAnalysisEmail(analysisResult.analysis);
+      const result = await checklistAPI.sendAnalysisEmail("contract", analysisResult.analysis);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {

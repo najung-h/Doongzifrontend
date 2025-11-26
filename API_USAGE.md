@@ -130,10 +130,11 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 
 ### 3. Checklist Service (둥지 짓기 플랜)
 
-- Endpoint: `VITE_N8N_CHECKLIST_WEBHOOK_URL` 
+- Endpoint: `VITE_N8N_CHECKLIST_WEBHOOK_URL`
 - 담당 기능: 깡통전세 분석, 보험 확인, PDF 내보내기 (PRD 4.4)
 - n8n Switch Logic (`actionType`)
   - `analyzeRisk`: 깡통전세 위험도 분석
+  - `checkInsurance`: 보증보험 가입 가능 여부 확인
   - `exportPDF`: 체크리스트 PDF 생성 및 다운로드 링크
   - `sendEmail`: 체크리스트 PDF 이메일 발송
 
@@ -170,7 +171,57 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 }
 ```
 
-#### 3.2 PDF 내보내기 (`exportPDF`)
+#### 3.2 보증보험 가입 가능 여부 확인 (`checkInsurance`)
+
+```json
+// Request (FormData):
+// 주의: 파일 업로드이므로 Content-Type: multipart/form-data 필수
+{
+  "actionType": "checkInsurance",
+  "files": [File Object (등기부등본), File Object (건축물대장)],  // 2개 파일 필수
+  "deposit": "12000"  // 보증금 (단위: 만원, 문자열)
+}
+```
+
+```json
+// Response:
+{
+  "success": true,
+  "status": "REVIEW_REQUIRED",  // 'PASS' | 'FAIL' | 'REVIEW_REQUIRED'
+
+  // status가 'FAIL'인 경우 (LLM이 자동으로 불가 판정)
+  "failedItems": [
+    {
+      "id": "mortgage_ratio",
+      "question": "근저당권 비율 확인",
+      "reason": "등기부등본 상 근저당권 설정 비율이 보증금 대비 150%를 초과합니다."
+    }
+  ],
+
+  // status가 'REVIEW_REQUIRED'인 경우 (사용자 확인 필요)
+  "reviewItems": [
+    {
+      "id": "building_approval",
+      "question": "건축물이 사용승인을 받았나요?",
+      "reason_why": "사용승인을 받지 않은 건축물은 보증보험 가입이 불가능합니다."
+    },
+    {
+      "id": "lawsuit_check",
+      "question": "임대인이 소송 중이거나 파산 절차 진행 중인가요?",
+      "reason_why": "임대인이 법적 분쟁 중이면 보증보험 가입이 제한됩니다."
+    }
+  ]
+}
+```
+
+**응답 처리 로직:**
+- `status: 'PASS'` → "보증보험 가입 가능합니다" 메시지 표시
+- `status: 'FAIL'` → failedItems의 이유들을 표시하고 "보증보험 가입이 불가능합니다" 안내
+- `status: 'REVIEW_REQUIRED'` → reviewItems의 질문들을 순차적으로 YES/NO로 확인
+  - 모든 질문에 YES → PASS 처리
+  - 하나라도 NO → 해당 reason_why를 누적하여 FINAL_FAIL 처리
+
+#### 3.4 PDF 내보내기 (`exportPDF`)
 
 ```json
 // Request Body:
@@ -188,7 +239,7 @@ VITE_N8N_CHECKLIST_WEBHOOK_URL=     # 둥지 짓기 플랜 (위험도 분석, PD
 }
 ```
 
-#### 3.3 이메일 전송 (`sendEmail`)
+#### 3.5 이메일 전송 (`sendEmail`)
 
 ```json
 // Request Body:

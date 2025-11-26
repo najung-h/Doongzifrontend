@@ -4,13 +4,22 @@
 export type DocumentDataType = 'registry' | 'contract' | 'building'; // 새 타입 추가
 
 export type ActionType =
-  | 'sendMessage' | 'searchLegal'                                     // Chat Service
-  | 'scanDocuments' | 'deepAnalyzeContract'                           // Document Service
-  | 'analyzeRisk' | 'exportPDF' | 'sendEmail'                         // Checklist Service (기본)
-  | 'checkInsurance'                                                  // Checklist Service (보험)
-  // 통합된 6가지 액션타입을 아래 2가지로 대체합니다.
-  | 'exportAnalysisPDF'                                               // 통합: 분석 결과 PDF 다운로드
-  | 'sendAnalysisEmail';                                              // 통합: 분석 결과 이메일 전송
+  // CHATBOT Service
+  | 'sendMessage'                                                     // 챗봇 메시지 전송
+  | 'searchLegal'                                                     // 법률 검색
+
+  // SCAN Service (문서 분석)
+  | 'analyzeDocuments'                                                // 문서 통합 분석 (등기부/계약서/건축물대장)
+  | 'analyzeDetailedDocument'                                         // 상세 문서 분석 (이메일 리포트)
+
+  // CHECKLIST Service
+  | 'analyzeContract'                                                 // 계약서 분석 (체크리스트용)
+  | 'analyzeRisk'                                                     // 깡통전세 위험도 분석
+  | 'exportPDF'                                                       // 체크리스트 PDF 다운로드
+  | 'sendEmail'                                                       // 체크리스트 이메일 전송
+  | 'checkInsurance'                                                  // 보증보험 가입 확인
+  | 'exportAnalysisPDF'                                               // 통합: 분석 결과 PDF 다운로드 (dataType 구분)
+  | 'sendAnalysisEmail';                                              // 통합: 분석 결과 이메일 전송 (dataType 구분)
   
 export interface BaseResponse {
   success: boolean;
