@@ -93,8 +93,6 @@ const getItemIcon = (title: string) => {
   return <CheckCircle {...iconProps} />;
 };
 
-// NOTE: Using abbreviated initialChecklist for brevity.
-// Ensure the full initialChecklist data structure is maintained.
 const initialChecklist: ChecklistTab[] = [
   {
     id: 'before',
@@ -193,7 +191,7 @@ const initialChecklist: ChecklistTab[] = [
             title: '신탁등기 상태 확인하기',
             whatIsIt: '등기부등본에서 이 집이 신탁회사에 맡겨진 상태인지(신탁등기) 확인하는 절차예요. 신탁등기면 겉보기 집주인이 아니라 신탁회사가 실제 권한을 가지고 있는 구조예요.',
             whyDoIt: '신탁된 집을 집주인과만 계약하면 계약이 무효가 될 수 있어, 보증금을 한순간에 잃을 위험이 있어요. 반드시 신탁회사 동의가 필요한 집이므로, 이를 모르고 계약하면 추후 강제퇴거·보증금 미반환 위험이 매우 커져요.',
-            additionalNote: '신탁등기 상태가 확인되었다면 주민센터가서 신탁원부 확인하는거 필요합니다.',
+            additionalNote: '신탁등기 상태가 확인되었다면 주민센터에 가서 신탁원부를 확인하는 과정이 필요합니다.',
             completed: false
           }
         ],
@@ -349,15 +347,18 @@ export default function ChecklistPage() {
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
+  // 현재 탭의 진행률 계산 (서브 항목만 카운트)
   const getAllCheckableItems = () => {
     let totalItems = 0;
     let completedItems = 0;
     
     currentTab?.items.forEach(item => {
       if (item.isGroup && item.subItems) {
+        // 그룹 헤더는 카운트하지 않고 서브 항목만 카운트
         totalItems += item.subItems.length;
         completedItems += item.subItems.filter(sub => sub.completed).length;
       } else if (!item.isGroup) {
+        // 일반 항목 카운트
         totalItems += 1;
         completedItems += item.completed ? 1 : 0;
       }
@@ -462,6 +463,7 @@ export default function ChecklistPage() {
           backgroundColor: subItem.completed ? '#F8F8F8' : '#FFFFFF'
         }}
       >
+        {/* Sub Item Header */}
         <div
           style={{
             padding: '14px 18px',
@@ -535,6 +537,7 @@ export default function ChecklistPage() {
           />
         </div>
 
+        {/* Expanded Content */}
         {isExpanded && (
           <div style={{
             padding: '0 18px 16px',
@@ -686,7 +689,7 @@ export default function ChecklistPage() {
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg-primary)' }}>
       <Navigation />
 
-      <div style={{ textAlign: 'center', padding: '60px 20px 40px', backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div style={{ textAlign: 'center', padding: '40px 20px 60px', backgroundColor: 'var(--color-bg-secondary)' }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -703,9 +706,9 @@ export default function ChecklistPage() {
               objectFit: 'contain'
             }}
           />
-          <h1 style={{ fontSize: '36px', fontWeight: '800', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-          둥지 짓기 플랜
-        </h1>
+          <h1 style={{ fontSize: '36px', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
+            둥지 짓기 플랜
+          </h1>
         </div>
         <p style={{ fontSize: '16px', color: 'var(--color-text-secondary)' }}>
           집 구하는 순서대로 하나씩 따라해보세요
@@ -1003,9 +1006,10 @@ export default function ChecklistPage() {
                                   minWidth: '140px',
                                   padding: '12px 20px',
                                   borderRadius: '8px',
-                                  border: button.type === 'primary' ? 'none' : '1px solid #8FBF4D',
-                                  backgroundColor: button.type === 'primary' ? '#8FBF4D' : '#FFFFFF',
-                                  color: button.type === 'primary' ? '#FFFFFF' : '#8FBF4D',
+                                  // [수정] 버튼 스타일 로직 변경
+                                  border: button.type === 'primary' ? 'none' : '1px solid rgb(45, 122, 142)',
+                                  backgroundColor: button.type === 'primary' ? 'rgb(45, 122, 142)' : '#FFFFFF',
+                                  color: button.type === 'primary' ? '#FFFFFF' : 'rgb(45, 122, 142)',
                                   fontSize: '14px',
                                   fontWeight: '600',
                                   cursor: 'pointer'
@@ -1226,9 +1230,10 @@ export default function ChecklistPage() {
                                 minWidth: '140px',
                                 padding: '12px 20px',
                                 borderRadius: '8px',
-                                border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
-                                backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
-                                color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
+                                // [수정] 버튼 스타일 로직 변경
+                                border: button.type === 'primary' ? 'none' : '1px solid rgb(45, 122, 142)',
+                                backgroundColor: button.type === 'primary' ? 'rgb(45, 122, 142)' : '#FFFFFF',
+                                color: button.type === 'primary' ? '#FFFFFF' : 'rgb(45, 122, 142)',
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 cursor: 'pointer'

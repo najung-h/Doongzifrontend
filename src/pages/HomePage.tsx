@@ -80,7 +80,6 @@ export default function HomePage() {
           fontSize: '17px',
           fontWeight: '500',
           color: '#666666',
-          marginBottom: '40px',
           letterSpacing: '-0.3px'
         }}>
           안전한 임대차 계약의 시작
