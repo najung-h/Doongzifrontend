@@ -96,6 +96,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
+  // PDF 다운로드 핸들러
   const handleDownloadPDF = async () => {
     if (!analysisResult) {
       alert('분석 결과가 없습니다.');
@@ -104,9 +105,11 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
 
     try {
       const result = await checklistAPI.exportAnalysisPDF(analysisResult.analysis);
-      if (result.success && result.pdfUrl) {
-        window.open(result.pdfUrl, '_blank');
-        alert('PDF가 생성되었습니다!');
+      if (result.success) {
+        if (result.pdfUrl) {
+          window.open(result.pdfUrl, '_blank');
+        }
+        alert('PDF 다운로드 요청이 처리되었습니다.');
       } else {
         alert(result.message || 'PDF 생성에 실패했습니다.');
       }
@@ -116,6 +119,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
+  // 이메일 전송 핸들러
   const handleSendEmail = async () => {
     if (!analysisResult) {
       alert('분석 결과가 없습니다.');
@@ -290,7 +294,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                 </p>
               </div>
 
-              {/* File Preview (복구됨) */}
+              {/* File Preview */}
               {previewUrl && (
                 <div
                   style={{
@@ -388,6 +392,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
           {/* 2. 분석 결과 표시 */}
           {analysisResult && (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              {/* [HTML 리포트 렌더링] output 필드가 있으면 iframe으로 표시 */}
               {analysisResult.output ? (
                 <div style={{ flex: 1, minHeight: '500px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #E8E8E8' }}>
                   <iframe
@@ -397,7 +402,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                   />
                 </div>
               ) : (
-                /* output이 없으면 기존 UI */
+                /* output이 없으면 기존 UI (Fallback) */
                 <div
                   style={{
                     padding: '24px',
@@ -550,7 +555,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                 </div>
               )}
 
-              {/* Action Buttons (주석 해제됨) */}
+              {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
                 <button
                   onClick={handleDownloadPDF}
@@ -571,7 +576,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                   }}
                 >
                   <Download size={18} />
-                  분석결과 PDF로 다운받기
+                  PDF로 저장
                 </button>
                 <button
                   onClick={handleSendEmail}
@@ -592,7 +597,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                   }}
                 >
                   <Mail size={18} />
-                  분석결과 이메일로 전송하기
+                  메일로 보내기
                 </button>
               </div>
             </div>

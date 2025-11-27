@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Download,
@@ -23,8 +23,8 @@ import {
   Pin,
   ScrollText,
   CheckCircle,
-  Lightbulb,
-  HelpCircle
+  HelpCircle,
+  Lightbulb
 } from 'lucide-react';
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
@@ -341,26 +341,27 @@ export default function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<'before' | 'during' | 'after'>('before');
   const [checklist, setChecklist] = useState<ChecklistTab[]>(initialChecklist);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
   const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
-  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [checkInsuranceDeposit, setCheckInsuranceDeposit] = useState<number | null>(null);
 
   const currentTab = checklist.find(tab => tab.id === activeTab);
   
-  // 현재 탭의 진행률 계산 (서브 항목만 카운트)
   const getAllCheckableItems = () => {
     let totalItems = 0;
     let completedItems = 0;
     
     currentTab?.items.forEach(item => {
       if (item.isGroup && item.subItems) {
-        // 그룹 헤더는 카운트하지 않고 서브 항목만 카운트
         totalItems += item.subItems.length;
         completedItems += item.subItems.filter(sub => sub.completed).length;
       } else if (!item.isGroup) {
-        // 일반 항목 카운트
         totalItems += 1;
         completedItems += item.completed ? 1 : 0;
       }
@@ -442,14 +443,37 @@ export default function ChecklistPage() {
     }
   };
 
-  // [수정] 보증보험 확인 핸들러: 이제 모달만 엽니다.
   const handleCheckInsurance = () => {
     setIsInsuranceModalOpen(true);
   };
 
-  // [수정] 깡통전세 위험도 분석 핸들러: 모달만 엽니다.
   const handleAnalyzeRisk = () => {
     setIsRiskModalOpen(true);
+  };
+
+  const handleInsuranceFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0 || checkInsuranceDeposit === null) return;
+
+    try {
+      alert("보증보험 가입 가능 여부를 확인 중입니다. 잠시만 기다려주세요...");
+      
+      const result = await checklistAPI.checkInsurance(files[0], files[1], checkInsuranceDeposit);
+      
+      if (result.success) {
+        alert(`[확인 결과]\n${result.message}\n\n${result.details || ''}`);
+      } else {
+        alert(`확인 실패: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('보증보험 확인 실패:', error);
+      alert('보증보험 확인 중 오류가 발생했습니다.');
+    } finally {
+      setCheckInsuranceDeposit(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const renderSubItem = (parentId: string, subItem: SubChecklistItem) => {
@@ -467,7 +491,6 @@ export default function ChecklistPage() {
           backgroundColor: subItem.completed ? '#F8F8F8' : '#FFFFFF'
         }}
       >
-        {/* Sub Item Header */}
         <div
           style={{
             padding: '14px 18px',
@@ -541,7 +564,6 @@ export default function ChecklistPage() {
           />
         </div>
 
-        {/* Expanded Content */}
         {isExpanded && (
           <div style={{
             padding: '0 18px 16px',
@@ -572,7 +594,8 @@ export default function ChecklistPage() {
                   fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  <HelpCircle size={14} strokeWidth={3} />                </div>
+                  <HelpCircle size={14} strokeWidth={3} />
+                </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
                     fontSize: '12px',
@@ -618,7 +641,8 @@ export default function ChecklistPage() {
                   fontWeight: '700',
                   flexShrink: 0
                 }}>
-                  <Lightbulb size={14} strokeWidth={3} />                </div>
+                  <Lightbulb size={14} strokeWidth={3} />
+                </div>
                 <div style={{ flex: 1 }}>
                   <h6 style={{
                     fontSize: '12px',
@@ -690,6 +714,15 @@ export default function ChecklistPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg-primary)' }}>
       <Navigation />
+
+      <input 
+        type="file" 
+        multiple 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        onChange={handleInsuranceFileChange}
+        accept=".pdf,.jpg,.jpeg,.png"
+      />
 
       <div style={{ textAlign: 'center', padding: '40px 20px 60px', backgroundColor: 'var(--color-bg-secondary)' }}>
         <div style={{
@@ -815,7 +848,7 @@ export default function ChecklistPage() {
 
             <div style={{
               position: 'relative',
-              marginBottom: '32px', // 아이콘 공간 확보를 위해 여백 증가
+              marginBottom: '32px',
               marginTop: '12px',
               marginLeft: '12px'
             }}>
@@ -837,17 +870,16 @@ export default function ChecklistPage() {
                   transition: 'width 0.3s ease',
                   borderRadius: '16px'
                 }} />
-                {/* Baby Bird Icon (크기 확대 & 위치 조정) */}
                 {currentTabProgress < 100 && (
                   <img
                     src="/baby.png"
                     alt="아기새"
                     style={{
                       position: 'absolute',
-                      left: `calc(${currentTabProgress}% - 25px)`, // 중앙 정렬 보정
+                      left: `calc(${currentTabProgress}% - 25px)`,
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      width: '52px', // 크기 확대 (40px -> 52px)
+                      width: '52px',
                       height: '52px',
                       objectFit: 'contain',
                       zIndex: 2,
@@ -856,16 +888,15 @@ export default function ChecklistPage() {
                     }}
                   />
                 )}
-                {/* Nest Icon (크기 확대 & 위치 조정) */}
                 <img
                   src={currentTabProgress >= 100 ? "/rest.png" : "/nest.png"}
                   alt="둥지"
                   style={{
                     position: 'absolute',
-                    right: '-20px', // 바 밖으로 살짝 나가게
+                    right: '-20px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    width: '58px', // 크기 확대 (40px -> 58px)
+                    width: '58px',
                     height: '58px',
                     objectFit: 'contain',
                     zIndex: 1,
@@ -924,7 +955,7 @@ export default function ChecklistPage() {
                     borderRadius: '12px',
                     paddingLeft: '16px',
                     paddingRight: '16px',
-                    marginRight: '2px' // [수정] margin-right 적용 (미세한 간격)
+                    marginRight: '2px'
                   }}>
                     <div
                       style={{
@@ -991,9 +1022,9 @@ export default function ChecklistPage() {
                                 onClick={() => {
                                   if (button.url) {
                                     window.open(button.url, '_blank');
-                                  } else if (button.label.includes('보증보험')) {
+                                  } else if (button.label === '보증보험 가입 가능 여부 확인') {
                                     handleCheckInsurance();
-                                  } else if (button.label.includes('위험도 분석')) {
+                                  } else if (button.label === '깡통전세 위험도 분석') {
                                     handleAnalyzeRisk();
                                   } else if (button.label === '등기부등본 분석하러가기') {
                                     setIsRegistryModalOpen(true);
@@ -1001,6 +1032,8 @@ export default function ChecklistPage() {
                                     setIsContractModalOpen(true);
                                   } else if (button.label === '건축물대장 분석하러가기') {
                                     setIsBuildingModalOpen(true);
+                                  } else if (button.type === 'primary') {
+                                    console.log('문서 분석 요청:', button.label);
                                   } else if (button.type === 'modal') {
                                     alert('준비 중입니다.');
                                   }
@@ -1010,7 +1043,6 @@ export default function ChecklistPage() {
                                   minWidth: '140px',
                                   padding: '12px 20px',
                                   borderRadius: '8px',
-                                  // [수정] 버튼 스타일 로직 변경
                                   border: button.type === 'primary' ? 'none' : '1px solid rgb(45, 122, 142)',
                                   backgroundColor: button.type === 'primary' ? 'rgb(45, 122, 142)' : '#FFFFFF',
                                   color: button.type === 'primary' ? '#FFFFFF' : 'rgb(45, 122, 142)',
@@ -1130,7 +1162,7 @@ export default function ChecklistPage() {
                             fontWeight: '700',
                             flexShrink: 0
                           }}>
-                                              <HelpCircle size={14} strokeWidth={3} />
+                            <HelpCircle size={14} strokeWidth={3} />
                           </div>
                           <div style={{ flex: 1 }}>
                             <h5 style={{
@@ -1234,10 +1266,9 @@ export default function ChecklistPage() {
                                 minWidth: '140px',
                                 padding: '12px 20px',
                                 borderRadius: '8px',
-                                // [수정] 버튼 스타일 로직 변경
-                                border: button.type === 'primary' ? 'none' : '1px solid rgb(45, 122, 142)',
-                                backgroundColor: button.type === 'primary' ? 'rgb(45, 122, 142)' : '#FFFFFF',
-                                color: button.type === 'primary' ? '#FFFFFF' : 'rgb(45, 122, 142)',
+                                border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
+                                backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
+                                color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 cursor: 'pointer'
