@@ -197,7 +197,7 @@ export const checklistAPI = {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportAnalysisPDF',
         analysisResult,
-        fileKey, // PDF 생성을 위한 원본 파일 키 추가
+        ...(fileKey && { fileKey }), // fileKey가 있을 때만 포함
       });
 
       return response.data;
@@ -219,7 +219,7 @@ export const checklistAPI = {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'sendAnalysisEmail',
         analysisResult,
-        fileKey, // PDF 생성을 위한 원본 파일 키 추가
+        ...(fileKey && { fileKey }), // fileKey가 있을 때만 포함
       });
 
       return response.data;
