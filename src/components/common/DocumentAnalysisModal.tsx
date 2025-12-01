@@ -95,12 +95,19 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
 
     try {
       const result = await checklistAPI.analyzeDocuments([file], docType);
+      console.log('=== 분석 결과 ===');
+      console.log('Full result:', result);
+      console.log('result.fileKey:', result.fileKey);
+      console.log('result keys:', Object.keys(result));
+
       setAnalysisResult(result);
 
       // fileKey 저장 (PDF 생성에 필요)
       if (result.fileKey) {
         setFileKey(result.fileKey);
-        console.log('FileKey saved:', result.fileKey);
+        console.log('✅ FileKey saved:', result.fileKey);
+      } else {
+        console.warn('⚠️ fileKey가 응답에 없습니다. 전체 응답 구조:', result);
       }
 
       if (result.success && result.result) {
