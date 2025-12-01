@@ -115,7 +115,7 @@ export const checklistAPI = {
       formData.append('building', buildingFile);
       formData.append('deposit', deposit.toString());
 
-      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
+      const response = await apiClient.post(env.scanWebhookUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -153,7 +153,7 @@ export const checklistAPI = {
   },
   
   /**
-   * [수정됨] 깡통전세 위험도 분석
+   * 깡통전세 위험도 분석
    * n8n 요구 변수명: address, exclusiveArea, type, deposit
    */
   analyzeRisk: async (propertyInfo: {
