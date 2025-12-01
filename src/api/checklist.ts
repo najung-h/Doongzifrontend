@@ -1,6 +1,6 @@
 import { apiClient } from './index';
 import { env } from '../config/env';
-import type { ChecklistTab, ScanResponse } from '../types';
+import type { ChecklistTab, ScanResponse, InsuranceCheckResponse } from '../types';
 
 /**
  * 체크리스트 관련 API
@@ -103,17 +103,12 @@ export const checklistAPI = {
    * 보증보험 가입 가능 여부 확인
    * actionType: "checkInsurance"
    */
-  checkInsurance: async (registryFile: File, buildingFile: File, deposit: number): Promise<{
-    success: boolean;
-    eligible: boolean;
-    message: string;
-    details?: string;
-  }> => {
+  checkInsurance: async (registryFile: File, buildingFile: File, deposit: number): Promise<InsuranceCheckResponse> => {
     try {
       const formData = new FormData();
-      
+
       formData.append('actionType', 'checkInsurance');
-      
+
       // n8n '분기처리' 노드 기준: file0=등기부등본, file1=건축물대장
       formData.append('file0', registryFile);
       formData.append('file1', buildingFile);
@@ -132,7 +127,7 @@ export const checklistAPI = {
       console.error('Failed to check insurance eligibility:', error);
       return {
         success: false,
-        eligible: false,
+        status: 'FAIL',
         message: '보증보험 확인 서버와 연결할 수 없습니다.',
       };
     }

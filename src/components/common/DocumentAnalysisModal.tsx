@@ -17,6 +17,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
   const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
   const [reportHtml, setReportHtml] = useState<string | null>(null);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [fileKey, setFileKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -26,6 +27,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
     setPreviewUrl(null);
     setAnalysisResult(null);
     setReportHtml(null);
+    setFileKey(null);
     onClose();
   };
 
@@ -95,6 +97,12 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       const result = await checklistAPI.analyzeDocuments([file], docType);
       setAnalysisResult(result);
 
+      // fileKey 저장 (PDF 생성에 필요)
+      if (result.fileKey) {
+        setFileKey(result.fileKey);
+        console.log('FileKey saved:', result.fileKey);
+      }
+
       if (result.success && result.result) {
         setReportHtml(result.result);
       } else {
@@ -118,11 +126,17 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       return;
     }
 
+    if (!fileKey) {
+      alert('파일 정보를 찾을 수 없습니다. 문서를 다시 분석해주세요.');
+      return;
+    }
+
     setIsDownloadingPDF(true);
     try {
+      console.log('Exporting PDF with fileKey:', fileKey);
       const result = await checklistAPI.exportAnalysisPDF(
         analysisResult.analysis || analysisResult,
-        analysisResult.fileKey // PDF 생성을 위한 원본 파일 키 전달
+        fileKey // 별도로 저장한 fileKey 전달
       );
       if (result.success && result.downloadUrl) {
         window.open(result.downloadUrl, '_blank');
@@ -144,10 +158,16 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       return;
     }
 
+    if (!fileKey) {
+      alert('파일 정보를 찾을 수 없습니다. 문서를 다시 분석해주세요.');
+      return;
+    }
+
     try {
+      console.log('Sending email with fileKey:', fileKey);
       const result = await checklistAPI.sendAnalysisEmail(
         analysisResult.analysis || analysisResult,
-        analysisResult.fileKey // PDF 생성을 위한 원본 파일 키 전달
+        fileKey // 별도로 저장한 fileKey 전달
       );
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
