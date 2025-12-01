@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
-  timeout: 120000,  // 60초(OCR) + 30초(LLM) + 여유분 = 120초 (120000ms)로 연장
+  // n8n 워크플로우에 대기 시간(30초 등)이 포함되어 있으므로 
+  // 타임아웃을 넉넉하게 3분(180000ms) 이상으로 설정해야 합니다.
+  timeout: 180000,
   headers: {
     'Content-Type': 'application/json',
   },
