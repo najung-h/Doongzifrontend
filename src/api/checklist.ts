@@ -197,11 +197,12 @@ export const checklistAPI = {
    * [통합됨] 분석 결과 PDF 다운로드
    * n8n actionType: exportAnalysisPDF
    */
-  exportAnalysisPDF: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  exportAnalysisPDF: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportAnalysisPDF',
         analysisResult,
+        fileKey, // PDF 생성을 위한 원본 파일 키 추가
       });
 
       return response.data;
@@ -218,11 +219,12 @@ export const checklistAPI = {
    * [통합됨] 분석 결과 이메일 전송
    * n8n actionType: sendAnalysisEmail
    */
-  sendAnalysisEmail: async (analysisResult: any): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  sendAnalysisEmail: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'sendAnalysisEmail',
         analysisResult,
+        fileKey, // PDF 생성을 위한 원본 파일 키 추가
       });
 
       return response.data;

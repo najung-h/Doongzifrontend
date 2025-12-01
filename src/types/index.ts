@@ -106,6 +106,7 @@ export interface ScanResponse extends BaseResponse {
     url: string;
   }>;
   result?: string; // [추가] n8n에서 생성된 HTML 리포트 문자열
+  fileKey?: string; // [추가] PDF 생성을 위한 파일 키
 }
 
 export interface DeepAnalysisResponse extends BaseResponse {
