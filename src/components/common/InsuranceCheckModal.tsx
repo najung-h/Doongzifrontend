@@ -19,7 +19,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   // 검토 질문 모드 관련 state
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
-  const [reviewAnswers, setReviewAnswers] = useState<Map<string, boolean>>(new Map());
+  const [reviewAnswers, setReviewAnswers] = useState<Map<number, boolean>>(new Map());
 
   const registryInputRef = useRef<HTMLInputElement>(null);
   const buildingInputRef = useRef<HTMLInputElement>(null);
