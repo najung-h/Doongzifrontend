@@ -4,9 +4,7 @@ import Navigation from '../components/common/Navigation';
 import { User, Home, MessageSquare, Bookmark, Edit2, Trash2, ExternalLink, Plus, X, Upload, FileText, Search } from 'lucide-react';
 import type { User as UserType, Property, Conversation, URLResource } from '../types';
 import { useAuth } from '../context/AuthContext';
-import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
-import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
-import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
+import DocumentAnalysisModal from '../components/common/DocumentAnalysisModal';
 
 type TabType = 'profile' | 'property' | 'conversations' | 'links';
 
@@ -105,9 +103,8 @@ export default function MyPage() {
   const [editedProperty, setEditedProperty] = useState<Property | null>(null);
 
   // 분석 모달 상태
-  const [isRegistryAnalysisOpen, setIsRegistryAnalysisOpen] = useState(false);
-  const [isBuildingAnalysisOpen, setIsBuildingAnalysisOpen] = useState(false);
-  const [isContractAnalysisOpen, setIsContractAnalysisOpen] = useState(false);
+  const [isDocumentAnalysisOpen, setIsDocumentAnalysisOpen] = useState(false);
+  const [analysisDocType, setAnalysisDocType] = useState<'임대차계약서' | '등기부등본' | '건축물대장' | null>(null);
 
   // 조회 모달 상태
   const [viewModalType, setViewModalType] = useState<'registry' | 'building' | 'contract' | null>(null);
@@ -1184,7 +1181,10 @@ export default function MyPage() {
                   </button>
 
                   <button
-                    onClick={() => setIsRegistryAnalysisOpen(true)}
+                    onClick={() => {
+                      setAnalysisDocType('등기부등본');
+                      setIsDocumentAnalysisOpen(true);
+                    }}
                     style={{
                     padding: '10px 14px',
                     backgroundColor: 'transparent',
@@ -1302,7 +1302,10 @@ export default function MyPage() {
                   </button>
 
                   <button
-                    onClick={() => setIsBuildingAnalysisOpen(true)}
+                    onClick={() => {
+                      setAnalysisDocType('건축물대장');
+                      setIsDocumentAnalysisOpen(true);
+                    }}
                     style={{
                     padding: '10px 14px',
                     backgroundColor: 'transparent',
@@ -1420,7 +1423,10 @@ export default function MyPage() {
                   </button>
 
                   <button
-                    onClick={() => setIsContractAnalysisOpen(true)}
+                    onClick={() => {
+                      setAnalysisDocType('임대차계약서');
+                      setIsDocumentAnalysisOpen(true);
+                    }}
                     style={{
                     padding: '10px 14px',
                     backgroundColor: 'transparent',
@@ -1455,19 +1461,17 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* 분석 모달들 */}
-      <RegistryAnalysisModal
-        isOpen={isRegistryAnalysisOpen}
-        onClose={() => setIsRegistryAnalysisOpen(false)}
-      />
-      <BuildingAnalysisModal
-        isOpen={isBuildingAnalysisOpen}
-        onClose={() => setIsBuildingAnalysisOpen(false)}
-      />
-      <ContractAnalysisModal
-        isOpen={isContractAnalysisOpen}
-        onClose={() => setIsContractAnalysisOpen(false)}
-      />
+      {/* 분석 모달 */}
+      {analysisDocType && (
+        <DocumentAnalysisModal
+          isOpen={isDocumentAnalysisOpen}
+          onClose={() => {
+            setIsDocumentAnalysisOpen(false);
+            setAnalysisDocType(null);
+          }}
+          docType={analysisDocType}
+        />
+      )}
 
       {/* 조회 모달 */}
       {viewModalType && (

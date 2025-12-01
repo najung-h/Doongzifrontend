@@ -1,23 +1,21 @@
 import { useState, useRef } from 'react';
-import { X, Upload, FileText, Download, Mail, AlertTriangle, Shield } from 'lucide-react';
+import { X, Upload, FileText, Download, Mail, AlertTriangle, Shield, CheckCircle } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
 import type { ScanResponse } from '../../types';
 
-interface ContractAnalysisModalProps {
+interface DocumentAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
+  docType: '임대차계약서' | '등기부등본' | '건축물대장';
 }
 
-export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnalysisModalProps) {
+export default function DocumentAnalysisModal({ isOpen, onClose, docType }: DocumentAnalysisModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
-  
-  // [추가] HTML 리포트 저장을 위한 상태
   const [reportHtml, setReportHtml] = useState<string | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -26,7 +24,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     setFile(null);
     setPreviewUrl(null);
     setAnalysisResult(null);
-    setReportHtml(null); // 초기화
+    setReportHtml(null);
     onClose();
   };
 
@@ -45,7 +43,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     setFile(selectedFile);
     setAnalysisResult(null);
     setReportHtml(null);
-    
+
     if (selectedFile.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -70,7 +68,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       handleFileSelect(droppedFile);
@@ -91,18 +88,15 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     setIsAnalyzing(true);
-    setReportHtml(null); // 분석 시작 시 이전 리포트 초기화
+    setReportHtml(null);
 
     try {
-      // API 호출 (n8n analyzeDocuments 로직 연결)
-      const result = await checklistAPI.analyzeDocuments([file], '임대차계약서');
+      const result = await checklistAPI.analyzeDocuments([file], docType);
       setAnalysisResult(result);
 
-      // [추가] HTML 결과가 있으면 상태에 저장
       if (result.success && result.result) {
         setReportHtml(result.result);
       } else {
-        // HTML이 없는 경우 기존 방식대로(혹은 실패 메시지)
         if (!result.success) alert(result.message || '분석에 실패했습니다.');
       }
     } catch (error: any) {
@@ -117,7 +111,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
-  // PDF 다운로드 핸들러
   const handleDownloadPDF = async () => {
     if (!analysisResult) {
       alert('분석 결과가 없습니다.');
@@ -125,12 +118,10 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     try {
-      const result = await checklistAPI.exportAnalysisPDF(analysisResult.analysis);
-      if (result.success) {
-        if (result.pdfUrl) {
-          window.open(result.pdfUrl, '_blank');
-        }
-        alert('PDF 다운로드 요청이 처리되었습니다.');
+      const result = await checklistAPI.exportAnalysisPDF(analysisResult.analysis || analysisResult);
+      if (result.success && result.pdfUrl) {
+        window.open(result.pdfUrl, '_blank');
+        alert('PDF가 생성되었습니다!');
       } else {
         alert(result.message || 'PDF 생성에 실패했습니다.');
       }
@@ -140,7 +131,6 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
-  // 이메일 전송 핸들러
   const handleSendEmail = async () => {
     if (!analysisResult) {
       alert('분석 결과가 없습니다.');
@@ -148,7 +138,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
 
     try {
-      const result = await checklistAPI.sendAnalysisEmail(analysisResult.analysis);
+      const result = await checklistAPI.sendAnalysisEmail(analysisResult.analysis || analysisResult);
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {
@@ -186,6 +176,14 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
     }
   };
 
+  const getDocumentTitle = () => {
+    switch (docType) {
+      case '임대차계약서': return '계약서';
+      case '등기부등본': return '등기부등본';
+      case '건축물대장': return '건축물대장';
+    }
+  };
+
   return (
     <div
       style={{
@@ -209,7 +207,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
             backgroundColor: '#FFFFFF',
             borderRadius: '16px',
             width: '100%',
-            maxWidth: '900px', // 리포트는 더 넓게
+            maxWidth: '900px',
             height: '90vh',
             display: 'flex',
             flexDirection: 'column',
@@ -230,11 +228,11 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
             flexShrink: 0
           }}>
             <h2 style={{ fontSize: '18px', fontWeight: '700', margin: 0, color: '#2C2C2C' }}>
-              📄 AI 정밀 분석 리포트
+              📄 {getDocumentTitle()} 정밀 분석 리포트
             </h2>
             <button
               onClick={() => {
-                setReportHtml(null); // 리포트 닫고 업로드 화면으로 돌아가기 (선택사항) 또는 handleClose
+                setReportHtml(null);
                 handleClose();
               }}
               style={{ border: 'none', background: 'none', cursor: 'pointer' }}
@@ -317,7 +315,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
           </div>
         </div>
       ) : (
-        /* 파일 업로드 뷰 (기존 코드) */
+        /* 파일 업로드 뷰 */
         <div
           style={{
             backgroundColor: '#FFFFFF',
@@ -348,7 +346,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                 margin: 0,
               }}
             >
-              계약서 정밀 분석
+              {getDocumentTitle()} 정밀 분석
             </h2>
             <button
               onClick={handleClose}
@@ -585,7 +583,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
                         margin: 0,
                       }}
                     >
-                      계약서 분석 완료
+                      {getDocumentTitle()} 분석 완료
                     </p>
                   </div>
                 </div>
@@ -690,7 +688,7 @@ export default function ContractAnalysisModal({ isOpen, onClose }: ContractAnaly
               </div>
             )}
           </div>
-          
+
           <style>{`
             @keyframes spin {
               to { transform: rotate(360deg); }

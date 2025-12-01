@@ -29,9 +29,7 @@ import {
 import { checklistAPI } from '../api/checklist';
 import Navigation from '../components/common/Navigation';
 import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
-import RegistryAnalysisModal from '../components/common/RegistryAnalysisModal';
-import ContractAnalysisModal from '../components/common/ContractAnalysisModal';
-import BuildingAnalysisModal from '../components/common/BuildingAnalysisModal';
+import DocumentAnalysisModal from '../components/common/DocumentAnalysisModal';
 import InsuranceCheckModal from '../components/common/InsuranceCheckModal';
 
 type SubChecklistItem = {
@@ -343,9 +341,8 @@ export default function ChecklistPage() {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
-  const [isRegistryModalOpen, setIsRegistryModalOpen] = useState(false);
-  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
-  const [isBuildingModalOpen, setIsBuildingModalOpen] = useState(false);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [documentModalType, setDocumentModalType] = useState<'임대차계약서' | '등기부등본' | '건축물대장' | null>(null);
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1027,11 +1024,14 @@ export default function ChecklistPage() {
                                   } else if (button.label === '깡통전세 위험도 분석') {
                                     handleAnalyzeRisk();
                                   } else if (button.label === '등기부등본 분석하러가기') {
-                                    setIsRegistryModalOpen(true);
+                                    setDocumentModalType('등기부등본');
+                                    setIsDocumentModalOpen(true);
                                   } else if (button.label === '계약서 분석하러가기') {
-                                    setIsContractModalOpen(true);
+                                    setDocumentModalType('임대차계약서');
+                                    setIsDocumentModalOpen(true);
                                   } else if (button.label === '건축물대장 분석하러가기') {
-                                    setIsBuildingModalOpen(true);
+                                    setDocumentModalType('건축물대장');
+                                    setIsDocumentModalOpen(true);
                                   } else if (button.type === 'primary') {
                                     console.log('문서 분석 요청:', button.label);
                                   } else if (button.type === 'modal') {
@@ -1250,11 +1250,14 @@ export default function ChecklistPage() {
                                 } else if (button.label === '깡통전세 위험도 분석') {
                                   handleAnalyzeRisk();
                                 } else if (button.label === '등기부등본 분석하러가기') {
-                                  setIsRegistryModalOpen(true);
+                                  setDocumentModalType('등기부등본');
+                                  setIsDocumentModalOpen(true);
                                 } else if (button.label === '계약서 분석하러가기') {
-                                  setIsContractModalOpen(true);
+                                  setDocumentModalType('임대차계약서');
+                                  setIsDocumentModalOpen(true);
                                 } else if (button.label === '건축물대장 분석하러가기') {
-                                  setIsBuildingModalOpen(true);
+                                  setDocumentModalType('건축물대장');
+                                  setIsDocumentModalOpen(true);
                                 } else if (button.type === 'primary') {
                                   console.log('문서 분석 요청:', button.label);
                                 } else if (button.type === 'modal') {
@@ -1315,24 +1318,20 @@ export default function ChecklistPage() {
         onClose={() => setIsRiskModalOpen(false)}
       />
 
-      <RegistryAnalysisModal
-        isOpen={isRegistryModalOpen}
-        onClose={() => setIsRegistryModalOpen(false)}
-      />
+      {documentModalType && (
+        <DocumentAnalysisModal
+          isOpen={isDocumentModalOpen}
+          onClose={() => {
+            setIsDocumentModalOpen(false);
+            setDocumentModalType(null);
+          }}
+          docType={documentModalType}
+        />
+      )}
 
-      <ContractAnalysisModal
-        isOpen={isContractModalOpen}
-        onClose={() => setIsContractModalOpen(false)}
-      />
-
-      <BuildingAnalysisModal
-        isOpen={isBuildingModalOpen}
-        onClose={() => setIsBuildingModalOpen(false)}
-      />
-      
-      <InsuranceCheckModal 
-        isOpen={isInsuranceModalOpen} 
-        onClose={() => setIsInsuranceModalOpen(false)} 
+      <InsuranceCheckModal
+        isOpen={isInsuranceModalOpen}
+        onClose={() => setIsInsuranceModalOpen(false)}
       />
     </div>
   );
