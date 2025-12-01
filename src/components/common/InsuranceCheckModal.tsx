@@ -110,7 +110,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   }, [checkItems, userDecisions]);
 
   const failCount = finalResults.filter(i => i.verdict === 'FAIL').length;
-  const reviewCount = finalResults.filter(i => i.verdict === 'REVIEW_REQUIRED').length; // 요약 화면에선 없어야 정상
+  // reviewCount 변수 삭제됨 (빌드 에러 해결)
 
   // --- 서브 컴포넌트: 파일 업로드 박스 ---
   const FileUploadBox = ({ title, file, onSelect, inputRef }: any) => (
