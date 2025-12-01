@@ -16,6 +16,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
   const [reportHtml, setReportHtml] = useState<string | null>(null);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
@@ -117,6 +118,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       return;
     }
 
+    setIsDownloadingPDF(true);
     try {
       const result = await checklistAPI.exportAnalysisPDF(
         analysisResult.analysis || analysisResult,
@@ -131,6 +133,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
     } catch (error) {
       console.error('PDF 다운로드 실패:', error);
       alert('PDF 다운로드 중 오류가 발생했습니다.');
+    } finally {
+      setIsDownloadingPDF(false);
     }
   };
 
@@ -272,6 +276,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
           }}>
             <button
               onClick={handleDownloadPDF}
+              disabled={isDownloadingPDF}
               style={{
                 flex: 1,
                 padding: '12px',
@@ -281,18 +286,35 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 color: '#8FBF4D',
                 fontSize: '15px',
                 fontWeight: '600',
-                cursor: 'pointer',
+                cursor: isDownloadingPDF ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                opacity: isDownloadingPDF ? 0.7 : 1
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F9F0'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+              onMouseEnter={(e) => !isDownloadingPDF && (e.currentTarget.style.backgroundColor = '#F5F9F0')}
+              onMouseLeave={(e) => !isDownloadingPDF && (e.currentTarget.style.backgroundColor = '#FFFFFF')}
             >
-              <Download size={18} />
-              PDF로 저장
+              {isDownloadingPDF ? (
+                <>
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    border: '2px solid #8FBF4D',
+                    borderTopColor: 'transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }} />
+                  PDF 생성 중...
+                </>
+              ) : (
+                <>
+                  <Download size={18} />
+                  PDF로 저장
+                </>
+              )}
             </button>
             <button
               onClick={handleSendEmail}

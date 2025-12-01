@@ -344,6 +344,7 @@ export default function ChecklistPage() {
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [documentModalType, setDocumentModalType] = useState<'임대차계약서' | '등기부등본' | '건축물대장' | null>(null);
   const [isInsuranceModalOpen, setIsInsuranceModalOpen] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [checkInsuranceDeposit, setCheckInsuranceDeposit] = useState<number | null>(null);
@@ -416,15 +417,20 @@ export default function ChecklistPage() {
   const isAllCompleted = currentTabCompleted === currentTabItems && currentTabItems > 0;
 
   const handleExportPDF = async () => {
+    setIsExportingPDF(true);
     try {
       const result = await checklistAPI.exportPDF(checklist);
       if (result.success && result.downloadUrl) {
         window.open(result.downloadUrl, '_blank');
         alert('PDF가 생성되었습니다!');
+      } else {
+        alert('PDF 생성에 실패했습니다.');
       }
     } catch (error) {
       console.error('PDF 생성 실패:', error);
       alert('PDF 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsExportingPDF(false);
     }
   };
 
@@ -787,12 +793,30 @@ export default function ChecklistPage() {
                     color: '#8FBF4D',
                     fontSize: '13px',
                     fontWeight: '600',
-                    cursor: 'pointer'
+                    cursor: isExportingPDF ? 'not-allowed' : 'pointer',
+                    opacity: isExportingPDF ? 0.7 : 1
                   }}
                   onClick={handleExportPDF}
+                  disabled={isExportingPDF}
                 >
-                  <Download size={14} />
-                  PDF
+                  {isExportingPDF ? (
+                    <>
+                      <div style={{
+                        width: '14px',
+                        height: '14px',
+                        border: '2px solid #8FBF4D',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Download size={14} />
+                      PDF
+                    </>
+                  )}
                 </button>
                 <button
                   style={{
@@ -1333,6 +1357,12 @@ export default function ChecklistPage() {
         isOpen={isInsuranceModalOpen}
         onClose={() => setIsInsuranceModalOpen(false)}
       />
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
