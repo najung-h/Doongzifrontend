@@ -159,19 +159,26 @@ export interface InsuranceCheckRequest {
   monthlyRent?: number;
 }
 
-// 보증보험 체크 결과 타입
+// ==========================================
+// 보험 가입 확인 관련 타입 (Checklist Service)
+// ==========================================
+
 export type InsuranceVerdict = 'PASS' | 'FAIL' | 'REVIEW_REQUIRED';
 
 export interface InsuranceCheckItem {
   id: number;
   question: string;
-  verdict: InsuranceVerdict; 
+  verdict: InsuranceVerdict;
   reason_why: string;
   user_id: string;
 }
 
-// API 응답 타입 (배열 형태)
-export type InsuranceCheckResponse = InsuranceCheckItem[];
+// 배열 자체가 아니라, results 필드에 배열을 담도록 변경
+// BaseResponse를 상속받아 success, message, details 필드를 사용할 수 있게 함
+export interface InsuranceCheckResponse extends BaseResponse {
+  results?: InsuranceCheckItem[];
+  details?: string;
+}
 
 export interface ExportPDFResponse extends BaseResponse {
   pdfUrl?: string;

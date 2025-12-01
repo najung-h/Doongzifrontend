@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, Shield, CheckCircle, AlertTriangle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
-import type { InsuranceCheckItem, InsuranceVerdict } from '../../types';
+import type { InsuranceCheckItem } from '../../types'; // InsuranceVerdict 제거 (미사용)
 
 interface InsuranceCheckModalProps {
   isOpen: boolean;
@@ -29,19 +29,17 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
 
     setIsAnalyzing(true);
     try {
-      // API 호출
-      // checkInsurance의 시그니처가 (registryFile, buildingFile, deposit) 형태라고 가정합니다.
-      // 만약 checklistAPI.checkInsurance가 객체 하나를 받는 형태라면 그에 맞게 수정해주세요.
       const response = await checklistAPI.checkInsurance(
-        registryFile, // 실제 구현된 API에 맞게 파라미터 전달
+        registryFile,
         buildingFile,
         Number(deposit)
       );
 
-      // response가 배열이라고 가정 (InsuranceCheckItem[])
-      // 만약 { result: [...] } 형태라면 response.result로 접근
-      const items = Array.isArray(response) ? response : (response as any).result || [];
-      setCheckItems(items);
+      if (response.success && response.results) {
+        setCheckItems(response.results);
+      } else {
+        alert(response.message || '분석에 실패했습니다.');
+      }
 
     } catch (error) {
       console.error(error);
@@ -64,9 +62,8 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   const reviewItems = checkItems?.filter(item => item.verdict === 'REVIEW_REQUIRED') || [];
   const passItems = checkItems?.filter(item => item.verdict === 'PASS') || [];
 
-  // 전체 상태 판단
+  // 전체 상태 판단 (isAllPass 제거됨 - 미사용 에러 해결)
   const hasFail = failItems.length > 0;
-  const isAllPass = checkItems && !hasFail && reviewItems.length === 0;
 
   const FileUploadBox = ({ title, file, onSelect, inputRef }: any) => (
     <div 
@@ -136,7 +133,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
         {/* Body */}
         <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
           {!checkItems ? (
-            // 입력 화면 (기존과 동일)
+            // 입력 화면
             <>
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2C2C2C' }}>
@@ -209,7 +206,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 </p>
               </div>
 
-              {/* 1. 가입 불가 항목 (FAIL) - 질문 + 불가 사유 표시 */}
+              {/* 1. 가입 불가 항목 (FAIL) */}
               {failItems.length > 0 && (
                 <div>
                   <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#D32F2F', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -232,7 +229,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 </div>
               )}
 
-              {/* 2. 검토 필요 항목 (REVIEW_REQUIRED) - 질문만 표시 */}
+              {/* 2. 검토 필요 항목 (REVIEW_REQUIRED) */}
               {reviewItems.length > 0 && (
                 <div>
                   <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#F57C00', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -258,7 +255,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 </div>
               )}
 
-              {/* 3. 통과 항목 (PASS) - 접기/펼치기 */}
+              {/* 3. 통과 항목 (PASS) */}
               {passItems.length > 0 && (
                 <div>
                   <button 

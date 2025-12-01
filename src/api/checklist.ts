@@ -103,32 +103,51 @@ export const checklistAPI = {
    * 보증보험 가입 가능 여부 확인
    * actionType: "checkInsurance"
    */
-  checkInsurance: async (registryFile: File, buildingFile: File, deposit: number): Promise<InsuranceCheckResponse> => {
+  checkInsurance: async (
+    registryFile: File,
+    buildingFile: File,
+    deposit: number
+  ): Promise<InsuranceCheckResponse> => { // 반환 타입이 변경된 인터페이스를 따름
     try {
       const formData = new FormData();
-
       formData.append('actionType', 'checkInsurance');
+      formData.append('registry', registryFile);
+      formData.append('building', buildingFile);
+      formData.append('deposit', deposit.toString());
 
-      // n8n '분기처리' 노드 기준: file0=등기부등본, file1=건축물대장
-      formData.append('file0', registryFile);
-      formData.append('file1', buildingFile);
-      // 보증금 및 고정된 사용자 ID 추가
-      formData.append('target_deposit', deposit.toString());
-      formData.append('userId', '61a8fc1d-67b0-45db-b913-602654b45c3c');
-
-      const response = await apiClient.post(env.scanWebhookUrl, formData, {
+      const response = await apiClient.post(env.checklistWebhookUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
+      // API 응답이 배열인 경우 results에 담아서 반환
+      if (Array.isArray(response.data)) {
+        return {
+          success: true,
+          results: response.data,
+          message: '분석이 완료되었습니다.'
+        };
+      }
+      
+      // API 응답이 객체이고 result 필드에 배열이 있는 경우
+      if (response.data.result && Array.isArray(response.data.result)) {
+         return {
+            success: true,
+            results: response.data.result,
+            message: response.data.message || '분석이 완료되었습니다.'
+         };
+      }
+
+      // 그 외의 경우 (기존 BaseResponse 형태 등)
       return response.data;
+
     } catch (error) {
-      console.error('Failed to check insurance eligibility:', error);
+      console.error('Failed to check insurance:', error);
       return {
         success: false,
-        status: 'FAIL',
-        message: '보증보험 확인 서버와 연결할 수 없습니다.',
+        message: '보증보험 가입 가능 여부 확인 중 오류가 발생했습니다.',
+        results: [], // 빈 배열 제공
       };
     }
   },
