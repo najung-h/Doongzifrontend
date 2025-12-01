@@ -98,7 +98,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       console.log('=== 분석 결과 ===');
       console.log('Full result:', result);
       console.log('result.fileKey:', result.fileKey);
-      console.log('result keys:', Object.keys(result));
+      console.log('result.result type:', typeof result.result);
+      console.log('result.result:', result.result);
 
       setAnalysisResult(result);
 
@@ -107,13 +108,40 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
         setFileKey(result.fileKey);
         console.log('✅ FileKey saved:', result.fileKey);
       } else {
-        console.warn('⚠️ fileKey가 응답에 없습니다. 전체 응답 구조:', result);
+        console.warn('⚠️ fileKey가 응답에 없습니다.');
       }
 
-      if (result.success && result.result) {
-        setReportHtml(result.result);
+      // result.result 처리: 문자열 또는 객체 모두 처리
+      if (result.success) {
+        let htmlContent: string | null = null;
+
+        if (typeof result.result === 'string') {
+          // result.result가 HTML 문자열인 경우
+          htmlContent = result.result;
+          console.log('✅ HTML 문자열 감지');
+        } else if (result.result && typeof result.result === 'object') {
+          // result.result가 객체인 경우, HTML이 있을 수 있는 필드들 확인
+          const resultObj = result.result as any;
+          htmlContent = resultObj.html
+            || resultObj.output
+            || resultObj.content
+            || null;
+
+          if (htmlContent) {
+            console.log('✅ 객체에서 HTML 추출 성공');
+          } else {
+            console.warn('⚠️ 객체에서 HTML을 찾을 수 없습니다. 사용 가능한 키:', Object.keys(resultObj));
+          }
+        }
+
+        if (htmlContent) {
+          setReportHtml(htmlContent);
+        } else {
+          console.error('❌ HTML 콘텐츠를 찾을 수 없습니다.');
+          alert('분석 결과를 표시할 수 없습니다. 응답 구조를 확인해주세요.');
+        }
       } else {
-        if (!result.success) alert(result.message || '분석에 실패했습니다.');
+        alert(result.message || '분석에 실패했습니다.');
       }
     } catch (error: any) {
       console.error('Analysis error:', error);
