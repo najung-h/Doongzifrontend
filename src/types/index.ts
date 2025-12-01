@@ -162,24 +162,16 @@ export interface InsuranceCheckRequest {
 // 보증보험 체크 결과 타입
 export type InsuranceVerdict = 'PASS' | 'FAIL' | 'REVIEW_REQUIRED';
 
-export interface InsuranceFailedItem {
-  id: string;
+export interface InsuranceCheckItem {
+  id: number;
   question: string;
-  reason: string;
-}
-
-export interface InsuranceReviewItem {
-  id: string;
-  question: string;
+  verdict: InsuranceVerdict; 
   reason_why: string;
+  user_id: string;
 }
 
-export interface InsuranceCheckResponse extends BaseResponse {
-  status: InsuranceVerdict;
-  failedItems?: InsuranceFailedItem[];
-  reviewItems?: InsuranceReviewItem[];
-  details?: string;
-}
+// API 응답 타입 (배열 형태)
+export type InsuranceCheckResponse = InsuranceCheckItem[];
 
 export interface ExportPDFResponse extends BaseResponse {
   pdfUrl?: string;
