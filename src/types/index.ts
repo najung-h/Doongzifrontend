@@ -98,14 +98,14 @@ export interface AnalysisResult {
   autoCheckItems: AutoCheckItem[];
 }
 
-// 기존 ScanResponse 인터페이스를 수정하거나 확장합니다.
+// 기존 ScanResponse에 result 필드 추가
 export interface ScanResponse extends BaseResponse {
   analysis: AnalysisResult;
   uploadedFiles?: Array<{
     filename: string;
     url: string;
   }>;
-  result?: string; // n8n에서 보내주는 HTML 문자열을 받을 필드 추가
+  result?: string; // [추가] n8n에서 생성된 HTML 리포트 문자열
 }
 
 export interface DeepAnalysisResponse extends BaseResponse {
