@@ -122,8 +122,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
         analysisResult.analysis || analysisResult,
         analysisResult.fileKey // PDF 생성을 위한 원본 파일 키 전달
       );
-      if (result.success && result.pdfUrl) {
-        window.open(result.pdfUrl, '_blank');
+      if (result.success && result.downloadUrl) {
+        window.open(result.downloadUrl, '_blank');
         alert('PDF가 생성되었습니다!');
       } else {
         alert(result.message || 'PDF 생성에 실패했습니다.');

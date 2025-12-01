@@ -59,7 +59,7 @@ export const checklistAPI = {
    * PDF 다운로드
    * actionType: "exportPDF"
    */
-  exportPDF: async (checklistData: ChecklistTab[]): Promise<{ success: boolean; pdfUrl?: string }> => {
+  exportPDF: async (checklistData: ChecklistTab[]): Promise<{ success: boolean; downloadUrl?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportPDF',
@@ -197,7 +197,7 @@ export const checklistAPI = {
    * [통합됨] 분석 결과 PDF 다운로드
    * n8n actionType: exportAnalysisPDF
    */
-  exportAnalysisPDF: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  exportAnalysisPDF: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; downloadUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'exportAnalysisPDF',
@@ -219,7 +219,7 @@ export const checklistAPI = {
    * [통합됨] 분석 결과 이메일 전송
    * n8n actionType: sendAnalysisEmail
    */
-  sendAnalysisEmail: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; pdfUrl?: string; message?: string }> => {
+  sendAnalysisEmail: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; downloadUrl?: string; message?: string }> => {
     try {
       const response = await apiClient.post(env.checklistWebhookUrl, {
         actionType: 'sendAnalysisEmail',

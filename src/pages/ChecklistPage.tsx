@@ -418,8 +418,8 @@ export default function ChecklistPage() {
   const handleExportPDF = async () => {
     try {
       const result = await checklistAPI.exportPDF(checklist);
-      if (result.success && result.pdfUrl) {
-        window.open(result.pdfUrl, '_blank');
+      if (result.success && result.downloadUrl) {
+        window.open(result.downloadUrl, '_blank');
         alert('PDF가 생성되었습니다!');
       }
     } catch (error) {
