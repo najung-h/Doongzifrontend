@@ -92,7 +92,7 @@ export default function RegistryAnalysisModal({ isOpen, onClose }: RegistryAnaly
 
     try {
       // 등기부등본은 scanAPI를 사용 (n8n analyzeDocuments)
-      const result = await scanAPI.analyzeDocuments([file], '등기부등본');
+      const result = await checklistAPI.analyzeDocuments([file], '등기부등본');
       setAnalysisResult(result);
 
       // HTML 결과가 있으면 상태에 저장
