@@ -16,7 +16,6 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<ScanResponse | null>(null);
   const [reportHtml, setReportHtml] = useState<string | null>(null);
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const [fileKey, setFileKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +45,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
     setFile(selectedFile);
     setAnalysisResult(null);
     setReportHtml(null);
+    setFileKey(null);
 
     if (selectedFile.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -92,53 +92,19 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
 
     setIsAnalyzing(true);
     setReportHtml(null);
+    setFileKey(null);
 
     try {
       const result = await checklistAPI.analyzeDocuments([file], docType);
-      console.log('=== 분석 결과 ===');
-      console.log('Full result:', result);
-      console.log('result.fileKey:', result.fileKey);
-      console.log('result.result type:', typeof result.result);
-      console.log('result.result:', result.result);
-
       setAnalysisResult(result);
 
-      // fileKey 저장 (PDF 생성에 필요)
-      if (result.fileKey) {
-        setFileKey(result.fileKey);
-        console.log('✅ FileKey saved:', result.fileKey);
-      } else {
-        console.warn('⚠️ fileKey가 응답에 없습니다.');
-      }
-
-      // result.result 처리: 문자열 또는 객체 모두 처리
       if (result.success) {
-        let htmlContent: string | null = null;
-
-        if (typeof result.result === 'string') {
-          // result.result가 HTML 문자열인 경우
-          htmlContent = result.result;
-          console.log('✅ HTML 문자열 감지');
-        } else if (result.result && typeof result.result === 'object') {
-          // result.result가 객체인 경우, HTML이 있을 수 있는 필드들 확인
-          const resultObj = result.result as any;
-          htmlContent = resultObj.html
-            || resultObj.output
-            || resultObj.content
-            || null;
-
-          if (htmlContent) {
-            console.log('✅ 객체에서 HTML 추출 성공');
-          } else {
-            console.warn('⚠️ 객체에서 HTML을 찾을 수 없습니다. 사용 가능한 키:', Object.keys(resultObj));
-          }
+        // [수정] 응답에서 HTML과 fileKey를 추출하여 저장
+        if (result.result) {
+          setReportHtml(result.result);
         }
-
-        if (htmlContent) {
-          setReportHtml(htmlContent);
-        } else {
-          console.error('❌ HTML 콘텐츠를 찾을 수 없습니다.');
-          alert('분석 결과를 표시할 수 없습니다. 응답 구조를 확인해주세요.');
+        if (result.fileKey) {
+          setFileKey(result.fileKey);
         }
       } else {
         alert(result.message || '분석에 실패했습니다.');
@@ -161,41 +127,22 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       return;
     }
 
-    if (!fileKey) {
-      alert('파일 정보를 찾을 수 없습니다. 문서를 다시 분석해주세요.');
-      return;
-    }
-
-    setIsDownloadingPDF(true);
     try {
-      console.log('=== PDF Export Debug ===');
-      console.log('fileKey:', fileKey);
-      console.log('analysisResult:', analysisResult);
-      console.log('analysisResult.analysis:', analysisResult.analysis);
-
-      // analysis 데이터만 전달 (중복 구조 제거)
-      const analysisData = analysisResult.analysis || analysisResult;
-      console.log('Sending analysisData:', analysisData);
-
+      // [수정] 저장해둔 fileKey를 함께 전달
       const result = await checklistAPI.exportAnalysisPDF(
-        analysisData,
-        fileKey
+        analysisResult.analysis || analysisResult,
+        fileKey || undefined
       );
-
-      console.log('PDF Export Response:', result);
 
       if (result.success && result.downloadUrl) {
         window.open(result.downloadUrl, '_blank');
         alert('PDF가 생성되었습니다!');
       } else {
-        console.error('PDF 생성 실패:', result);
         alert(result.message || 'PDF 생성에 실패했습니다.');
       }
     } catch (error) {
       console.error('PDF 다운로드 실패:', error);
       alert('PDF 다운로드 중 오류가 발생했습니다.');
-    } finally {
-      setIsDownloadingPDF(false);
     }
   };
 
@@ -205,17 +152,12 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       return;
     }
 
-    if (!fileKey) {
-      alert('파일 정보를 찾을 수 없습니다. 문서를 다시 분석해주세요.');
-      return;
-    }
-
     try {
-      console.log('Sending email with fileKey:', fileKey);
       const result = await checklistAPI.sendAnalysisEmail(
         analysisResult.analysis || analysisResult,
-        fileKey // 별도로 저장한 fileKey 전달
+        fileKey || undefined
       );
+      
       if (result.success) {
         alert(result.message || '이메일이 전송되었습니다!');
       } else {
@@ -343,7 +285,6 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
           }}>
             <button
               onClick={handleDownloadPDF}
-              disabled={isDownloadingPDF}
               style={{
                 flex: 1,
                 padding: '12px',
@@ -353,35 +294,18 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 color: '#8FBF4D',
                 fontSize: '15px',
                 fontWeight: '600',
-                cursor: isDownloadingPDF ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                transition: 'all 0.2s',
-                opacity: isDownloadingPDF ? 0.7 : 1
+                transition: 'all 0.2s'
               }}
-              onMouseEnter={(e) => !isDownloadingPDF && (e.currentTarget.style.backgroundColor = '#F5F9F0')}
-              onMouseLeave={(e) => !isDownloadingPDF && (e.currentTarget.style.backgroundColor = '#FFFFFF')}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F9F0'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
             >
-              {isDownloadingPDF ? (
-                <>
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    border: '2px solid #8FBF4D',
-                    borderTopColor: 'transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
-                  }} />
-                  PDF 생성 중...
-                </>
-              ) : (
-                <>
-                  <Download size={18} />
-                  PDF로 저장
-                </>
-              )}
+              <Download size={18} />
+              PDF로 저장
             </button>
             <button
               onClick={handleSendEmail}
