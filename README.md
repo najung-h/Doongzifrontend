@@ -1,5 +1,5 @@
-# 둥지 (Doongzi) - 임대차 계약 안전 도우미
-
+![image.png](./public/둥지로고.png)
+---
 ### 부동산 임대차 계약 시 안전한 거래를 돕는 통합 웹 서비스
 ![image.png](./public/doongzi_logo.png)
 
