@@ -194,18 +194,26 @@ export const checklistAPI = {
    */
   exportAnalysisPDF: async (analysisResult: any, fileKey?: string): Promise<{ success: boolean; downloadUrl?: string; message?: string }> => {
     try {
-      const response = await apiClient.post(env.checklistWebhookUrl, {
+      const payload = {
         actionType: 'exportAnalysisPDF',
         analysisResult,
-        ...(fileKey && { fileKey }), // fileKey가 있을 때만 포함
-      });
+        ...(fileKey && { fileKey }),
+      };
 
+      console.log('=== exportAnalysisPDF API Call ===');
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+      console.log('fileKey included:', !!fileKey);
+
+      const response = await apiClient.post(env.checklistWebhookUrl, payload);
+
+      console.log('API Response:', response.data);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to export document analysis PDF:', error);
+      console.error('Error details:', error.response?.data);
       return {
         success: false,
-        message: '문서 분석 결과 PDF 생성에 실패했습니다.',
+        message: error.response?.data?.message || '문서 분석 결과 PDF 생성에 실패했습니다.',
       };
     }
   },

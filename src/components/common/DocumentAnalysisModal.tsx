@@ -133,15 +133,27 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
 
     setIsDownloadingPDF(true);
     try {
-      console.log('Exporting PDF with fileKey:', fileKey);
+      console.log('=== PDF Export Debug ===');
+      console.log('fileKey:', fileKey);
+      console.log('analysisResult:', analysisResult);
+      console.log('analysisResult.analysis:', analysisResult.analysis);
+
+      // analysis 데이터만 전달 (중복 구조 제거)
+      const analysisData = analysisResult.analysis || analysisResult;
+      console.log('Sending analysisData:', analysisData);
+
       const result = await checklistAPI.exportAnalysisPDF(
-        analysisResult.analysis || analysisResult,
-        fileKey // 별도로 저장한 fileKey 전달
+        analysisData,
+        fileKey
       );
+
+      console.log('PDF Export Response:', result);
+
       if (result.success && result.downloadUrl) {
         window.open(result.downloadUrl, '_blank');
         alert('PDF가 생성되었습니다!');
       } else {
+        console.error('PDF 생성 실패:', result);
         alert(result.message || 'PDF 생성에 실패했습니다.');
       }
     } catch (error) {
