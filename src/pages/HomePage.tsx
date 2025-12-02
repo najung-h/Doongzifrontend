@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Upload, ChevronRight, PieChart, CheckCircle2, MessageCircle } from 'lucide-react';
+import { Upload, ChevronRight, MessageCircle } from 'lucide-react';
 import Navigation from '../components/common/Navigation';
 import NestScanModal from '../components/common/NestScanModal';
 
