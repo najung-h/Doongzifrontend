@@ -30,6 +30,21 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
     mortgageMessage: string;
   } | null>(null);
 
+  // [수정] 컬러 팔레트 정의
+  const COLORS = {
+    bgCard: '#FFFFFF',      // 카드 배경
+    bgSub: '#F9F7F5',       // 연한 배경
+    primary: '#A68263',     // 브랜드 메인 (갈색)
+    primaryDark: '#8C6F5D', // 버튼 호버
+    textMain: '#402211',    // 메인 텍스트
+    textSub: '#857162',     // 보조 텍스트
+    textLight: '#999999',
+    border: '#E6D8CC',      // 테두리
+    riskHigh: '#F44336',
+    riskMedium: '#FFC107',
+    riskLow: '#4CAF50'
+  };
+
   if (!isOpen) return null;
 
   const handleAnalyze = async () => {
@@ -71,10 +86,10 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
 
   const getRiskColor = (level: 'safe' | 'warning' | 'danger') => {
     switch (level) {
-      case 'safe': return '#4CAF50';
-      case 'warning': return '#FFC107';
-      case 'danger': return '#F44336';
-      default: return '#999999';
+      case 'safe': return COLORS.riskLow;
+      case 'warning': return COLORS.riskMedium;
+      case 'danger': return COLORS.riskHigh;
+      default: return COLORS.textLight;
     }
   };
 
@@ -99,9 +114,9 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
   const getGaugeData = () => {
     // 3개 구간: 안전(0-70), 주의(70-80), 위험(80-100)
     return [
-      { name: '안전', value: 70, color: '#4CAF50' },
-      { name: '주의', value: 10, color: '#FFC107' },
-      { name: '위험', value: 20, color: '#F44336' },
+      { name: '안전', value: 70, color: COLORS.riskLow },
+      { name: '주의', value: 10, color: COLORS.riskMedium },
+      { name: '위험', value: 20, color: COLORS.riskHigh },
     ];
   };
 
@@ -134,7 +149,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
     >
       <div
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: COLORS.bgCard,
           borderRadius: '16px',
           width: '100%',
           maxWidth: '600px',
@@ -148,7 +163,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
         <div
           style={{
             padding: '24px',
-            borderBottom: '1px solid #E8E8E8',
+            borderBottom: `1px solid ${COLORS.border}`, // [수정]
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -158,7 +173,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
             style={{
               fontSize: '20px',
               fontWeight: '700',
-              color: '#2C2C2C',
+              color: COLORS.textMain, // [수정]
               margin: 0,
             }}
           >
@@ -171,12 +186,12 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
               height: '32px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: '#F0F0F0',
+              backgroundColor: COLORS.bgSub, // [수정]
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: '#666666',
+              color: COLORS.textSub, // [수정]
             }}
           >
             <X size={20} />
@@ -194,7 +209,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   marginBottom: '8px',
                 }}
               >
@@ -209,18 +224,20 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   width: '100%',
                   padding: '12px 16px',
                   borderRadius: '8px',
-                  border: '1px solid #E8E8E8',
+                  border: `1px solid ${COLORS.border}`, // [수정]
                   fontSize: '14px',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   outline: 'none',
                   boxSizing: 'border-box',
                   marginBottom: '6px',
                 }}
+                onFocus={(e) => e.currentTarget.style.borderColor = COLORS.primary}
+                onBlur={(e) => e.currentTarget.style.borderColor = COLORS.border}
               />
               <p
                 style={{
                   fontSize: '12px',
-                  color: '#F44336',
+                  color: COLORS.riskHigh, // [수정]
                   margin: 0,
                   display: 'flex',
                   alignItems: 'center',
@@ -239,7 +256,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   marginBottom: '8px',
                 }}
               >
@@ -254,12 +271,14 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   width: '100%',
                   padding: '12px 16px',
                   borderRadius: '8px',
-                  border: '1px solid #E8E8E8',
+                  border: `1px solid ${COLORS.border}`, // [수정]
                   fontSize: '14px',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
+                onFocus={(e) => e.currentTarget.style.borderColor = COLORS.primary}
+                onBlur={(e) => e.currentTarget.style.borderColor = COLORS.border}
               />
             </div>
 
@@ -270,7 +289,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   marginBottom: '8px',
                 }}
               >
@@ -285,12 +304,14 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   width: '100%',
                   padding: '12px 16px',
                   borderRadius: '8px',
-                  border: '1px solid #E8E8E8',
+                  border: `1px solid ${COLORS.border}`, // [수정]
                   fontSize: '14px',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
+                onFocus={(e) => e.currentTarget.style.borderColor = COLORS.primary}
+                onBlur={(e) => e.currentTarget.style.borderColor = COLORS.border}
               />
             </div>
 
@@ -301,7 +322,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   marginBottom: '8px',
                 }}
               >
@@ -321,9 +342,9 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                     style={{
                       padding: '12px',
                       borderRadius: '8px',
-                      border: propertyType === type ? 'none' : '1px solid #E8E8E8',
-                      backgroundColor: propertyType === type ? '#8FBF4D' : '#FFFFFF',
-                      color: propertyType === type ? '#FFFFFF' : '#666666',
+                      border: propertyType === type ? 'none' : `1px solid ${COLORS.border}`,
+                      backgroundColor: propertyType === type ? COLORS.primary : COLORS.bgCard,
+                      color: propertyType === type ? '#FFFFFF' : COLORS.textSub,
                       fontSize: '14px',
                       fontWeight: propertyType === type ? '600' : '500',
                       cursor: 'pointer',
@@ -347,7 +368,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                 backgroundColor:
                   isLoading || !address || !deposit || !area
                     ? '#CCCCCC'
-                    : '#8FBF4D',
+                    : COLORS.primary, // [수정] 버튼 색상
                 color: '#FFFFFF',
                 fontSize: '15px',
                 fontWeight: '600',
@@ -367,7 +388,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
               style={{
                 padding: '24px',
                 borderRadius: '12px',
-                backgroundColor: '#F8F8F8',
+                backgroundColor: COLORS.bgSub, // [수정]
                 border: `2px solid ${getRiskColor(result.riskLevel)}`,
               }}
             >
@@ -378,7 +399,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   <div style={{ fontSize: '48px', fontWeight: '700', color: getRiskColor(result.riskLevel), lineHeight: '1' }}>
                     {result.ratio.toFixed(1)}%
                   </div>
-                  <div style={{ fontSize: '14px', color: '#666666', marginTop: '4px', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '14px', color: COLORS.textSub, marginTop: '4px', marginBottom: '8px' }}>
                     전세가율
                   </div>
                   <div style={{ fontSize: '18px', fontWeight: '600', color: getRiskColor(result.riskLevel), display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -415,7 +436,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                       left: '50%',
                       width: '2px',
                       height: '80px',
-                      backgroundColor: '#2C2C2C',
+                      backgroundColor: COLORS.textMain, // [수정] 바늘 색상
                       transformOrigin: 'bottom center',
                       transform: `translateX(-50%) rotate(${getNeedleAngle()}deg)`,
                       transition: 'transform 0.5s ease-out',
@@ -431,7 +452,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                         height: '0',
                         borderLeft: '6px solid transparent',
                         borderRight: '6px solid transparent',
-                        borderBottom: '12px solid #2C2C2C',
+                        borderBottom: `12px solid ${COLORS.textMain}`, // [수정] 바늘 끝 색상
                       }}
                     />
                   </div>
@@ -446,7 +467,7 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                       width: '12px',
                       height: '12px',
                       borderRadius: '50%',
-                      backgroundColor: '#2C2C2C',
+                      backgroundColor: COLORS.textMain, // [수정]
                     }}
                   />
                 </div>
@@ -460,13 +481,13 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                     marginTop: '8px',
                   }}
                 >
-                  <span style={{ fontSize: '12px', color: '#4CAF50', fontWeight: '600' }}>
+                  <span style={{ fontSize: '12px', color: COLORS.riskLow, fontWeight: '600' }}>
                     안전<br />0-70%
                   </span>
-                  <span style={{ fontSize: '12px', color: '#FFC107', fontWeight: '600' }}>
+                  <span style={{ fontSize: '12px', color: COLORS.riskMedium, fontWeight: '600' }}>
                     주의<br />70-80%
                   </span>
-                  <span style={{ fontSize: '12px', color: '#F44336', fontWeight: '600' }}>
+                  <span style={{ fontSize: '12px', color: COLORS.riskHigh, fontWeight: '600' }}>
                     위험<br />80-100%
                   </span>
                 </div>
@@ -477,14 +498,14 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                 style={{
                   padding: '16px',
                   borderRadius: '8px',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: COLORS.bgCard, // [수정]
                   marginBottom: '16px',
                 }}
               >
                 <p
                   style={{
                     fontSize: '14px',
-                    color: '#2C2C2C',
+                    color: COLORS.textMain, // [수정]
                     lineHeight: '1.6',
                     margin: 0,
                   }}
@@ -502,12 +523,12 @@ export default function RiskAnalysisModal({ isOpen, onClose }: RiskAnalysisModal
                   </h4>
                   {result.extraToWarning_만원 > 0 && (
                     <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: '0 0 6px 0' }}>
-                      • <strong style={{ color: '#FFC107' }}>주의 단계</strong>까지: 추가 근저당 <strong>{result.extraToWarning_만원.toLocaleString()}만원</strong>
+                      • <strong style={{ color: COLORS.riskMedium }}>주의 단계</strong>까지: 추가 근저당 <strong>{result.extraToWarning_만원.toLocaleString()}만원</strong>
                     </p>
                   )}
                   {result.extraToDanger_만원 > 0 && (
                     <p style={{ fontSize: '13px', color: '#424242', lineHeight: '1.6', margin: 0 }}>
-                      • <strong style={{ color: '#F44336' }}>위험 단계</strong>까지: 추가 근저당 <strong>{result.extraToDanger_만원.toLocaleString()}만원</strong>
+                      • <strong style={{ color: COLORS.riskHigh }}>위험 단계</strong>까지: 추가 근저당 <strong>{result.extraToDanger_만원.toLocaleString()}만원</strong>
                     </p>
                   )}
                 </div>

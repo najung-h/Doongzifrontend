@@ -6,90 +6,63 @@ export default function Navigation() {
   const location = useLocation();
   const { isLoggedIn, logout } = useAuth();
 
+  // 컬러 팔레트 정의 (메인 테마 Earth Tone 적용)
+  const COLORS = {
+    bgTranslucent: 'rgba(242, 229, 213, 0.3)', // [수정] 메인 배경색(#F2E5D5) 기반 투명 배경
+    primary: '#A68263',     // 브랜드 메인 (갈색)
+    primaryDark: '#8C6F5D', // 진한 갈색
+    textMain: '#402211',    // 메인 텍스트 (짙은 고동색)
+    textSub: '#857162',     // 보조 텍스트
+    border: 'rgba(166, 130, 99, 0.2)', // 테두리 (브랜드 컬러 기반 은은하게)
+    activeBg: 'rgba(166, 130, 99, 0.1)', // 활성 탭 배경
+    white: '#FFFFFF'
+  };
+
+  // 활성화된 탭 스타일링 헬퍼
+  const getLinkStyle = (path: string) => ({
+    background: 'none',
+    border: 'none',
+    color: location.pathname === path ? COLORS.textMain : COLORS.textSub, // 활성: 짙은색, 비활성: 연한색
+    fontSize: '15px',
+    cursor: 'pointer',
+    padding: '8px 12px',
+    fontWeight: location.pathname === path ? '700' : '500',
+    borderRadius: '12px',
+    transition: 'all 0.2s ease',
+    backgroundColor: location.pathname === path ? COLORS.activeBg : 'transparent',
+  });
+
   return (
     <nav style={{
-      backgroundColor: '#FFFFFF',
-      borderBottom: '1px solid #E5E5E5',
-      width: '100%',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+      backgroundColor: COLORS.bgTranslucent, // [수정] 배경색 변경
+      backdropFilter: 'blur(10px)',
+      // borderBottom: `1px solid ${COLORS.border}`, // [수정] 테두리 색상 변경
+      padding: '16px 40px',
       display: 'flex',
-      justifyContent: 'center' // 내부 컨텐츠 중앙 정렬
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      // boxShadow: '0 4px 20px rgba(64, 34, 17, 0.05)' // 그림자 톤 조정
     }}>
-      {/* Inner Container: 최대 너비 제한 및 중앙 정렬 */}
-      <div style={{
-        width: '100%',
-        maxWidth: '1200px', // 메인 컨텐츠 폭에 맞춰 제한 (너무 넓어지지 않게)
-        padding: '16px 24px', // 좌우 여백 (기존 40px -> 24px로 조정하여 모바일/태블릿 대응력 향상)
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'relative' // 로고 절대 위치의 기준점
-      }}>
-        {/* Left Menu */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '32px'
-        }}>
-          <button
-            onClick={() => navigate('/checklist')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: location.pathname === '/checklist' ? '#8FBF4D' : '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0',
-              fontWeight: location.pathname === '/checklist' ? '600' : '400'
-            }}
-          >
-            체크리스트
-          </button>
-          <button
-            onClick={() => navigate('/chatbot')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: location.pathname === '/chatbot' ? '#8FBF4D' : '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0',
-              fontWeight: location.pathname === '/chatbot' ? '600' : '400'
-            }}
-          >
-            AI 챗봇
-          </button>
-          <button
-            onClick={() => navigate('/search')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: location.pathname === '/search' ? '#8FBF4D' : '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0',
-              fontWeight: location.pathname === '/search' ? '600' : '400'
-            }}
-          >
-            법률 검색
-          </button>
-          <button
-            onClick={() => navigate('/mypage')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: location.pathname === '/mypage' ? '#8FBF4D' : '#2C2C2C',
-              fontSize: '15px',
-              cursor: 'pointer',
-              padding: '8px 0',
-              fontWeight: location.pathname === '/mypage' ? '600' : '400'
-            }}
-          >
-            마이페이지
-          </button>
-        </div>
+      {/* Left Menu */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button onClick={() => navigate('/checklist')} style={getLinkStyle('/checklist')}>
+          체크리스트
+        </button>
+        <button onClick={() => navigate('/chatbot')} style={getLinkStyle('/chatbot')}>
+          AI 챗봇
+        </button>
+        <button onClick={() => navigate('/mypage')} style={getLinkStyle('/mypage')}>
+          마이페이지
+        </button>
+      </div>
 
-        {/* Center Logo */}
-        <div style={{
+      {/* Center Logo */}
+      <div 
+        onClick={() => navigate('/')}
+        style={{
           position: 'absolute',
           left: '50%',
           transform: 'translateX(-50%)',
@@ -98,83 +71,84 @@ export default function Navigation() {
           gap: '8px',
           cursor: 'pointer'
         }}
-        onClick={() => navigate('/')}
-        >
-          <img
-            src="/logo.png"
-            alt="둥지 로고"
-            style={{
-              width: '48px',
-              height: '48px',
-              objectFit: 'contain'
-            }}
-          />
-          <span style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: '#2C2C2C'
-          }}>
+      >
+        <img
+          src="/logo.png"
+          alt="둥지 로고"
+          style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+        />
+        {/* 텍스트 베이스라인 정렬을 위한 컨테이너 추가 */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <span style={{ fontSize: '24px', fontWeight: '800', color: COLORS.textMain, letterSpacing: '-0.5px' }}>
             둥지
           </span>
+          <span style={{ fontSize: '20px', fontWeight: '500', color: COLORS.textSub}}>
+            집 찾는 아기새
+          </span>
         </div>
+      </div>
 
-        {/* Right Buttons */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px'
-        }}>
-          {!isLoggedIn ? (
-            // 로그인하지 않은 상태: 로그인 + 회원가입 버튼
-            <>
-              <button
-                onClick={() => navigate('/login')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#666666',
-                  fontSize: '15px',
-                  cursor: 'pointer',
-                  padding: '8px 16px'
-                }}
-              >
-                로그인
-              </button>
-              <button
-                onClick={() => navigate('/signup')}
-                style={{
-                  backgroundColor: '#8FBF4D',
-                  border: 'none',
-                  color: '#FFFFFF',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  padding: '10px 20px',
-                  borderRadius: '8px'
-                }}
-              >
-                회원가입
-              </button>
-            </>
-          ) : (
-            // 로그인한 상태: 로그아웃 버튼만
+      {/* Right Buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {!isLoggedIn ? (
+          <>
             <button
-              onClick={logout}
+              onClick={() => navigate('/login')}
               style={{
-                backgroundColor: '#8FBF4D',
+                background: 'none',
                 border: 'none',
-                color: '#FFFFFF',
-                fontSize: '15px',
+                color: COLORS.textSub,
+                fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                padding: '10px 20px',
-                borderRadius: '8px'
+                padding: '8px 16px'
               }}
             >
-              로그아웃
+              로그인
             </button>
-          )}
-        </div>
+            <button
+              onClick={() => navigate('/signup')}
+              style={{
+                backgroundColor: COLORS.primary,
+                border: 'none',
+                color: COLORS.white,
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                padding: '10px 24px',
+                borderRadius: '20px',
+                boxShadow: '0 4px 12px rgba(166, 130, 99, 0.2)',
+                transition: 'transform 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.backgroundColor = COLORS.primaryDark;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.backgroundColor = COLORS.primary;
+              }}
+            >
+              회원가입
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={logout}
+            style={{
+              backgroundColor: COLORS.activeBg,
+              border: `1px solid ${COLORS.border}`,
+              color: COLORS.primary, // 텍스트는 브랜드 컬러 유지
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              padding: '8px 20px',
+              borderRadius: '20px'
+            }}
+          >
+            로그아웃
+          </button>
+        )}
       </div>
     </nav>
   );

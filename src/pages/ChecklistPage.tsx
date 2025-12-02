@@ -32,6 +32,29 @@ import RiskAnalysisModal from '../components/common/RiskAnalysisModal';
 import DocumentAnalysisModal from '../components/common/DocumentAnalysisModal';
 import InsuranceCheckModal from '../components/common/InsuranceCheckModal';
 
+// [수정] 컬러 팔레트 정의
+const COLORS = {
+  bgMain: '#F2E5D5',      // 메인 배경 (따뜻한 베이지)
+  bgCard: '#FFFFFF',      // 카드 배경
+  bgSub: '#F9F7F5',       // 연한 배경
+  primary: '#A68263',     // 브랜드 메인 (중간 갈색) - 체크박스, 탭, 아이콘 등
+  primaryDark: '#8C6F5D', // 호버링 등 강조색
+  accent: '#8C0707',      // [NEW] 액션/강조 (짙은 적색) - 버튼에 적용
+  textMain: '#402211',    // 메인 텍스트 (짙은 갈색)
+  textSub: '#857162',     // 보조 텍스트
+  border: '#E6D8CC',      // 테두리
+  iconBase: '#A68263',    // 아이콘 기본색
+  iconBg: '#E0D5CD',      // 아이콘 배경 (비활성)
+  
+  // 정보 박스 컬러
+  infoBg: '#F0F4F8',      
+  infoIcon: '#78909C',    
+  whyBg: '#FFF8E1',       
+  whyIcon: '#FFB74D',
+  noteBg: '#EFEBE9',      
+  noteBorder: '#A1887F'
+};
+
 type SubChecklistItem = {
   id: string;
   title: string;
@@ -321,7 +344,7 @@ const initialChecklist: ChecklistTab[] = [
       },
       {
         id: 'after-6',
-        title: '(선택) 전세보증금 반환보증 가입하기',
+        title: '전세보증금 반환보증 가입하기',
         whatIsIt: '전세계약이 끝났을 때 임대인이 보증금을 돌려주지 않더라도, HUG나 SGI가 대신 보증금을 먼저 지급해주는 보험이에요. 전세보증금이 위험해질 때를 대비해서 보증기관이 세입자의 돈을 대신 지켜주는 장치예요.',
         whyDoIt: '전세사기는 대부분 세입자가 계약 기간 종료 후 보증금을 못 돌려받는 상황에서 발생해요. 세입자가 통제할 수 없는 상황이 존재하기 때문에 마지막 안전망으로 가입하는 것을 권장합니다.',
         completed: false,
@@ -460,9 +483,7 @@ export default function ChecklistPage() {
 
     try {
       alert("보증보험 가입 가능 여부를 확인 중입니다. 잠시만 기다려주세요...");
-      
       const result = await checklistAPI.checkInsurance(files[0], files[1], checkInsuranceDeposit);
-      
       if (result.success) {
         alert(`[확인 결과]\n${result.message}\n\n${result.details || ''}`);
       } else {
@@ -488,10 +509,10 @@ export default function ChecklistPage() {
         style={{
           marginBottom: '8px',
           marginLeft: '4px',
-          border: '1px solid #E8E8E8',
+          border: `1px solid ${COLORS.border}`,
           borderRadius: '12px',
           overflow: 'hidden',
-          backgroundColor: subItem.completed ? '#F8F8F8' : '#FFFFFF'
+          backgroundColor: subItem.completed ? COLORS.bgSub : COLORS.bgCard
         }}
       >
         <div
@@ -511,13 +532,14 @@ export default function ChecklistPage() {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: subItem.completed ? '#8FBF4D' : '#E8E8E8',
+              backgroundColor: subItem.completed ? COLORS.primary : COLORS.iconBg,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
               cursor: 'pointer',
-              color: subItem.completed ? '#FFFFFF' : '#5A7A3C'
+              color: subItem.completed ? '#FFFFFF' : COLORS.textSub,
+              transition: 'background-color 0.2s'
             }}>
             {getItemIcon(subItem.title)}
           </div>
@@ -531,7 +553,7 @@ export default function ChecklistPage() {
             <h5 style={{
               fontSize: '14px',
               fontWeight: '600',
-              color: subItem.completed ? '#999999' : '#2C2C2C',
+              color: subItem.completed ? '#999999' : COLORS.textMain,
               textDecoration: subItem.completed ? 'line-through' : 'none',
               margin: 0
             }}>
@@ -561,7 +583,7 @@ export default function ChecklistPage() {
               width: '18px',
               height: '18px',
               cursor: 'pointer',
-              accentColor: '#8FBF4D',
+              accentColor: COLORS.primary,
               flexShrink: 0
             }}
           />
@@ -570,10 +592,10 @@ export default function ChecklistPage() {
         {isExpanded && (
           <div style={{
             padding: '0 18px 16px',
-            borderTop: '1px solid #F0F0F0'
+            borderTop: `1px solid ${COLORS.border}`
           }}>
             <div style={{
-              backgroundColor: '#E3F2FD',
+              backgroundColor: COLORS.infoBg,
               borderRadius: '8px',
               padding: '14px',
               marginTop: '14px',
@@ -588,14 +610,15 @@ export default function ChecklistPage() {
                   width: '22px',
                   height: '22px',
                   borderRadius: '50%',
-                  backgroundColor: '#2196F3',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  color: COLORS.infoIcon,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '11px',
                   fontWeight: '700',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  border: `1px solid ${COLORS.infoIcon}`
                 }}>
                   <HelpCircle size={14} strokeWidth={3} />
                 </div>
@@ -603,14 +626,14 @@ export default function ChecklistPage() {
                   <h6 style={{
                     fontSize: '12px',
                     fontWeight: '700',
-                    color: '#1976D2',
+                    color: COLORS.textMain,
                     margin: '0 0 6px 0'
                   }}>
                     이게 뭐예요?
                   </h6>
                   <p style={{
                     fontSize: '12px',
-                    color: '#424242',
+                    color: '#555555',
                     lineHeight: '1.6',
                     margin: 0
                   }}>
@@ -621,7 +644,7 @@ export default function ChecklistPage() {
             </div>
 
             <div style={{
-              backgroundColor: '#FFF3E0',
+              backgroundColor: COLORS.whyBg,
               borderRadius: '8px',
               padding: '14px',
               marginBottom: '12px'
@@ -635,14 +658,15 @@ export default function ChecklistPage() {
                   width: '22px',
                   height: '22px',
                   borderRadius: '50%',
-                  backgroundColor: '#FF9800',
-                  color: '#FFFFFF',
+                  backgroundColor: '#FFFFFF',
+                  color: COLORS.whyIcon,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '11px',
                   fontWeight: '700',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  border: `1px solid ${COLORS.whyIcon}`
                 }}>
                   <Lightbulb size={14} strokeWidth={3} />
                 </div>
@@ -650,14 +674,14 @@ export default function ChecklistPage() {
                   <h6 style={{
                     fontSize: '12px',
                     fontWeight: '700',
-                    color: '#E65100',
+                    color: COLORS.textMain,
                     margin: '0 0 6px 0'
                   }}>
                     왜 해야 하나요?
                   </h6>
                   <p style={{
                     fontSize: '12px',
-                    color: '#424242',
+                    color: '#555555',
                     lineHeight: '1.6',
                     margin: 0
                   }}>
@@ -669,15 +693,15 @@ export default function ChecklistPage() {
             
             {subItem.additionalNote && (
               <div style={{
-                backgroundColor: '#FFF8E1',
+                backgroundColor: COLORS.noteBg,
                 borderRadius: '8px',
                 padding: '12px',
                 marginBottom: '12px',
-                borderLeft: '3px solid #FFC107'
+                borderLeft: `3px solid ${COLORS.noteBorder}`
               }}>
                 <p style={{
                   fontSize: '12px',
-                  color: '#F57C00',
+                  color: COLORS.textMain,
                   lineHeight: '1.5',
                   margin: 0,
                   fontWeight: '500'
@@ -693,9 +717,10 @@ export default function ChecklistPage() {
                 width: '100%',
                 padding: '10px',
                 borderRadius: '8px',
-                border: '1px solid #8FBF4D',
+                // [수정] 버튼 스타일: 붉은색 테두리 및 텍스트
+                border: `1px solid ${COLORS.primary}`,
                 backgroundColor: '#FFFFFF',
-                color: '#8FBF4D',
+                color: COLORS.primary,
                 fontSize: '13px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -715,7 +740,7 @@ export default function ChecklistPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg-primary)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: COLORS.bgMain, paddingBottom: '80px' }}>
       <Navigation />
 
       <input 
@@ -727,42 +752,42 @@ export default function ChecklistPage() {
         accept=".pdf,.jpg,.jpeg,.png"
       />
 
-      <div style={{ textAlign: 'center', padding: '40px 20px 60px', backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div style={{ textAlign: 'center', padding: '20px 20px 60px', backgroundColor: COLORS.bgMain }}>
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '12px',
+          // gap: '12px',
           marginBottom: '12px'
         }}>
           <img
-            src="/baby.png"
-            alt="아기새"
+            src="/scan.png"
+            alt="둥지스캔"
             style={{
-              width: '56px',
-              height: '56px',
+              width: '80px',
+              height: '80px',
               objectFit: 'contain'
             }}
           />
-          <h1 style={{ fontSize: '36px', fontWeight: '700', color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-            둥지 짓기 플랜
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: COLORS.textMain, marginBottom: '12px' }}>
+            둥지 계약 체크리스트
           </h1>
         </div>
-        <p style={{ fontSize: '16px', color: 'var(--color-text-secondary)' }}>
-          집 구하는 순서대로 하나씩 따라해보세요
+        <p style={{ fontSize: '16px', color: COLORS.textSub }}>
+          전세사기 없는 집 구하기, 함께 해요!
         </p>
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '-30px auto 60px', padding: '0 20px', position: 'relative', zIndex: 10 }}>
+      <div style={{ maxWidth: '1000px', margin: '-30px auto 60px', padding: '0 20px', position: 'relative', zIndex: 10 }}>
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+          boxShadow: '0 8px 32px rgba(166, 130, 99, 0.1)',
           overflow: 'hidden'
         }}>
           <div style={{
             padding: '24px 28px',
-            borderBottom: '1px solid #E8E8E8'
+            borderBottom: `1px solid ${COLORS.border}`
           }}>
             <div style={{
               display: 'flex',
@@ -788,9 +813,9 @@ export default function ChecklistPage() {
                     gap: '6px',
                     padding: '8px 16px',
                     backgroundColor: '#FFFFFF',
-                    border: '1px solid #8FBF4D',
+                    border: `1px solid ${COLORS.primary}`,
                     borderRadius: '20px',
-                    color: '#8FBF4D',
+                    color: COLORS.primary,
                     fontSize: '13px',
                     fontWeight: '600',
                     cursor: isExportingPDF ? 'not-allowed' : 'pointer',
@@ -804,7 +829,7 @@ export default function ChecklistPage() {
                       <div style={{
                         width: '14px',
                         height: '14px',
-                        border: '2px solid #8FBF4D',
+                        border: `2px solid ${COLORS.primary}`,
                         borderTopColor: 'transparent',
                         borderRadius: '50%',
                         animation: 'spin 1s linear infinite'
@@ -824,7 +849,7 @@ export default function ChecklistPage() {
                     alignItems: 'center',
                     gap: '6px',
                     padding: '8px 16px',
-                    backgroundColor: '#8FBF4D',
+                    backgroundColor: COLORS.primary,
                     border: 'none',
                     borderRadius: '20px',
                     color: '#FFFFFF',
@@ -852,9 +877,9 @@ export default function ChecklistPage() {
                   onClick={() => setActiveTab(tab.id)}
                   style={{
                     padding: '12px',
-                    backgroundColor: activeTab === tab.id ? '#8FBF4D' : '#FFFFFF',
+                    backgroundColor: activeTab === tab.id ? COLORS.primary : '#FFFFFF',
                     color: activeTab === tab.id ? '#FFFFFF' : '#666666',
-                    border: activeTab === tab.id ? 'none' : '1px solid #E8E8E8',
+                    border: activeTab === tab.id ? 'none' : `1px solid ${COLORS.border}`,
                     borderRadius: '8px',
                     fontSize: '15px',
                     fontWeight: activeTab === tab.id ? '700' : '500',
@@ -871,11 +896,11 @@ export default function ChecklistPage() {
               position: 'relative',
               marginBottom: '32px',
               marginTop: '12px',
-              marginLeft: '12px'
+              marginLeft: '3%'
             }}>
               <div style={{
                 height: '14px',
-                backgroundColor: '#F0F0F0',
+                backgroundColor: COLORS.bgSub,
                 borderRadius: '16px',
                 width: '85%',
                 marginTop: '32px',
@@ -887,7 +912,7 @@ export default function ChecklistPage() {
                   top: 0,
                   height: '100%',
                   width: `${currentTabProgress}%`,
-                  backgroundColor: '#8FBF4D',
+                  backgroundColor: COLORS.primary,
                   transition: 'width 0.3s ease',
                   borderRadius: '16px'
                 }} />
@@ -927,12 +952,12 @@ export default function ChecklistPage() {
               </div>
               <div style={{
                 position: 'absolute',
-                right: '12px',
+                right: '3%',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                fontSize: '14px',
+                fontSize: '15px',
                 fontWeight: '700',
-                color: '#2C2C2C'
+                color: COLORS.textSub
               }}>
                 {currentTabCompleted} / {currentTabItems} 완료
               </div>
@@ -942,13 +967,13 @@ export default function ChecklistPage() {
               <div style={{
                 textAlign: 'center',
                 padding: '8px',
-                backgroundColor: '#E8F5E9',
+                backgroundColor: COLORS.whyBg,
                 borderRadius: '8px',
                 marginTop: '12px'
               }}>
                 <span style={{
                   fontSize: '14px',
-                  color: '#2E7D32',
+                  color: COLORS.textMain,
                   fontWeight: '600'
                 }}>
                   🎉 축하합니다! 아기새가 둥지에 안착했어요!
@@ -968,10 +993,10 @@ export default function ChecklistPage() {
                 return (
                   <div key={item.id} style={{
                     marginBottom: '16px',
-                    borderLeft: '4px solid #8FBF4D',
-                    borderTop: '1px solid #E8E8E8',
-                    borderRight: '1px solid #E8E8E8',
-                    borderBottom: '1px solid #E8E8E8',
+                    borderLeft: `4px solid ${COLORS.primary}`,
+                    borderTop: `1px solid ${COLORS.border}`,
+                    borderRight: `1px solid ${COLORS.border}`,
+                    borderBottom: `1px solid ${COLORS.border}`,
                     backgroundColor: '#FFFFFF',
                     borderRadius: '12px',
                     paddingLeft: '16px',
@@ -996,7 +1021,7 @@ export default function ChecklistPage() {
                           width: '36px',
                           height: '36px',
                           borderRadius: '50%',
-                          backgroundColor: groupCompleted ? '#8FBF4D' : '#7AA83F',
+                          backgroundColor: groupCompleted ? COLORS.primary : '#DBCBBF',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -1010,7 +1035,7 @@ export default function ChecklistPage() {
                           <h4 style={{
                             fontSize: '15px',
                             fontWeight: '700',
-                            color: groupCompleted ? '#999999' : '#5A7A3C',
+                            color: groupCompleted ? '#999999' : COLORS.textMain,
                             textDecoration: groupCompleted ? 'line-through' : 'none',
                             margin: 0
                           }}>
@@ -1018,7 +1043,7 @@ export default function ChecklistPage() {
                           </h4>
                         </div>
 
-                        <div style={{ color: '#7AA83F' }}>
+                        <div style={{ color: COLORS.textSub }}>
                           {isGroupExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </div>
                       </div>
@@ -1067,9 +1092,10 @@ export default function ChecklistPage() {
                                   minWidth: '140px',
                                   padding: '12px 20px',
                                   borderRadius: '8px',
-                                  border: button.type === 'primary' ? 'none' : '1px solid rgb(45, 122, 142)',
-                                  backgroundColor: button.type === 'primary' ? 'rgb(45, 122, 142)' : '#FFFFFF',
-                                  color: button.type === 'primary' ? '#FFFFFF' : 'rgb(45, 122, 142)',
+                                  // [수정] Primary(채워진) 버튼은 붉은색 배경, Secondary(테두리) 버튼은 붉은색 테두리
+                                  border: button.type === 'primary' ? 'none' : `1px solid ${COLORS.accent}`,
+                                  backgroundColor: button.type === 'primary' ? COLORS.accent : '#FFFFFF',
+                                  color: button.type === 'primary' ? '#FFFFFF' : COLORS.accent,
                                   fontSize: '14px',
                                   fontWeight: '600',
                                   cursor: 'pointer'
@@ -1093,10 +1119,10 @@ export default function ChecklistPage() {
                   key={item.id}
                   style={{
                     marginBottom: '12px',
-                    border: '1px solid #E8E8E8',
+                    border: `1px solid ${COLORS.border}`,
                     borderRadius: '12px',
                     overflow: 'hidden',
-                    backgroundColor: item.completed ? '#F8F8F8' : '#FFFFFF'
+                    backgroundColor: item.completed ? COLORS.bgSub : '#FFFFFF'
                   }}
                 >
                   <div
@@ -1113,12 +1139,12 @@ export default function ChecklistPage() {
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      backgroundColor: item.completed ? '#8FBF4D' : '#E8E8E8',
+                      backgroundColor: item.completed ? COLORS.primary : COLORS.iconBg,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      color: item.completed ? '#FFFFFF' : '#5A7A3C'
+                      color: item.completed ? '#FFFFFF' : COLORS.textSub
                     }}>
                       {getItemIcon(item.title)}
                     </div>
@@ -1127,7 +1153,7 @@ export default function ChecklistPage() {
                       <h4 style={{
                         fontSize: '15px',
                         fontWeight: '600',
-                        color: item.completed ? '#999999' : '#2C2C2C',
+                        color: item.completed ? '#999999' : COLORS.textMain,
                         textDecoration: item.completed ? 'line-through' : 'none',
                         margin: 0
                       }}>
@@ -1150,7 +1176,7 @@ export default function ChecklistPage() {
                         width: '20px',
                         height: '20px',
                         cursor: 'pointer',
-                        accentColor: '#8FBF4D',
+                        accentColor: COLORS.primary,
                         flexShrink: 0
                       }}
                     />
@@ -1159,10 +1185,10 @@ export default function ChecklistPage() {
                   {isExpanded && (
                     <div style={{
                       padding: '0 20px 20px',
-                      borderTop: '1px solid #F0F0F0'
+                      borderTop: `1px solid ${COLORS.border}`
                     }}>
                       <div style={{
-                        backgroundColor: '#E3F2FD',
+                        backgroundColor: COLORS.infoBg,
                         borderRadius: '8px',
                         padding: '16px',
                         marginTop: '16px',
@@ -1177,14 +1203,15 @@ export default function ChecklistPage() {
                             width: '24px',
                             height: '24px',
                             borderRadius: '50%',
-                            backgroundColor: '#2196F3',
-                            color: '#FFFFFF',
+                            backgroundColor: '#FFFFFF',
+                            color: COLORS.infoIcon,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: '12px',
                             fontWeight: '700',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            border: `1px solid ${COLORS.infoIcon}`
                           }}>
                             <HelpCircle size={14} strokeWidth={3} />
                           </div>
@@ -1192,14 +1219,14 @@ export default function ChecklistPage() {
                             <h5 style={{
                               fontSize: '13px',
                               fontWeight: '700',
-                              color: '#1976D2',
+                              color: COLORS.textMain,
                               margin: '0 0 8px 0'
                             }}>
                               이게 뭐예요?
                             </h5>
                             <p style={{
                               fontSize: '13px',
-                              color: '#424242',
+                              color: '#555555',
                               lineHeight: '1.6',
                               margin: 0
                             }}>
@@ -1210,7 +1237,7 @@ export default function ChecklistPage() {
                       </div>
 
                       <div style={{
-                        backgroundColor: '#FFF3E0',
+                        backgroundColor: COLORS.whyBg,
                         borderRadius: '8px',
                         padding: '16px',
                         marginBottom: '16px'
@@ -1224,14 +1251,15 @@ export default function ChecklistPage() {
                             width: '24px',
                             height: '24px',
                             borderRadius: '50%',
-                            backgroundColor: '#FF9800',
-                            color: '#FFFFFF',
+                            backgroundColor: '#FFFFFF',
+                            color: COLORS.whyIcon,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: '12px',
                             fontWeight: '700',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            border: `1px solid ${COLORS.whyIcon}`
                           }}>
                             <Lightbulb size={14} strokeWidth={3} />
                           </div>
@@ -1239,14 +1267,14 @@ export default function ChecklistPage() {
                             <h5 style={{
                               fontSize: '13px',
                               fontWeight: '700',
-                              color: '#E65100',
+                              color: COLORS.textMain,
                               margin: '0 0 8px 0'
                             }}>
                               왜 해야 하나요?
                             </h5>
                             <p style={{
                               fontSize: '13px',
-                              color: '#424242',
+                              color: '#555555',
                               lineHeight: '1.6',
                               margin: 0
                             }}>
@@ -1293,9 +1321,10 @@ export default function ChecklistPage() {
                                 minWidth: '140px',
                                 padding: '12px 20px',
                                 borderRadius: '8px',
-                                border: button.type === 'primary' ? 'none' : '1px solid #2D7A8E',
-                                backgroundColor: button.type === 'primary' ? '#2D7A8E' : '#FFFFFF',
-                                color: button.type === 'primary' ? '#FFFFFF' : '#2D7A8E',
+                                // [수정] 붉은색 테마 적용
+                                border: button.type === 'primary' ? 'none' : `1px solid ${COLORS.accent}`,
+                                backgroundColor: button.type === 'primary' ? COLORS.accent : '#FFFFFF',
+                                color: button.type === 'primary' ? '#FFFFFF' : COLORS.accent,
                                 fontSize: '14px',
                                 fontWeight: '600',
                                 cursor: 'pointer'
@@ -1313,9 +1342,10 @@ export default function ChecklistPage() {
                           width: '100%',
                           padding: '12px',
                           borderRadius: '8px',
-                          border: '1px solid #8FBF4D',
+                          // [수정] 챗봇 질문 버튼도 일관성 있게 붉은색 계열로 변경 (테두리형)
+                          border: `1px solid ${COLORS.primary}`,
                           backgroundColor: '#FFFFFF',
-                          color: '#8FBF4D',
+                          color: COLORS.primary,
                           fontSize: '14px',
                           fontWeight: '600',
                           cursor: 'pointer',

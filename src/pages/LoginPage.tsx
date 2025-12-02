@@ -13,16 +13,26 @@ export default function LoginPage() {
     e.preventDefault();
     // TODO: 실제 로그인 로직 구현
     console.log('로그인 시도:', { email, password });
-    // 로그인 상태 업데이트
     login();
-    // 홈으로 이동
     navigate('/');
+  };
+
+  // 컬러 팔레트 정의
+  const COLORS = {
+    bg: '#F2E5D5',          // 메인 배경
+    card: '#FFFFFF',        // 카드 배경
+    textMain: '#402211',    // 메인 텍스트
+    textSub: '#A68263',     // 서브 텍스트
+    primary: '#A68263',     // 버튼/강조 색상 (갈색)
+    primaryDark: '#8C6F5D', // 버튼 호버
+    border: '#E6D8CC',      // 테두리
+    placeholder: '#999999'  // 플레이스홀더/아이콘 기본
   };
 
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#FAF8F3',
+      backgroundColor: COLORS.bg, // [수정] 배경색 변경
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -52,7 +62,7 @@ export default function LoginPage() {
         <span style={{
           fontSize: '28px',
           fontWeight: '700',
-          color: '#2C2C2C'
+          color: COLORS.textMain // [수정] 텍스트 색상 변경
         }}>
           둥지
         </span>
@@ -60,17 +70,17 @@ export default function LoginPage() {
 
       {/* Login Card */}
       <div style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: COLORS.card,
         borderRadius: '16px',
         padding: '40px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 8px 32px rgba(166, 130, 99, 0.1)', // [수정] 그림자 톤 조정
         width: '100%',
         maxWidth: '400px'
       }}>
         <h2 style={{
           fontSize: '24px',
           fontWeight: '700',
-          color: '#2C2C2C',
+          color: COLORS.textMain, // [수정]
           marginBottom: '8px',
           textAlign: 'center'
         }}>
@@ -78,7 +88,7 @@ export default function LoginPage() {
         </h2>
         <p style={{
           fontSize: '14px',
-          color: '#666666',
+          color: COLORS.textSub, // [수정]
           marginBottom: '32px',
           textAlign: 'center'
         }}>
@@ -92,7 +102,7 @@ export default function LoginPage() {
               display: 'block',
               fontSize: '14px',
               fontWeight: '600',
-              color: '#2C2C2C',
+              color: COLORS.textMain, // [수정]
               marginBottom: '8px'
             }}>
               이메일
@@ -107,7 +117,7 @@ export default function LoginPage() {
                 style={{
                   position: 'absolute',
                   left: '14px',
-                  color: '#999999'
+                  color: COLORS.placeholder
                 }}
               />
               <input
@@ -119,14 +129,15 @@ export default function LoginPage() {
                 style={{
                   width: '100%',
                   padding: '12px 12px 12px 44px',
-                  border: '1px solid #E8E8E8',
+                  border: `1px solid ${COLORS.border}`, // [수정] 테두리 색상
                   borderRadius: '8px',
                   fontSize: '14px',
                   outline: 'none',
-                  transition: 'border-color 0.2s'
+                  transition: 'border-color 0.2s',
+                  color: COLORS.textMain
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#8FBF4D'}
-                onBlur={(e) => e.target.style.borderColor = '#E8E8E8'}
+                onFocus={(e) => e.target.style.borderColor = COLORS.primary} // [수정] 포커스 색상
+                onBlur={(e) => e.target.style.borderColor = COLORS.border}
               />
             </div>
           </div>
@@ -137,7 +148,7 @@ export default function LoginPage() {
               display: 'block',
               fontSize: '14px',
               fontWeight: '600',
-              color: '#2C2C2C',
+              color: COLORS.textMain, // [수정]
               marginBottom: '8px'
             }}>
               비밀번호
@@ -152,7 +163,7 @@ export default function LoginPage() {
                 style={{
                   position: 'absolute',
                   left: '14px',
-                  color: '#999999'
+                  color: COLORS.placeholder
                 }}
               />
               <input
@@ -164,14 +175,15 @@ export default function LoginPage() {
                 style={{
                   width: '100%',
                   padding: '12px 12px 12px 44px',
-                  border: '1px solid #E8E8E8',
+                  border: `1px solid ${COLORS.border}`, // [수정]
                   borderRadius: '8px',
                   fontSize: '14px',
                   outline: 'none',
-                  transition: 'border-color 0.2s'
+                  transition: 'border-color 0.2s',
+                  color: COLORS.textMain
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#8FBF4D'}
-                onBlur={(e) => e.target.style.borderColor = '#E8E8E8'}
+                onFocus={(e) => e.target.style.borderColor = COLORS.primary} // [수정]
+                onBlur={(e) => e.target.style.borderColor = COLORS.border}
               />
             </div>
           </div>
@@ -182,7 +194,7 @@ export default function LoginPage() {
             style={{
               width: '100%',
               padding: '14px',
-              backgroundColor: '#8FBF4D',
+              backgroundColor: COLORS.primary, // [수정] 버튼 색상
               border: 'none',
               borderRadius: '8px',
               color: '#FFFFFF',
@@ -191,8 +203,8 @@ export default function LoginPage() {
               cursor: 'pointer',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7AA83F'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8FBF4D'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.primaryDark} // [수정] 호버 색상
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.primary}
           >
             로그인
           </button>
@@ -205,9 +217,9 @@ export default function LoginPage() {
           margin: '24px 0',
           gap: '12px'
         }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#E8E8E8' }} />
-          <span style={{ fontSize: '13px', color: '#999999' }}>또는</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: '#E8E8E8' }} />
+          <div style={{ flex: 1, height: '1px', backgroundColor: COLORS.border }} />
+          <span style={{ fontSize: '13px', color: COLORS.placeholder }}>또는</span>
+          <div style={{ flex: 1, height: '1px', backgroundColor: COLORS.border }} />
         </div>
 
         {/* Sign Up Link */}
@@ -220,7 +232,7 @@ export default function LoginPage() {
             style={{
               background: 'none',
               border: 'none',
-              color: '#8FBF4D',
+              color: COLORS.primary, // [수정] 링크 색상
               fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',

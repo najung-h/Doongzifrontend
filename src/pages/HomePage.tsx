@@ -1,17 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { X, Upload, Mail, CheckCircle } from 'lucide-react';
-import { scanAPI } from '../api/scan';
+import { Upload, ChevronRight, PieChart, CheckCircle2, MessageCircle } from 'lucide-react';
 import Navigation from '../components/common/Navigation';
+import NestScanModal from '../components/common/NestScanModal';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [uploadStep, setUploadStep] = useState<'upload' | 'email' | 'complete'>('upload');
+  
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [email, setEmail] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
 
+  // 파일 업로드 핸들러
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -19,838 +17,297 @@ export default function HomePage() {
     }
   };
 
-  // [수정] 파일 선택 후 '다음' 버튼 클릭 시 (API 호출 X, 이메일 단계로 이동 O)
-  const handleFileSubmit = async () => {
-    if (!selectedFile) return;
-    // 바로 전송하지 않고 이메일 입력 단계로 이동
-    setUploadStep('email');
-  };
-// [수정] 이메일 입력 후 '결과 받기' 클릭 시 (API 호출 O)
-  const handleEmailSubmit = async () => {
-    if (!email || !email.includes('@')) {
-      alert('올바른 이메일을 입력해주세요.');
-      return;
-    }
-    
-    if (!selectedFile) {
-      alert('파일이 선택되지 않았습니다.');
-      return;
-    }
-
-    setIsUploading(true);
-    
-    try {
-      // [중요] 여기서 파일과 이메일을 함께 전송!
-      const result = await scanAPI.scanDocuments([selectedFile], email);
-      
-      if (result.success) {
-        setUploadStep('complete');
-      } else {
-        alert(result.message || '전송에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('오류가 발생했습니다.');
-    } finally {
-      setIsUploading(false);
-    }
+  // 공통 글래스모피즘 스타일
+  const glassStyle = {
+    // background: 'rgba(255, 255, 255, 0.9)', // 배경색이 진해져서 투명도 약간 조정
+    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 240, 235, 0.5) 100%)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255, 255, 255, 0.9)',
+    boxShadow: '0 8px 32px 0 rgba(166, 130, 99, 0.35)', // #A68263 계열 그림자
+    borderRadius: '24px',
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setUploadStep('upload');
-    setSelectedFile(null);
-    setEmail('');
-  };
-
-  const openModal = () => {
-    setIsModalOpen(true);
+  // 컬러 상수 (재사용을 위해 정의)
+  const COLORS = {
+    bg: '#F2E5D5',
+    textMain: '#402211',
+    textSub: '#A68263',
+    brand: '#a68263ff',
+    brandLight: 'rgba(166, 130, 99, 0.1)',
+    danger: '#8C0707',
+    white: '#FFFFFF',
+    border: '#E6D8CC'
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#FAF8F3'
-    }}>
-      {/* Top Navigation */}
+    <div style={{ minHeight: '100vh', paddingBottom: '80px', backgroundColor: COLORS.bg }}>
       <Navigation />
 
       {/* Hero Section */}
-      <div style={{
-        textAlign: 'center',
-        padding: '60px 40px 50px'
-      }}>
-        <h2 style={{
-          fontSize: '17px',
-          fontWeight: '500',
-          color: '#666666',
-          letterSpacing: '-0.3px'
+      <div style={{ textAlign: 'center', padding: '60px 20px 50px' }}>
+        <div style={{ 
+          display: 'inline-block', 
+          padding: '8px 16px', 
+          borderRadius: '30px', 
+          background: 'rgba(166, 130, 99, 0.1)', // Brand color opacity
+          color: COLORS.brand, 
+          fontSize: '14px', 
+          fontWeight: '600',
+          marginBottom: '16px' 
         }}>
-          안전한 임대차 계약의 시작
-        </h2>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '20px',
-          marginBottom: '30px'
-        }}>
-          <img
-            src="/logo.png"
-            alt="둥지 메인 로고"
-            style={{
-              width: '180px',
-              height: '180px',
-              objectFit: 'contain'
-            }}
-          />
-          <div style={{
-            textAlign: 'left'
-          }}>
-            <h1 style={{
-              fontSize: '48px',
-              fontWeight: '700',
-              color: '#8FBF4D',
-              marginBottom: '4px',
-              lineHeight: '1',
-              letterSpacing: '-1px'
-            }}>
-              둥지
-            </h1>
-            <p style={{
-              fontSize: '16px',
-              color: '#999999',
-              fontWeight: '400',
-              letterSpacing: '-0.3px'
-            }}>
-              집 찾는 아기새
-            </p>
-          </div>
+          🏠 사회초년생을 위한 안심 계약 가이드
         </div>
-
-        <p style={{
-          fontSize: '15px',
-          color: '#2C2C2C',
-          lineHeight: '1.7',
-          marginBottom: '4px',
-          letterSpacing: '-0.3px',
-          fontWeight: '400'
+        <h1 style={{ 
+          fontSize: '42px', 
+          fontWeight: '800', 
+          color: COLORS.textMain, 
+          marginBottom: '12px', 
+          letterSpacing: '-0.5px' 
         }}>
-          처음 집을 구하는 사회 초년생을 위한 임대차 계약 가이드입니다.
-        </p>
-        <p style={{
-          fontSize: '15px',
-          color: '#2C2C2C',
-          lineHeight: '1.7',
-          letterSpacing: '-0.3px',
-          fontWeight: '400'
-        }}>
-          법률 용어 한 줄 모르는 '아기새'도 안전하게 둥지를 틀 수 있도록 도와드릴게요.
+          따뜻한 둥지를 찾아드릴게요
+        </h1>
+        <p style={{ fontSize: '17px', color: COLORS.textSub, fontWeight: 500 }}>
+          서류 스캔 한 번으로 위험 진단부터 체크리스트 관리까지!
         </p>
       </div>
 
-      {/* Feature Cards */}
+      {/* Bento Grid Layout (3 Columns) */}
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 40px 80px',
+        padding: '0 24px',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr',
-        gap: '20px',
-        alignItems: 'start'
+        gridTemplateColumns: '1fr 1.4fr 1fr', // 좌:중:우 비율 조정
+        gap: '24px',
+        alignItems: 'stretch'
       }}>
-        {/* Card 1: 둥지 스캔하기 */}
-        <div
-          onClick={openModal}
+        
+        {/* 1. [좌측] 둥지 스캔하기 (Action) */}
+        <label 
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '28px 24px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            cursor: 'pointer',
-            border: '1px solid #F0F0F0',
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            transition: 'all 0.3s ease',
-            transform: 'scale(1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.03)';
-            e.currentTarget.style.borderColor = '#8FBF4D';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.borderColor = '#F0F0F0';
-          }}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '12px',
-            marginBottom: '20px'
-          }}>
-            <img
-              src="/scan.png"
-              alt="둥지스캔하기"
-              style={{
-                width: '56px',
-                height: '56px',
-                objectFit: 'contain',
-                flexShrink: 0
-              }}
-            />
-            <div>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '700',
-                color: '#2C2C2C',
-                marginBottom: '6px',
-                letterSpacing: '-0.3px'
-              }}>
-                둥지 스캔하기
-              </h3>
-              <p style={{
-                fontSize: '13px',
-                color: '#666666',
-                lineHeight: '1.5',
-                letterSpacing: '-0.2px'
-              }}>
-                등기부등본, 건축물대장, 계약서를 업로드하면 어미새가 확인해드려요
-              </p>
-            </div>
-          </div>
-
-          <div style={{
-            backgroundColor: '#FAFAFA',
-            border: '2px dashed #D9D9D9',
-            borderRadius: '12px',
-            padding: '28px 16px',
-            textAlign: 'center',
-            marginBottom: '14px',
-            flex: 1,
+            ...glassStyle,
+            padding: '40px 24px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: '#E8E8E8',
-              borderRadius: '50%',
-              margin: '0 auto 12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px'
-            }}>
-              ⬆
+            textAlign: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'transform 0.2s, border-color 0.2s',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.borderColor = COLORS.brand;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)';
+          }}
+        >
+          <input type="file" onChange={handleFileSelect} accept=".pdf,.jpg,.png" hidden />
+          
+          {/* <div style={{ 
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', 
+            background: `linear-gradient(90deg, ${COLORS.brand}, #EBE5DD)` 
+          }} /> */}
+
+          <div style={{ marginBottom: '24px', position: 'relative' }}>
+            {/* 둥지 이미지 */}
+            <div style={{ 
+              width: '120px', height: '120px', 
+              background: '#F9F7F5', // 아주 연한 회색/베이지
+              borderRadius: '50%', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.05)'
+            }} >
+              <img src="/scan.png" alt="스캔" style={{ width: '120px' }} />
             </div>
-            <p style={{
-              fontSize: '13px',
-              color: '#666666',
-              marginBottom: '2px',
-              letterSpacing: '-0.2px'
+            <div style={{
+              position: 'absolute', bottom: 0, right: 0,
+              background: COLORS.brand, 
+              borderRadius: '50%', padding: '8px',
+              border: '3px solid white',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.15)'
             }}>
-              파일을 드래그하거나 클릭하여
-            </p>
-            <p style={{
-              fontSize: '13px',
-              color: '#666666',
-              marginBottom: '10px',
-              letterSpacing: '-0.2px'
-            }}>
-              업로드
-            </p>
-            <p style={{
-              fontSize: '11px',
-              color: '#999999',
-              letterSpacing: '-0.1px'
-            }}>
-              PDF, JPG, PNG 파일 (최대 10MB)
-            </p>
+              <Upload size={20} color="white" />
+            </div>
           </div>
+
+          <h3 style={{ fontSize: '22px', fontWeight: '800', color: COLORS.textMain, marginBottom: '8px' }}>
+            둥지 스캔하기
+          </h3>
+          <p style={{ fontSize: '13px', color: COLORS.textSub, lineHeight: '1.6', marginBottom: '24px' }}>
+            계약서나 등기부등본을 올리면<br/>
+            <strong>AI가 위험요소를 분석</strong>하고<br/>
+            체크리스트를 자동으로 채워줘요!
+          </p>
 
           <div style={{
-            backgroundColor: '#EEF5FF',
-            border: '1px solid #D0E3FF',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px'
+            padding: '12px 24px',
+            background: 'linear-gradient(0deg, rgba(166, 130, 99, 1) 25%, rgba(166, 130, 99, 0.65) 90%)',
+            border: `1px solid ${COLORS.brand}`,
+            color: 'white',
+            borderRadius: '12px',
+            fontSize: '15px',
+            fontWeight: '600',
+            width: '100%',
+            maxWidth: '200px',
+            boxShadow: `0 4px 12px rgba(166, 130, 99, 0.4)`
           }}>
-            <span style={{
-              color: '#4A90E2',
-              fontSize: '14px',
-              lineHeight: '1',
-              marginTop: '1px'
-            }}>
-              ℹ️
-            </span>
-            <div>
-              <p style={{
-                fontSize: '11px',
-                color: '#4A90E2',
-                fontWeight: '600',
-                letterSpacing: '-0.1px'
-              }}>
-                문서를 빠르게 스캔해서 완료된 체크리스트 항목을 자동으로 체크해드려요
-              </p>
-            </div>
+            파일 업로드
           </div>
-        </div>
+          
+        </label>
 
-        {/* Card 2: 둥지 짓기 플랜 */}
-        <div
+
+        {/* 2. [중앙] 둥지 계약 체크리스트 (Status Hub) */}
+        <div 
           onClick={() => navigate('/checklist')}
           style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '40px 28px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            ...glassStyle,
+            padding: '32px',
+            display: 'flex',
+            flexDirection: 'column',
             cursor: 'pointer',
-            border: '1px solid #F0F0F0',
+            transition: 'transform 0.2s',
+            background: 'linear-gradient(0deg, rgba(255, 255, 255) 0%, rgba(245, 240, 235) 100%)'
+          }}
+
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.borderColor = COLORS.danger;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)';
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: '800', color: COLORS.textMain }}>둥지 계약 체크리스트</h3>
+            <div style={{ 
+              background: 'rgba(166, 130, 99, 0.1)', padding: '6px 14px', borderRadius: '20px', 
+              fontSize: '13px', fontWeight: '600', color: COLORS.brand, display: 'flex', alignItems: 'center', gap: '4px'
+            }}>
+              전체 보기 <ChevronRight size={14} />
+            </div>
+          </div>
+
+          {/* Circular Progress Graph & Status */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+            
+            {/* CSS-only Circular Progress */}
+            <div style={{ 
+              position: 'relative', width: '160px', height: '160px',
+              borderRadius: '50%',
+              background: `conic-gradient(${COLORS.danger} 35%, #EBE5DD 0)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 20px rgba(166, 130, 99, 0.15)'
+            }}>
+              <div style={{ 
+                width: '120px', height: '120px', background: '#F9F7F5', borderRadius: '50%',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.05)'
+              }}>
+                <span style={{ fontSize: '13px', color: COLORS.textSub, fontWeight: '600' }}>둥지 마련까지</span>
+                <span style={{ fontSize: '32px', fontWeight: '800', color: COLORS.textMain }}>35%</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '24px', textAlign: 'center' }}>
+              <p style={{ fontSize: '16px', fontWeight: '700', color: COLORS.textMain, marginBottom: '4px' }}>
+                계약 전 확인 단계
+              </p>
+              <p style={{ fontSize: '13px', color: COLORS.textSub }}>
+                필수 항목 <strong>4개</strong>가 남아있어요!
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+        {/* 3. [우측] 어미새 챗봇 (Support) */}
+        <div 
+          onClick={() => navigate('/chatbot')}
+          style={{
+            ...glassStyle,
+            padding: '32px 24px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             textAlign: 'center',
-            height: '100%',
             justifyContent: 'center',
-            transition: 'all 0.3s ease',
-            transform: 'scale(1)'
+            cursor: 'pointer',
+            transition: 'transform 0.2s'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.03)';
-            e.currentTarget.style.borderColor = '#8FBF4D';
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.borderColor = COLORS.brand;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.borderColor = '#F0F0F0';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)';
           }}
         >
-          <img
-            src="/baby.png"
-            alt="아기새"
-            style={{
-              width: '96px',
-              height: '96px',
-              objectFit: 'contain',
-              marginBottom: '24px'
-            }}
-          />
-          <h3 style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            color: '#2C2C2C',
-            marginBottom: '10px',
-            letterSpacing: '-0.3px'
+          <div style={{ 
+            background: COLORS.brand, color: 'white', padding: '6px 12px', borderRadius: '20px', 
+            fontSize: '12px', fontWeight: '500', marginBottom: '24px' 
           }}>
-            둥지 짓기 플랜
-          </h3>
-          <p style={{
-            fontSize: '13px',
-            color: '#666666',
-            lineHeight: '1.6',
-            letterSpacing: '-0.2px'
-          }}>
-            집 구하는 순서대로 하나씩 따라해보세요
-          </p>
-        </div>
-
-        {/* Card 3 & 4: Right Column */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          height: '100%'
-        }}>
-          {/* 어미새 챗봇 */}
-          <div
-            onClick={() => navigate('/chatbot')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '36px 24px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-              cursor: 'pointer',
-              border: '1px solid #F0F0F0',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              flex: 1,
-              justifyContent: 'center',
-              transition: 'all 0.3s ease',
-              transform: 'scale(1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.03)';
-              e.currentTarget.style.borderColor = '#8FBF4D';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.borderColor = '#F0F0F0';
-            }}
-          >
-            <img
-              src="/mom.png"
-              alt="어미새"
-              style={{
-                width: '84px',
-                height: '84px',
-                objectFit: 'contain',
-                marginBottom: '18px'
-              }}
-            />
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '700',
-              color: '#2C2C2C',
-              marginBottom: '10px',
-              letterSpacing: '-0.3px'
-            }}>
-              어미새 챗봇
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#666666',
-              lineHeight: '1.5',
-              letterSpacing: '-0.2px'
-            }}>
-              막막한 계약 용어를 쉽게 설명해드려요
-            </p>
+            무엇이든 물어보세요
           </div>
 
-          {/* 똑똑한 법률 사전 */}
-          <div
-            onClick={() => navigate('/search')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '36px 24px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-              cursor: 'pointer',
-              border: '1px solid #F0F0F0',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              flex: 1,
-              justifyContent: 'center',
-              transition: 'all 0.3s ease',
-              transform: 'scale(1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.03)';
-              e.currentTarget.style.borderColor = '#8FBF4D';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.borderColor = '#F0F0F0';
-            }}
-          >
-            <img
-              src="/law.png"
-              alt="똑똑한 법률 사전"
-              style={{
-                width: '84px',
-                height: '84px',
-                objectFit: 'contain',
-                marginBottom: '18px'
-              }}
-            />
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: '700',
-              color: '#2C2C2C',
-              marginBottom: '10px',
-              letterSpacing: '-0.3px'
+          <div style={{ marginBottom: '24px', position: 'relative' }}>
+            <img src="/baby.png" alt="챗봇" style={{ width: '90px', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }} />
+            <div style={{
+              position: 'absolute', top: -10, right: -10,
+              background: '#FFFFFF', padding: '8px 12px', borderRadius: '12px',
+              fontSize: '20px', boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+              fontWeight: 'bold', color: COLORS.brand
             }}>
-              똑똑한 법률 사전
-            </h3>
-            <p style={{
-              fontSize: '13px',
-              color: '#666666',
-              lineHeight: '1.5',
-              letterSpacing: '-0.2px'
-            }}>
-              법률과 판례를 쉽게 검색해보세요
-            </p>
+              ?
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: '22px', fontWeight: '800', color: COLORS.textMain, marginBottom: '8px' }}>
+            어미새 챗봇
+          </h3>
+          <p style={{ fontSize: '13px', color: COLORS.textSub, lineHeight: '1.5', marginBottom: '24px' }}>
+            "특약사항이 뭔가요?"<br/>
+            "확정일자는 언제 받나요?"<br/>
+            <br/>
+            어려운 용어와 절차,<br/>
+            친절하게 알려드릴게요!
+          </p>
+
+          <div style={{
+            width: '100%',
+            padding: '12px',
+            border: `1px solid ${COLORS.brand}`,
+            color: COLORS.brand,
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            backgroundColor: 'rgba(255,255,255,0.5)'
+          }}>
+            <MessageCircle size={18} />
+            대화 시작하기
           </div>
         </div>
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}
-          onClick={handleModalClose}
-        >
-          <div 
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '32px 40px',
-              width: '500px',
-              maxWidth: '90%',
-              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
-              position: 'relative'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={handleModalClose}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#999999',
-                padding: '8px'
-              }}
-            >
-              <X size={24} />
-            </button>
-
-            {uploadStep === 'upload' && (
-              <div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '24px'
-                }}>
-                  {/* [수정] 기존 div(갈색 원)를 img(둥지 이미지)로 교체 */}
-                  <img
-                    src="/scan.png"
-                    alt="둥지스캔하기"
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      objectFit: 'contain'
-                    }}
-                  />
-                  <div>
-                    <h2 style={{
-                      fontSize: '22px',
-                      fontWeight: '700',
-                      color: '#2C2C2C',
-                      marginBottom: '4px'
-                    }}>
-                      둥지 스캔하기
-                    </h2>
-                    <p style={{
-                      fontSize: '13px',
-                      color: '#666666'
-                    }}>
-                      등기부등본, 건축물대장, 계약서를 업로드하면 어미새가 확인해드려요
-                    </p>
-                  </div>
-                </div>
-
-                <div style={{
-                  backgroundColor: '#FAFAFA',
-                  border: '2px dashed #D9D9D9',
-                  borderRadius: '12px',
-                  padding: '40px 20px',
-                  textAlign: 'center',
-                  marginBottom: '20px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onClick={() => document.getElementById('fileInput')?.click()}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F5F5F5';
-                  e.currentTarget.style.borderColor = '#8FBF4D';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FAFAFA';
-                  e.currentTarget.style.borderColor = '#D9D9D9';
-                }}
-                >
-                  <div style={{
-                    width: '64px',
-                    height: '64px',
-                    backgroundColor: '#E8E8E8',
-                    borderRadius: '50%',
-                    margin: '0 auto 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Upload size={32} color="#8FBF4D" />
-                  </div>
-                  <p style={{
-                    fontSize: '14px',
-                    color: '#2C2C2C',
-                    fontWeight: '600',
-                    marginBottom: '8px'
-                  }}>
-                    파일을 드래그하거나 클릭하여 업로드
-                  </p>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#999999'
-                  }}>
-                    PDF, JPG, PNG 파일 (최대 10MB)
-                  </p>
-                </div>
-
-                <input
-                  type="file"
-                  accept="application/pdf,image/jpeg,image/png"
-                  onChange={handleFileSelect}
-                  style={{ display: 'none' }}
-                  id="fileInput"
-                />
-
-                {selectedFile && (
-                  <div style={{
-                    backgroundColor: '#F0F7FA',
-                    border: '1px solid #D0E3FF',
-                    borderRadius: '8px',
-                    padding: '12px 16px',
-                    marginBottom: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <CheckCircle size={20} color="#8FBF4D" />
-                      <span style={{
-                        fontSize: '13px',
-                        color: '#2C2C2C',
-                        fontWeight: '500'
-                      }}>
-                        {selectedFile.name}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => setSelectedFile(null)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: '#999999',
-                        padding: '4px'
-                      }}
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleFileSubmit}
-                  disabled={!selectedFile || isUploading}
-                  style={{
-                    width: '100%',
-                    backgroundColor: selectedFile && !isUploading ? '#8FBF4D' : '#E8E8E8',
-                    color: selectedFile && !isUploading ? '#FFFFFF' : '#999999',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    padding: '14px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: selectedFile && !isUploading ? 'pointer' : 'not-allowed',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {isUploading ? '업로드 중...' : '분석 시작하기'}
-                </button>
-              </div>
-            )}
-
-            {/* Email Step */}
-            {uploadStep === 'email' && (
-              <div>
-                <div style={{
-                  textAlign: 'center',
-                  marginBottom: '24px'
-                }}>
-                  <div style={{
-                    width: '64px',
-                    height: '64px',
-                    backgroundColor: '#E3F2FD',
-                    borderRadius: '50%',
-                    margin: '0 auto 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Mail size={32} color="#2196F3" />
-                  </div>
-                  <h2 style={{
-                    fontSize: '22px',
-                    fontWeight: '700',
-                    color: '#2C2C2C',
-                    marginBottom: '8px'
-                  }}>
-                    분석 결과를 받을 이메일
-                  </h2>
-                  <p style={{
-                    fontSize: '13px',
-                    color: '#666666',
-                    lineHeight: '1.5'
-                  }}>
-                    파일 분석이 완료되면 결과를 이메일로 전송해드려요
-                  </p>
-                </div>
-
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="example@email.com"
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    marginBottom: '20px',
-                    border: '1px solid #D9D9D9',
-                    borderRadius: '8px',
-                    fontSize: '15px',
-                    color: '#2C2C2C',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#8FBF4D';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#D9D9D9';
-                  }}
-                />
-
-                <button
-                  onClick={handleEmailSubmit}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#8FBF4D',
-                    color: '#FFFFFF',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    padding: '14px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#7DA842';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#8FBF4D';
-                  }}
-                >
-                  결과 받기
-                </button>
-              </div>
-            )}
-
-            {/* Complete Step */}
-            {uploadStep === 'complete' && (
-              <div style={{ textAlign: 'center' }}>
-                <div style={{
-                  width: '80px',
-                  height: '80px',
-                  backgroundColor: '#E8F5E9',
-                  borderRadius: '50%',
-                  margin: '0 auto 20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <CheckCircle size={48} color="#4CAF50" />
-                </div>
-
-                <h2 style={{
-                  fontSize: '24px',
-                  fontWeight: '700',
-                  color: '#2C2C2C',
-                  marginBottom: '12px'
-                }}>
-                  분석 요청이 완료되었어요!
-                </h2>
-
-                <p style={{
-                  fontSize: '14px',
-                  color: '#666666',
-                  lineHeight: '1.7',
-                  marginBottom: '24px'
-                }}>
-                  분석 결과는 <strong style={{ color: '#8FBF4D' }}>{email}</strong>로<br />
-                  5-10분 이내에 전송될 예정입니다.
-                </p>
-
-                <div style={{
-                  backgroundColor: '#F0F7FA',
-                  border: '1px solid #D0E3FF',
-                  borderRadius: '8px',
-                  padding: '16px',
-                  marginBottom: '24px',
-                  textAlign: 'left'
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#2C2C2C',
-                    lineHeight: '1.6',
-                    margin: 0
-                  }}>
-                    📧 <strong>이메일 확인 안내</strong><br />
-                    • 스팸 메일함도 확인해주세요<br />
-                    • 발신자: noreply@doongzi.com<br />
-                    • 10분 이내 미수신 시 고객센터로 문의해주세요
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleModalClose}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#8FBF4D',
-                    color: '#FFFFFF',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    padding: '14px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#7DA842';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#8FBF4D';
-                  }}
-                >
-                  확인
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* 둥지 스캔 모달 */}
+      {selectedFile && (
+        <NestScanModal
+          isOpen={!!selectedFile}
+          file={selectedFile}
+          onClose={() => setSelectedFile(null)}
+        />
       )}
     </div>
   );

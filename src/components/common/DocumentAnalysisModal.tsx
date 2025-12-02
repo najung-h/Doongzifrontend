@@ -19,6 +19,23 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
   const [fileKey, setFileKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // [수정] 컬러 팔레트 정의
+  const COLORS = {
+    bgMain: '#F2E5D5',
+    bgCard: '#FFFFFF',
+    bgSub: '#F9F7F5',       // 연한 배경
+    primary: '#A68263',     // 브랜드 메인 (갈색)
+    primaryDark: '#8C6F5D', // 버튼 호버
+    textMain: '#402211',    // 메인 텍스트
+    textSub: '#857162',     // 보조 텍스트
+    textLight: '#999999',
+    border: '#E6D8CC',      // 테두리
+    accent: '#8C0707',      // 강조/경고 (필요 시)
+    riskHigh: '#F44336',
+    riskMedium: '#FFC107',
+    riskLow: '#4CAF50'
+  };
+
   if (!isOpen) return null;
 
   const handleClose = () => {
@@ -99,7 +116,6 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       setAnalysisResult(result);
 
       if (result.success) {
-        // [수정] 응답에서 HTML과 fileKey를 추출하여 저장
         if (result.result) {
           setReportHtml(result.result);
         }
@@ -128,7 +144,6 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
     }
 
     try {
-      // [수정] 저장해둔 fileKey를 함께 전달
       const result = await checklistAPI.exportAnalysisPDF(
         analysisResult.analysis || analysisResult,
         fileKey || undefined
@@ -171,10 +186,10 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
 
   const getRiskColor = (grade: 'low' | 'medium' | 'high') => {
     switch (grade) {
-      case 'low': return '#4CAF50';
-      case 'medium': return '#FFC107';
-      case 'high': return '#F44336';
-      default: return '#999999';
+      case 'low': return COLORS.riskLow;
+      case 'medium': return COLORS.riskMedium;
+      case 'high': return COLORS.riskHigh;
+      default: return COLORS.textLight;
     }
   };
 
@@ -223,7 +238,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
       {reportHtml ? (
         <div
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: COLORS.bgCard, // [수정]
             borderRadius: '16px',
             width: '100%',
             maxWidth: '900px',
@@ -239,14 +254,14 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
           {/* 리포트 헤더 */}
           <div style={{
             padding: '16px 24px',
-            borderBottom: '1px solid #E8E8E8',
+            borderBottom: `1px solid ${COLORS.border}`, // [수정]
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            backgroundColor: '#fff',
+            backgroundColor: COLORS.bgCard, // [수정]
             flexShrink: 0
           }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: 0, color: '#2C2C2C' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: 0, color: COLORS.textMain }}>
               📄 {getDocumentTitle()} 정밀 분석 리포트
             </h2>
             <button
@@ -256,7 +271,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
               }}
               style={{ border: 'none', background: 'none', cursor: 'pointer' }}
             >
-              <X size={24} color="#666" />
+              <X size={24} color={COLORS.textSub} />
             </button>
           </div>
 
@@ -277,8 +292,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
           {/* 리포트 하단 액션 버튼 영역 */}
           <div style={{
             padding: '16px 24px',
-            borderTop: '1px solid #E8E8E8',
-            backgroundColor: '#fff',
+            borderTop: `1px solid ${COLORS.border}`,
+            backgroundColor: COLORS.bgCard,
             display: 'flex',
             gap: '12px',
             flexShrink: 0
@@ -289,9 +304,9 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 flex: 1,
                 padding: '12px',
                 borderRadius: '8px',
-                border: '1px solid #8FBF4D',
-                backgroundColor: '#FFFFFF',
-                color: '#8FBF4D',
+                border: `1px solid ${COLORS.primary}`, // [수정] 테두리
+                backgroundColor: COLORS.bgCard,
+                color: COLORS.primary, // [수정] 텍스트
                 fontSize: '15px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -301,8 +316,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 gap: '8px',
                 transition: 'all 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F9F0'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FFFFFF'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.bgSub}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.bgCard}
             >
               <Download size={18} />
               PDF로 저장
@@ -314,8 +329,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 padding: '12px',
                 borderRadius: '8px',
                 border: 'none',
-                backgroundColor: '#8FBF4D',
-                color: '#FFFFFF',
+                backgroundColor: COLORS.primary, // [수정] 메인 버튼
+                color: 'white',
                 fontSize: '15px',
                 fontWeight: '600',
                 cursor: 'pointer',
@@ -325,8 +340,8 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 gap: '8px',
                 transition: 'all 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7AA83F'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8FBF4D'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.primaryDark}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.primary}
             >
               <Mail size={18} />
               메일로 보내기
@@ -337,7 +352,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
         /* 파일 업로드 뷰 */
         <div
           style={{
-            backgroundColor: '#FFFFFF',
+            backgroundColor: COLORS.bgCard, // [수정]
             borderRadius: '16px',
             width: '100%',
             maxWidth: '700px',
@@ -351,7 +366,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
           <div
             style={{
               padding: '24px',
-              borderBottom: '1px solid #E8E8E8',
+              borderBottom: `1px solid ${COLORS.border}`, // [수정]
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -361,7 +376,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
               style={{
                 fontSize: '20px',
                 fontWeight: '700',
-                color: '#2C2C2C',
+                color: COLORS.textMain, // [수정]
                 margin: 0,
               }}
             >
@@ -374,12 +389,12 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 height: '32px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: '#F0F0F0',
+                backgroundColor: COLORS.bgSub, // [수정]
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#666666',
+                color: COLORS.textSub, // [수정]
               }}
             >
               <X size={20} />
@@ -395,12 +410,12 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               style={{
-                border: `2px dashed ${isDragging ? '#8FBF4D' : '#E8E8E8'}`,
+                border: `2px dashed ${isDragging ? COLORS.primary : COLORS.border}`, // [수정]
                 borderRadius: '12px',
                 padding: '40px 20px',
                 textAlign: 'center',
                 cursor: 'pointer',
-                backgroundColor: isDragging ? '#F5F3E6' : '#FAFAFA',
+                backgroundColor: isDragging ? COLORS.bgSub : '#FAFAFA', // [수정]
                 transition: 'all 0.2s',
                 marginBottom: '20px',
               }}
@@ -415,7 +430,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
 
               <Upload
                 size={48}
-                color={isDragging ? '#8FBF4D' : '#CCCCCC'}
+                color={isDragging ? COLORS.primary : '#CCCCCC'} // [수정]
                 style={{ margin: '0 auto 16px' }}
               />
 
@@ -423,7 +438,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 style={{
                   fontSize: '16px',
                   fontWeight: '600',
-                  color: '#2C2C2C',
+                  color: COLORS.textMain, // [수정]
                   margin: '0 0 8px 0',
                 }}
               >
@@ -433,7 +448,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
               <p
                 style={{
                   fontSize: '13px',
-                  color: '#999999',
+                  color: COLORS.textSub, // [수정]
                   margin: 0,
                 }}
               >
@@ -447,7 +462,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 style={{
                   marginBottom: '20px',
                   padding: '16px',
-                  backgroundColor: '#F8F8F8',
+                  backgroundColor: COLORS.bgSub, // [수정]
                   borderRadius: '8px',
                 }}
               >
@@ -455,7 +470,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                   style={{
                     fontSize: '14px',
                     fontWeight: '600',
-                    color: '#2C2C2C',
+                    color: COLORS.textMain, // [수정]
                     marginBottom: '12px',
                   }}
                 >
@@ -469,17 +484,17 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                       alignItems: 'center',
                       gap: '12px',
                       padding: '16px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: COLORS.bgCard, // [수정]
                       borderRadius: '8px',
                     }}
                   >
-                    <FileText size={40} color="#F44336" />
+                    <FileText size={40} color={COLORS.riskHigh} />
                     <div>
                       <p
                         style={{
                           fontSize: '14px',
                           fontWeight: '600',
-                          color: '#2C2C2C',
+                          color: COLORS.textMain, // [수정]
                           margin: '0 0 4px 0',
                         }}
                       >
@@ -488,7 +503,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                       <p
                         style={{
                           fontSize: '12px',
-                          color: '#999999',
+                          color: COLORS.textSub, // [수정]
                           margin: 0,
                         }}
                       >
@@ -505,7 +520,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                       maxHeight: '300px',
                       objectFit: 'contain',
                       borderRadius: '8px',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: COLORS.bgCard, // [수정]
                     }}
                   />
                 )}
@@ -522,7 +537,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                   padding: '14px',
                   borderRadius: '8px',
                   border: 'none',
-                  backgroundColor: isAnalyzing ? '#CCCCCC' : '#8FBF4D',
+                  backgroundColor: isAnalyzing ? '#CCCCCC' : COLORS.primary, // [수정]
                   color: '#FFFFFF',
                   fontSize: '15px',
                   fontWeight: '600',
@@ -556,7 +571,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                 style={{
                   padding: '24px',
                   borderRadius: '12px',
-                  backgroundColor: '#F8F8F8',
+                  backgroundColor: COLORS.bgSub, // [수정]
                   border: `2px solid ${getRiskColor(analysisResult.analysis.riskGrade)}`,
                   marginBottom: '20px',
                 }}
@@ -598,7 +613,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                     <p
                       style={{
                         fontSize: '14px',
-                        color: '#666666',
+                        color: COLORS.textSub, // [수정]
                         margin: 0,
                       }}
                     >
@@ -612,7 +627,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                   style={{
                     padding: '16px',
                     borderRadius: '8px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: COLORS.bgCard, // [수정]
                     marginBottom: '16px',
                   }}
                 >
@@ -620,7 +635,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                     style={{
                       fontSize: '14px',
                       fontWeight: '600',
-                      color: '#2C2C2C',
+                      color: COLORS.textMain, // [수정]
                       marginBottom: '8px',
                     }}
                   >
@@ -645,7 +660,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                       style={{
                         fontSize: '14px',
                         fontWeight: '600',
-                        color: '#2C2C2C',
+                        color: COLORS.textMain, // [수정]
                         marginBottom: '12px',
                       }}
                     >
@@ -658,9 +673,9 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                           style={{
                             padding: '12px',
                             borderRadius: '8px',
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: COLORS.bgCard, // [수정]
                             borderLeft: `3px solid ${
-                              issue.severity === 'danger' ? '#F44336' : '#FFC107'
+                              issue.severity === 'danger' ? COLORS.riskHigh : COLORS.riskMedium
                             }`,
                           }}
                         >
@@ -672,16 +687,16 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                             }}
                           >
                             {issue.severity === 'danger' ? (
-                              <AlertTriangle size={16} color="#F44336" style={{ marginTop: '2px', flexShrink: 0 }} />
+                              <AlertTriangle size={16} color={COLORS.riskHigh} style={{ marginTop: '2px', flexShrink: 0 }} />
                             ) : (
-                              <CheckCircle size={16} color="#FFC107" style={{ marginTop: '2px', flexShrink: 0 }} />
+                              <CheckCircle size={16} color={COLORS.riskMedium} style={{ marginTop: '2px', flexShrink: 0 }} />
                             )}
                             <div style={{ flex: 1 }}>
                               <p
                                 style={{
                                   fontSize: '13px',
                                   fontWeight: '600',
-                                  color: '#2C2C2C',
+                                  color: COLORS.textMain, // [수정]
                                   margin: '0 0 4px 0',
                                 }}
                               >
@@ -690,7 +705,7 @@ export default function DocumentAnalysisModal({ isOpen, onClose, docType }: Docu
                               <p
                                 style={{
                                   fontSize: '12px',
-                                  color: '#666666',
+                                  color: COLORS.textSub, // [수정]
                                   lineHeight: '1.5',
                                   margin: 0,
                                 }}

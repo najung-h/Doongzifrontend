@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, Shield, CheckCircle, AlertTriangle, XCircle, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { checklistAPI } from '../../api/checklist';
-import type { InsuranceCheckItem } from '../../types'; // InsuranceVerdict 제거 (미사용)
+import type { InsuranceCheckItem } from '../../types';
 
 interface InsuranceCheckModalProps {
   isOpen: boolean;
@@ -23,6 +23,25 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
 
   const registryInputRef = useRef<HTMLInputElement>(null);
   const buildingInputRef = useRef<HTMLInputElement>(null);
+
+  // [수정] 컬러 팔레트 정의
+  const COLORS = {
+    bgMain: '#F2E5D5',
+    bgCard: '#FFFFFF',
+    bgSub: '#F9F7F5',       // 연한 배경
+    primary: '#A68263',     // 브랜드 메인 (갈색)
+    primaryDark: '#8C6F5D', // 버튼 호버
+    textMain: '#402211',    // 메인 텍스트
+    textSub: '#857162',     // 보조 텍스트
+    textLight: '#999999',
+    border: '#E6D8CC',      // 테두리
+    accent: '#8C0707',      // 강조/경고
+    riskHigh: '#F44336',
+    riskMedium: '#FFC107',
+    riskLow: '#4CAF50',
+    infoBg: '#F0F4F8',
+    infoIcon: '#78909C'
+  };
 
   if (!isOpen) return null;
 
@@ -104,19 +123,19 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
   const reviewItems = checkItems?.filter(item => item.verdict === 'REVIEW_REQUIRED') || [];
   const passItems = checkItems?.filter(item => item.verdict === 'PASS') || [];
 
-  // 전체 상태 판단 (isAllPass 제거됨 - 미사용 에러 해결)
+  // 전체 상태 판단
   const hasFail = failItems.length > 0;
 
   const FileUploadBox = ({ title, file, onSelect, inputRef }: any) => (
     <div 
       onClick={() => inputRef.current?.click()}
       style={{
-        border: `1px dashed ${file ? '#8FBF4D' : '#D9D9D9'}`,
+        border: `1px dashed ${file ? COLORS.primary : COLORS.border}`, // [수정] 테두리 색상
         borderRadius: '8px',
         padding: '20px',
         textAlign: 'center',
         cursor: 'pointer',
-        backgroundColor: file ? '#F0F7FA' : '#FAFAFA',
+        backgroundColor: file ? COLORS.bgSub : '#FAFAFA', // [수정] 배경색
         marginBottom: '12px',
         transition: 'all 0.2s'
       }}
@@ -129,15 +148,15 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
         onChange={(e) => e.target.files?.[0] && onSelect(e.target.files[0])}
       />
       {file ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#2C2C2C' }}>
-          <CheckCircle size={20} color="#8FBF4D" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: COLORS.textMain }}>
+          <CheckCircle size={20} color={COLORS.primary} />
           <span style={{ fontSize: '14px', fontWeight: '500' }}>{file.name}</span>
         </div>
       ) : (
-        <div style={{ color: '#666' }}>
-          <Upload size={24} style={{ marginBottom: '8px', color: '#999' }} />
-          <div style={{ fontSize: '14px', fontWeight: '600' }}>{title} 업로드</div>
-          <div style={{ fontSize: '12px', color: '#999' }}>PDF, JPG, PNG</div>
+        <div style={{ color: COLORS.textSub }}>
+          <Upload size={24} style={{ marginBottom: '8px', color: COLORS.textLight }} />
+          <div style={{ fontSize: '14px', fontWeight: '600', color: COLORS.textMain }}>{title} 업로드</div>
+          <div style={{ fontSize: '12px', color: COLORS.textLight }}>PDF, JPG, PNG</div>
         </div>
       )}
     </div>
@@ -158,17 +177,17 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
         
         {/* Header */}
         <div style={{ 
-          padding: '24px', borderBottom: '1px solid #E8E8E8', 
+          padding: '24px', borderBottom: `1px solid ${COLORS.border}`, 
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' 
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Shield size={24} color="#8FBF4D" />
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: '#2C2C2C' }}>
+            <Shield size={24} color={COLORS.primary} />
+            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, color: COLORS.textMain }}>
               보증보험 가입 가능 여부 확인
             </h2>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <X size={24} color="#666" />
+            <X size={24} color={COLORS.textSub} />
           </button>
         </div>
 
@@ -178,7 +197,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
             // 입력 화면
             <>
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2C2C2C' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: COLORS.textMain }}>
                   전세 보증금 (만원)
                 </label>
                 <input
@@ -187,14 +206,18 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                   onChange={(e) => setDeposit(e.target.value)}
                   placeholder="예: 20000"
                   style={{
-                    width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E8E8E8',
-                    fontSize: '14px', outline: 'none'
+                    width: '100%', padding: '12px', borderRadius: '8px', 
+                    border: `1px solid ${COLORS.border}`, // [수정] 테두리
+                    fontSize: '14px', outline: 'none',
+                    color: COLORS.textMain
                   }}
+                  onFocus={(e) => e.target.style.borderColor = COLORS.primary}
+                  onBlur={(e) => e.target.style.borderColor = COLORS.border}
                 />
               </div>
 
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#2C2C2C' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: COLORS.textMain }}>
                   필수 서류 업로드
                 </label>
                 <FileUploadBox title="등기부등본" file={registryFile} onSelect={setRegistryFile} inputRef={registryInputRef} />
@@ -213,9 +236,13 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 disabled={isAnalyzing}
                 style={{
                   width: '100%', padding: '16px', borderRadius: '8px', border: 'none',
-                  backgroundColor: isAnalyzing ? '#E0E0E0' : '#8FBF4D',
-                  color: 'white', fontSize: '16px', fontWeight: '600', cursor: isAnalyzing ? 'not-allowed' : 'pointer'
+                  backgroundColor: isAnalyzing ? '#E0E0E0' : COLORS.primary, // [수정] 버튼 배경
+                  color: 'white', fontSize: '16px', fontWeight: '600', 
+                  cursor: isAnalyzing ? 'not-allowed' : 'pointer',
+                  transition: 'background-color 0.2s'
                 }}
+                onMouseEnter={(e) => !isAnalyzing && (e.currentTarget.style.backgroundColor = COLORS.primaryDark)}
+                onMouseLeave={(e) => !isAnalyzing && (e.currentTarget.style.backgroundColor = COLORS.primary)}
               >
                 {isAnalyzing ? '분석 중...' : '가입 가능 여부 확인하기'}
               </button>
@@ -226,10 +253,10 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
               {/* 안내 메시지 */}
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: '10px',
-                backgroundColor: '#E3F2FD', padding: '14px', borderRadius: '8px', marginBottom: '24px'
+                backgroundColor: COLORS.bgSub, padding: '14px', borderRadius: '8px', marginBottom: '24px'
               }}>
-                <Shield size={20} color="#1976D2" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <p style={{ fontSize: '13px', color: '#1565C0', margin: 0, lineHeight: '1.5' }}>
+                <Shield size={20} color={COLORS.primary} style={{ flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ fontSize: '13px', color: COLORS.textMain, margin: 0, lineHeight: '1.5' }}>
                   업로드한 문서를 바탕으로 확인한 항목들을 자동으로 체크해줍니다.
                 </p>
               </div>
@@ -239,9 +266,9 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                 textAlign: 'center',
                 fontSize: '18px',
                 fontWeight: '700',
-                color: '#8FBF4D',
+                color: COLORS.primary, // [수정]
                 marginBottom: '20px',
-                backgroundColor: '#F5F9F0',
+                backgroundColor: COLORS.bgSub, // [수정]
                 padding: '12px',
                 borderRadius: '50px'
               }}>
@@ -252,9 +279,9 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
               <div style={{
                 flex: 1,
                 padding: '30px 24px',
-                backgroundColor: '#FFFBF0',
+                backgroundColor: COLORS.bgCard,
                 borderRadius: '12px',
-                border: '2px solid #FFE0B2',
+                border: `2px solid ${COLORS.border}`, // [수정]
                 marginBottom: '24px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -271,7 +298,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'white',
-                    border: '1px solid #E0E0E0',
+                    border: `1px solid ${COLORS.border}`,
                     borderRadius: '50%',
                     width: '36px',
                     height: '36px',
@@ -282,7 +309,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     opacity: currentReviewIndex === 0 ? 0.3 : 1
                   }}
                 >
-                  <ChevronLeft size={20} color="#666" />
+                  <ChevronLeft size={20} color={COLORS.textSub} />
                 </button>
 
                 <button
@@ -294,7 +321,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'white',
-                    border: '1px solid #E0E0E0',
+                    border: `1px solid ${COLORS.border}`,
                     borderRadius: '50%',
                     width: '36px',
                     height: '36px',
@@ -305,7 +332,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     opacity: (currentReviewIndex === reviewItems.length - 1 || !reviewAnswers.has(reviewItems[currentReviewIndex].id)) ? 0.3 : 1
                   }}
                 >
-                  <ChevronRight size={20} color="#666" />
+                  <ChevronRight size={20} color={COLORS.textSub} />
                 </button>
 
                 {/* 질문 텍스트 */}
@@ -313,7 +340,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                   <p style={{
                     fontSize: '16px',
                     fontWeight: '700',
-                    color: '#2C2C2C',
+                    color: COLORS.textMain,
                     lineHeight: '1.6',
                     margin: 0,
                     wordBreak: 'keep-all',
@@ -324,7 +351,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                   {reviewItems[currentReviewIndex].reason_why && (
                     <p style={{
                       fontSize: '12px',
-                      color: '#F57C00',
+                      color: COLORS.textSub, // [수정]
                       marginTop: '12px',
                       textAlign: 'center',
                       lineHeight: '1.4'
@@ -343,21 +370,21 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     flex: 1,
                     padding: '16px',
                     borderRadius: '8px',
-                    border: '1px solid #E0E0E0',
+                    border: `1px solid ${COLORS.border}`,
                     backgroundColor: 'white',
-                    color: '#666',
+                    color: COLORS.textSub,
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F5F5F5';
-                    e.currentTarget.style.borderColor = '#999';
+                    e.currentTarget.style.backgroundColor = COLORS.bgSub;
+                    e.currentTarget.style.borderColor = COLORS.textSub;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'white';
-                    e.currentTarget.style.borderColor = '#E0E0E0';
+                    e.currentTarget.style.borderColor = COLORS.border;
                   }}
                 >
                   아니오
@@ -369,15 +396,15 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     padding: '16px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: '#8FBF4D',
+                    backgroundColor: COLORS.primary, // [수정]
                     color: 'white',
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7AA83F'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8FBF4D'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.primaryDark}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.primary}
                 >
                   예
                 </button>
@@ -485,7 +512,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                     onClick={() => setShowPassItems(!showPassItems)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '8px',
-                      fontSize: '14px', fontWeight: '600', color: '#4CAF50',
+                      fontSize: '14px', fontWeight: '600', color: COLORS.riskLow, // [수정]
                       background: 'none', border: 'none', cursor: 'pointer', padding: 0
                     }}
                   >
@@ -500,7 +527,7 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
                           padding: '12px 16px', backgroundColor: '#F1F8E9', borderRadius: '8px',
                           display: 'flex', alignItems: 'center', gap: '10px'
                         }}>
-                          <CheckCircle size={16} color="#4CAF50" style={{ flexShrink: 0 }} />
+                          <CheckCircle size={16} color={COLORS.riskLow} style={{ flexShrink: 0 }} />
                           <p style={{ fontSize: '13px', color: '#558B2F', margin: 0, lineHeight: '1.4' }}>
                             {item.question}
                           </p>
@@ -514,8 +541,9 @@ export default function InsuranceCheckModal({ isOpen, onClose }: InsuranceCheckM
               <button
                 onClick={handleReset}
                 style={{
-                  width: '100%', padding: '14px', borderRadius: '8px', border: '1px solid #E0E0E0',
-                  backgroundColor: 'white', color: '#666', fontSize: '15px', fontWeight: '600',
+                  width: '100%', padding: '14px', borderRadius: '8px', 
+                  border: `1px solid ${COLORS.border}`, // [수정]
+                  backgroundColor: 'white', color: COLORS.textSub, fontSize: '15px', fontWeight: '600',
                   cursor: 'pointer', marginTop: '12px'
                 }}
               >
