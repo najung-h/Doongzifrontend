@@ -92,7 +92,7 @@ export default function HomePage() {
             flexDirection: 'column',
             alignItems: 'center',
             textAlign: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             cursor: 'pointer',
             transition: 'transform 0.2s, border-color 0.2s',
             position: 'relative',
@@ -107,12 +107,14 @@ export default function HomePage() {
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)';
           }}
         >
+          <div style={{ 
+            background: COLORS.brand, color: 'white', padding: '6px 12px', borderRadius: '20px', alignSelf: 'center',
+            fontSize: '12px', fontWeight: '500', textAlign: 'center', marginBottom: '24px', width: '100px' 
+          }}>
+            STEP 1
+          </div>
+
           <input type="file" onChange={handleFileSelect} accept=".pdf,.jpg,.png" hidden />
-          
-          {/* <div style={{ 
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '6px', 
-            background: `linear-gradient(90deg, ${COLORS.brand}, #EBE5DD)` 
-          }} /> */}
 
           <div style={{ marginBottom: '24px', position: 'relative' }}>
             {/* 둥지 이미지 */}
@@ -168,10 +170,11 @@ export default function HomePage() {
           onClick={() => navigate('/checklist')}
           style={{
             ...glassStyle,
-            padding: '32px',
+            padding: '40px 56px',
             display: 'flex',
             flexDirection: 'column',
             cursor: 'pointer',
+            justifyContent: 'space-between',
             transition: 'transform 0.2s',
             background: 'linear-gradient(0deg, rgba(255, 255, 255) 0%, rgba(245, 240, 235) 100%)'
           }}
@@ -185,18 +188,16 @@ export default function HomePage() {
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.9)';
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: '800', color: COLORS.textMain }}>둥지 계약 체크리스트</h3>
-            <div style={{ 
-              background: 'rgba(166, 130, 99, 0.1)', padding: '6px 14px', borderRadius: '20px', 
-              fontSize: '13px', fontWeight: '600', color: COLORS.brand, display: 'flex', alignItems: 'center', gap: '4px'
-            }}>
-              전체 보기 <ChevronRight size={14} />
-            </div>
+          <div style={{ 
+            background: COLORS.brand, color: 'white', padding: '6px 12px', borderRadius: '20px', alignSelf: 'center',
+            fontSize: '12px', fontWeight: '500', textAlign: 'center', marginBottom: '24px', width: '100px' 
+          }}>
+            STEP 2
           </div>
 
+
           {/* Circular Progress Graph & Status */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
             
             {/* CSS-only Circular Progress */}
             <div style={{ 
@@ -225,6 +226,16 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '22px', fontWeight: '800', color: COLORS.textMain }}>둥지 계약 체크리스트</h3>
+            <div style={{ 
+              background: 'rgba(166, 130, 99, 0.1)', padding: '6px 14px', borderRadius: '20px', 
+              fontSize: '16px', fontWeight: '600', color: COLORS.danger, display: 'flex', alignItems: 'center', gap: '4px'
+            }}>
+              전체 보기 <ChevronRight size={14} />
+            </div>
+          </div>
         </div>
 
 
@@ -233,12 +244,12 @@ export default function HomePage() {
           onClick={() => navigate('/chatbot')}
           style={{
             ...glassStyle,
-            padding: '32px 24px',
+            padding: '40px 24px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             textAlign: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             cursor: 'pointer',
             transition: 'transform 0.2s'
           }}
@@ -258,7 +269,7 @@ export default function HomePage() {
             무엇이든 물어보세요
           </div>
 
-          <div style={{ marginBottom: '24px', position: 'relative' }}>
+          <div style={{ marginBottom: '16px', position: 'relative' }}>
             <img src="/baby.png" alt="챗봇" style={{ width: '90px', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }} />
             <div style={{
               position: 'absolute', top: -10, right: -10,
@@ -283,6 +294,7 @@ export default function HomePage() {
 
           <div style={{
             width: '100%',
+            maxWidth: '200px',
             padding: '12px',
             border: `1px solid ${COLORS.brand}`,
             color: COLORS.brand,
