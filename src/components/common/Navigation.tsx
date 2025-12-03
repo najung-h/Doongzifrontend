@@ -39,12 +39,12 @@ export default function Navigation() {
       zIndex: 100,
       backgroundColor: COLORS.bgTranslucent, // [수정] 배경색 변경
       backdropFilter: 'blur(10px)',
-      // borderBottom: `1px solid ${COLORS.border}`, // [수정] 테두리 색상 변경
+      borderBottom: `1px solid ${COLORS.border}`, // [수정] 테두리 색상 변경
       padding: '16px 40px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      // boxShadow: '0 4px 20px rgba(64, 34, 17, 0.05)' // 그림자 톤 조정
+      boxShadow: '0 4px 20px rgba(64, 34, 17, 0.05)' // 그림자 톤 조정
     }}>
       {/* Left Menu */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

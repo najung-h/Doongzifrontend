@@ -65,7 +65,7 @@ export default function HomePage() {
           marginBottom: '12px', 
           letterSpacing: '-0.5px' 
         }}>
-          따뜻한 둥지를 찾아드릴게요
+          안전한 둥지를 찾아드릴게요
         </h1>
         <p style={{ fontSize: '17px', color: COLORS.textSub, fontWeight: 500 }}>
           서류 스캔 한 번으로 위험 진단부터 체크리스트 관리까지!
