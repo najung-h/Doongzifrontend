@@ -53,7 +53,7 @@
 
     **페인포인트 :** <u>지식과 실행의 괴리</u>
 
-    ![사용자 페인포인트 인포그래픽](.public/user_needs_infographic.png)
+    ![사용자 페인포인트 인포그래픽](./public/user_needs_infographic.png)
 
     
 
