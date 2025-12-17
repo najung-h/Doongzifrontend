@@ -1,8 +1,7 @@
-![image.png](./public/둥지로고.png)
----
-### 부동산 임대차 계약 시 안전한 거래를 돕는 통합 웹 서비스
-![image.png](./public/doongzi_logo.png)
+# 둥지 - 집 찾는 아기새
+![image.png](./public/둥지logo.png)
 
+<br>
 
 ## 🏠 프로젝트 개요
 
