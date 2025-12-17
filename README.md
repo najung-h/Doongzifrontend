@@ -72,11 +72,11 @@
 
 - **나정현**: Frontend Lead, PM
 
-- **강한결**: AI Engineer (RAGFlow)
+- **강한결**: AI Engineer 
 
-- **박준아**: Backend (n8n Workflow)
+- **박준아**: Backend 
 
-- **정환승**: Feature Developer
+- **정환승**: AI Engineer 
 
   <br>
 
@@ -84,40 +84,81 @@
 ## ⚒️ 기능 소개
 
 ### 체크리스트 속 자동화 액션 연동
-| 계약서 분석 | 깡통전세 위험도 분석 | 보증보험 가입여부 확인 |
-| --- | --- | --- |
-| ![gif](./public/계약서분석.gif) | ![gif](./public/깡통전세.gif) | ![gif](./public/,) |
-| **임대차 계약서**에서 **독소 조항**을 찾아내고 **누락된 항목**이 없는지 확인 | 최신 실거래가 기반의 **깡통전세 위험도**를 분석 | **자동 검증 시스템**을 통해 복잡한 확인 절차를 **절반 이상 개선** |
+>**1. 계약서 분석**
+>
+>임대차 계약서에서 독소 조항을 찾아내고 누락된 항목이 없는지 분석해줍니다. 계약서상에서 확인해야 할 요소들을 이유, 해결방안과 함께 제공해 사용자가 바로 조치할 수 있도록 안내합니다.
+>
+>![gif](./public/계약서분석.gif)
+
+>**2. 깡통전세 위험도 분석**
+>
+>최신 실거래가를 기반으로 전세가 대비 담보여력을 산정해 깡통전세 위험도를 시각화해 제공합니다. 또한 안전 단계로 판단되더라도 근저당권 등 추가 위험요소를 반영해, **주의 단계로 전환되기까지 필요한 추가 여력(금액)**을 함께 제시하여 사용자의 합리적 의사결정을 돕습니다.
+>
+>![gif](./public/깡통전세.gif)
+
+>**3. 보증보험 가입여부 확인**
+>
+>등기부등본·건축물대장 기반으로 보증보험 가입 가능 여부를 **AI로 분석**해, 사용자가 직접 확인해야 했던 복잡한 체크 항목을 **50% 이상** 줄였습니다. 또한 문서 내 난해한 텍스트 정보를 핵심 포인트 중심으로 구조화·요약하여, 사용자 관점의 가독성과 사용 편의성을 향상시켰습니다.
+>
+>![gif](./public/.gif)
+
+<br>
 
 ### 체크리스트 보관 및 전송
-| PDF 추출 | Email 전송 | 
+| **PDF 추출** | **Email 전송** | 
 | --- | --- | 
 | ![gif](./public/체크리스트-PDF추출.gif) | ![gif](./public/체크리스트-이메일전송.gif) | 
-| 진행 상황이 담긴 체크리스트를 **PDF로 추출** 가능 | 사용자의 **이메일로도 간편하게 전송** 가능 | 
+| 진행 상황이 담긴 체크리스트를 **PDF로 추출** 할 수 있습니다. | 사용자의 **이메일로도 간편하게 전송**할 수 있습니다. | 
+
+<br>
 
 ### 대화형 법률 정보 안내
-| 어미새 챗봇 | 추천 법률 정보 | 
+| **어미새 챗봇** | **추천 법률 정보** | 
 | --- | --- |
 | ![gif](./public/챗봇대화.gif) | ![gif](./public/법률검색-추천법률.gif) | 
-| **최신 판례**와 **법률 용어**를 사용자의 **질문 맥락**에 맞춰 찾아주고, **이해 쉽게 설명**해주는 챗봇 | 대표적인 **판례·법률 큐레이션** 기능 | 
+| 관련 **최신 법률**을 기반으로 사용자의 질문에 맞는 답변을 제공합니다. 복잡한 법률 표현들을 사용자가 바로 이해할 수 있도록 친절하게 설명해줍니다. | 임대차에서 자주 문제되는 쟁점을 중심으로 **대표 판례·핵심 법률(조항/용어)**을 한곳에서 찾아볼 수 있는 기능입니다. | 
 
-
-## 📃 기능 상세 설명
-> ### 서비스 주요 기능 
-> ![image.png](./public/둥지스캔.png)
-> ![image.png](./public/둥지짓기.png)
-> ![image.png](./public/어미새챗봇.png)
+<br>
 
 ## 📚 기술스택
 ### 전체 기술 스택
+
+<img src="https://img.shields.io/badge/n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white"/>
+<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white"/>
+<img src="https://img.shields.io/badge/RAGFlow-5B5FC7?style=for-the-badge&logoColor=white"/>
+<img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white"/>
+<img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/>
+<img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
+<img src="https://img.shields.io/badge/Let%27s%20Encrypt%20SSL-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white"/>
+
+<br>
+
 ### n8n아키텍쳐
 
-- 문서 분석 로직
+>**Ragflow**
+>
+>![ragflow](./public/n8n_ragflow.png)
 
-  ![문서 분서 로직 노드](./public/문서분석_n8n.png)
+>**체크리스트**
+>- 깡통전세 위험도 분석
+>- 체크리스트 PDF 변환 · Email 전송
+>- 문서 분석 결과 PDF 변환 · Email 전송
+>
+>![checklist](./public/n8n_체크리스트.png)
+
+>**문서 스캔**
+>
+>- 문서 분석
+>- 체크리스트 자동 체크
+>- 보증보험 가입 가능 여부 확인
+>![scan](./public/n8n_문서스캔.png)
+
+<br>
 
 ### ERD 다이어그램
+>![ERD](./public/둥지ERD.png)
 
+<br>
 
 ## 📁 프로젝트 구조
 ```
@@ -167,14 +208,14 @@
         └── 📃 Guidelines.md
 ```
 
-
+<br>
 
 ## 🌐 배포
 
 - **도메인**: doongzi.site
 - **호스팅**: EC2 + Nginx + Let's Encrypt SSL
 
-
+<br>
 
 ## 🚀 시작하기
 
@@ -216,11 +257,4 @@ npm run build
 npm run build:dev
 ```
 
-
-## 🎨 주요 색상
-
-- **배경색**: `#FAF8F3` (밝은 크림) / 메시지 영역: `#E8E5CE` (연한 베이지)
-- **포인트 컬러**: `#8FBF4D` (올리브 그린) / 액센트: `#9ACD32` (연두색)
-- **AI 메시지**: `#FFFACD` (연한 노란색)
-- **사용자 메시지**: `#D4E5B8` (연한 그린)
 
